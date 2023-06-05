@@ -7,7 +7,7 @@ extend type Mutation {
   """
   Removes a monitor
   """
-  deleteMonitor(urn: String!): boolean
+  deleteMonitor(urn: String!): Boolean
 }
 
 
@@ -24,6 +24,11 @@ type Monitor implements Entity {
     The standard Entity Type
     """
     type: EntityType!
+
+    """
+    The entity being monitored
+    """
+    entity: Entity!
 
     """
     Key information about the monitor
@@ -50,8 +55,12 @@ type MonitorInfo {
     Information about an assertion evaluator monitor. Present if type is ASSERTION.
     """
     assertion: AssertionMonitor
-}
 
+    """
+    Information about the current status of a Monitor.
+    """
+    status: MonitorStatus!
+}
 
 """
 A type of monitor
@@ -116,7 +125,7 @@ type AssertionEvaluationParameters {
   """
   The parameters required to evaluate a dataset SLA assertion. Present if type is DATASET_SLA.
   """
-  datasetSlaParameters: optional DatasetSlaAssertionParameters
+  datasetSlaParameters: DatasetSlaAssertionParameters
 }
 
 """
@@ -210,23 +219,28 @@ type CronSchedule {
 }
 
 """
-The parameters for creating an Assertion Monitor
+The operational mode of a monitor
 """
-input AssertionEvaluationSpecInput {
-    """
-    The assertion being evaluated
-    """
-    assertion: String!
+enum MonitorMode {
+  """
+  The monitor is actively operating
+  """
+  ACTIVE
 
-    """
-    A cron schedule dictating when the assertion is evaluated.
-    """
-    schedule: CronScheduleInput!
+  """
+  The monitor is disabled, or not actively operating
+  """
+  INACTIVE
+}
 
-    """
-    Parameters required to evaluate the assertion
-    """
-    parameters: AssertionEvaluationParametersInput!
+"""
+Details about the status of a monitor.
+"""
+type MonitorStatus {
+  """
+  The operational mode of the monitor
+  """
+  mode: MonitorMode!
 }
 
 """
@@ -318,13 +332,25 @@ input AuditLogSpecInput {
 Input for creating an Assertion Monitor. Assumes that the assertion under monitor has already been created.
 """
 input CreateAssertionMonitorInput {
+
     """
-    The urn of the assertion that monitor should evaluate.
+    The urn of the entity being monitored.
+    This should exactly match the urn of the entity against which the assertion was defined.
+    """
+    entityUrn: String!
+
+    """
+    The assertion to be evaluated
     """
     assertionUrn: String!
 
     """
-    The specifications for evaluating the assertion.
+    A cron schedule dictating when the assertion is evaluated.
     """
-    evaluationSpec: AssertionEvaluationSpecInput!
+    schedule: CronScheduleInput!
+
+    """
+    Parameters required to evaluate the assertion
+    """
+    parameters: AssertionEvaluationParametersInput!
 }

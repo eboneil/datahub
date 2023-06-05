@@ -35,6 +35,7 @@ import com.linkedin.metadata.secret.SecretService;
 import com.linkedin.metadata.service.DataProductService;
 import com.linkedin.metadata.service.OwnershipTypeService;
 import com.linkedin.metadata.service.AssertionService;
+import com.linkedin.metadata.service.MonitorService;
 import com.linkedin.metadata.test.TestEngine;
 import com.linkedin.metadata.service.QueryService;
 import com.linkedin.metadata.service.SettingsService;
@@ -187,6 +188,10 @@ public class GraphQLEngineFactory {
   @Qualifier("assertionService")
   private AssertionService _assertionsService;
 
+  @Autowired
+  @Qualifier("monitorService")
+  private MonitorService _monitorService;
+
   @Value("${platformAnalytics.enabled}") // TODO: Migrate to DATAHUB_ANALYTICS_ENABLED
   private Boolean isAnalyticsEnabled;
 
@@ -237,6 +242,7 @@ public class GraphQLEngineFactory {
     args.setTestEngine(_testEngine);
     args.setProposalService(_proposalService);
     args.setAssertionService(_assertionsService);
+    args.setMonitorService(_monitorService);
 
     return new GmsGraphQLEngine(
         args

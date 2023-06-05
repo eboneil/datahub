@@ -46,6 +46,8 @@ graphqlCodegen {
         "$projectDir/src/main/resources/lineage.graphql".toString(),
         // Connections not in OSS
         "$projectDir/src/main/resources/connection.graphql".toString(),
+        // Monitor not in OSS
+        "$projectDir/src/main/resources/monitor.graphql".toString(),
     ]
     outputDir = new File("$projectDir/src/mainGeneratedGraphQL/java")
     packageName = "com.linkedin.datahub.graphql.generated"

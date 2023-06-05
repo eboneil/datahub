@@ -218,7 +218,6 @@ public class AssertionServiceTest {
         .setOnSuccess(new AssertionActionArray())
         .setOnFailure(new AssertionActionArray());
 
-
     Mockito.doAnswer(invocation -> {
       List<MetadataChangeProposal> aspects = invocation.getArgument(0);
       Assert.assertEquals(aspects.size(), 2);

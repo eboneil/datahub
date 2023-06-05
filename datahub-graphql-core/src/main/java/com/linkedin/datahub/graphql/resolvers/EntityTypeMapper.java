@@ -40,6 +40,7 @@ public class EntityTypeMapper {
           .put(EntityType.DATA_PRODUCT, Constants.DATA_PRODUCT_ENTITY_NAME)
           .put(EntityType.DATAHUB_CONNECTION, Constants.DATAHUB_CONNECTION_ENTITY_NAME)
           .put(EntityType.ASSERTION, Constants.ASSERTION_ENTITY_NAME)
+          .put(EntityType.MONITOR, Constants.MONITOR_ENTITY_NAME)
           .build();
 
   private static final Map<String, EntityType> ENTITY_NAME_TO_TYPE =

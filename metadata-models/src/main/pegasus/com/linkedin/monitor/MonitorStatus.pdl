@@ -1,0 +1,25 @@
+namespace com.linkedin.monitor
+
+import com.linkedin.common.CustomProperties
+import com.linkedin.common.ExternalReference
+
+/**
+ * The status of an asset monitor
+ */
+record MonitorStatus {
+    /**
+    * The current operation mode of the monitor
+    */
+    @Searchable = { }
+    mode: enum MonitorMode {
+      /**
+       * The monitor should be actively operating.
+       */
+      ACTIVE
+
+      /**
+       * The monitor is not actively operating.
+       */
+       INACTIVE
+    }
+}

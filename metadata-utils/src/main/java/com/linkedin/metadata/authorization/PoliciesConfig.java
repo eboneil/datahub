@@ -127,6 +127,12 @@ public class PoliciesConfig {
       "Manage Connections",
       "Manage connections to external platforms.");
 
+  // Acryl-Main only.
+  public static final Privilege MANAGE_MONITORS = Privilege.of(
+      "MANAGE_MONITORS",
+      "Manage Monitors",
+      "Create, update, and delete any data asset monitors.");
+
   public static final List<Privilege> PLATFORM_PRIVILEGES = ImmutableList.of(
       MANAGE_POLICIES_PRIVILEGE,
       MANAGE_USERS_AND_GROUPS_PRIVILEGE,
@@ -149,7 +155,8 @@ public class PoliciesConfig {
       MANAGE_GLOBAL_OWNERSHIP_TYPES,
       MANAGE_GLOBAL_SETTINGS,
       MANAGE_GLOBAL_VIEWS,
-      MANAGE_CONNECTIONS_PRIVILEGE
+      MANAGE_CONNECTIONS_PRIVILEGE,
+      MANAGE_MONITORS
   );
 
   // Resource Privileges //
@@ -353,6 +360,12 @@ public class PoliciesConfig {
       "Edit Dataset Queries",
       "The ability to edit the Queries for a Dataset.");
 
+  // Acryl-main Only
+  public static final Privilege EDIT_MONITORS_PRIVILEGE = Privilege.of(
+      "EDIT_MONITORS",
+      "Edit Monitors",
+      "The ability to edit monitors for the entity.");
+
   // Tag Privileges
   public static final Privilege EDIT_TAG_COLOR_PRIVILEGE = Privilege.of(
       "EDIT_TAG_COLOR",
@@ -454,7 +467,9 @@ public class PoliciesConfig {
               EDIT_ENTITY_ASSERTIONS_PRIVILEGE,
               EDIT_LINEAGE_PRIVILEGE,
               EDIT_ENTITY_EMBED_PRIVILEGE,
-              EDIT_QUERIES_PRIVILEGE))
+              EDIT_QUERIES_PRIVILEGE,
+              EDIT_MONITORS_PRIVILEGE) // Acryl-Main only
+      )
           .flatMap(Collection::stream)
           .collect(Collectors.toList())
   );

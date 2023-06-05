@@ -338,6 +338,12 @@ public class Constants {
   public static final String ANOMALY_INFO_ASPECT_NAME = "anomalyInfo";
   public static final String ANOMALIES_SUMMARY_ASPECT_NAME = "anomaliesSummary";
 
+  // Monitor
+  public static final String MONITOR_ENTITY_NAME = "monitor";
+  public static final String MONITOR_KEY_ASPECT_NAME = "monitorKey";
+  public static final String MONITOR_INFO_ASPECT_NAME = "monitorInfo";
+
+
   /**
    * Relationships
    */

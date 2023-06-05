@@ -26,6 +26,7 @@ import com.linkedin.datahub.graphql.generated.ActionRequest;
 import com.linkedin.datahub.graphql.generated.ActorFilter;
 import com.linkedin.datahub.graphql.generated.AggregationMetadata;
 import com.linkedin.datahub.graphql.generated.Assertion;
+import com.linkedin.datahub.graphql.generated.AssertionEvaluationSpec;
 import com.linkedin.datahub.graphql.generated.AutoCompleteResultForEntity;
 import com.linkedin.datahub.graphql.generated.AutoCompleteResults;
 import com.linkedin.datahub.graphql.generated.BrowseResults;
@@ -39,6 +40,7 @@ import com.linkedin.datahub.graphql.generated.CorpUser;
 import com.linkedin.datahub.graphql.generated.CorpUserInfo;
 import com.linkedin.datahub.graphql.generated.CreateGlossaryEntityProposalProperties;
 import com.linkedin.datahub.graphql.generated.CorpUserViewsSettings;
+import com.linkedin.datahub.graphql.generated.Monitor;
 import com.linkedin.datahub.graphql.generated.OwnershipTypeEntity;
 import com.linkedin.datahub.graphql.generated.Dashboard;
 import com.linkedin.datahub.graphql.generated.DashboardInfo;
@@ -188,6 +190,8 @@ import com.linkedin.datahub.graphql.resolvers.load.LoadableTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.load.OwnerTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.load.ProposalsResolver;
 import com.linkedin.datahub.graphql.resolvers.load.TimeSeriesAspectResolver;
+import com.linkedin.datahub.graphql.resolvers.monitor.CreateAssertionMonitorResolver;
+import com.linkedin.datahub.graphql.resolvers.monitor.DeleteMonitorResolver;
 import com.linkedin.datahub.graphql.resolvers.proposal.AcceptProposalResolver;
 import com.linkedin.datahub.graphql.resolvers.mutate.AddLinkResolver;
 import com.linkedin.datahub.graphql.resolvers.mutate.AddOwnerResolver;
@@ -320,6 +324,7 @@ import com.linkedin.datahub.graphql.types.mlmodel.MLFeatureType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLModelGroupType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLModelType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLPrimaryKeyType;
+import com.linkedin.datahub.graphql.types.monitor.MonitorType;
 import com.linkedin.datahub.graphql.types.notebook.NotebookType;
 import com.linkedin.datahub.graphql.types.ownership.OwnershipType;
 import com.linkedin.datahub.graphql.types.policy.DataHubPolicyType;
@@ -348,6 +353,7 @@ import com.linkedin.metadata.secret.SecretService;
 import com.linkedin.metadata.service.AssertionService;
 import com.linkedin.metadata.service.DataProductService;
 import com.linkedin.metadata.service.OwnershipTypeService;
+import com.linkedin.metadata.service.MonitorService;
 import com.linkedin.metadata.service.QueryService;
 import com.linkedin.metadata.service.SettingsService;
 import com.linkedin.metadata.service.ViewService;
@@ -422,6 +428,7 @@ public class GmsGraphQLEngine {
     private final QueryService queryService;
     private final DataProductService dataProductService;
     private final AssertionService assertionService;
+    private final MonitorService monitorService; // Acryl-only
 
     private final FeatureFlags featureFlags;
 
@@ -468,6 +475,7 @@ public class GmsGraphQLEngine {
     private final DataProductType dataProductType;
     private final OwnershipType ownershipType;
     private final DataHubConnectionType connectionType; // Saas-ONLY
+    private final MonitorType monitorType; // Saas-ONLY
 
     // SaaS only
     private final ProposalService proposalService;
@@ -526,6 +534,7 @@ public class GmsGraphQLEngine {
         this.queryService = args.queryService;
         this.dataProductService = args.dataProductService;
         this.assertionService = args.assertionService;
+        this.monitorService = args.monitorService;
 
         this.ingestionConfiguration = Objects.requireNonNull(args.ingestionConfiguration);
         this.authenticationConfiguration = Objects.requireNonNull(args.authenticationConfiguration);
@@ -571,6 +580,7 @@ public class GmsGraphQLEngine {
         this.dataProductType = new DataProductType(entityClient);
         this.ownershipType = new OwnershipType(entityClient);
         this.connectionType = new DataHubConnectionType(entityClient, secretService); // SaaS only
+        this.monitorType = new MonitorType(entityClient); // SaaS only
 
         // Init Lists
         this.entityTypes = ImmutableList.of(
@@ -605,7 +615,8 @@ public class GmsGraphQLEngine {
             dataProductType,
             ownershipType,
             queryType,
-            connectionType // Saas only
+            connectionType, // Saas only
+            monitorType
         );
         this.loadableTypes = new ArrayList<>(entityTypes);
         this.ownerTypes = ImmutableList.of(corpUserType, corpGroupType);
@@ -681,6 +692,7 @@ public class GmsGraphQLEngine {
         configureQueryEntityResolvers(builder);
         configureOwnershipTypeResolver(builder);
         configureConnectionResolvers(builder); // Not in OSS
+        configureMonitorResolvers(builder); // Not in OSS
     }
 
     public GraphQLEngine.Builder builder() {
@@ -704,6 +716,8 @@ public class GmsGraphQLEngine {
             .addSchema(fileBasedSchema(LINEAGE_SCHEMA_FILE))
             // Connections not in OSS
             .addSchema(fileBasedSchema(CONNECTIONS_SCHEMA_FILE))
+            // Monitors not in OSS
+            .addSchema(fileBasedSchema(MONITORS_SCHEMA_FILE))
             .addDataLoaders(loaderSuppliers(loadableTypes))
             .addDataLoader("Aspect", context -> createDataLoader(aspectType, context))
             .configureRuntimeWiring(this::configureRuntimeWiring);
@@ -2000,5 +2014,24 @@ public class GmsGraphQLEngine {
                         return connection.getPlatform() != null ? connection.getPlatform().getUrn() : null;
                     })
             ));
+    }
+
+    private void configureMonitorResolvers(final RuntimeWiring.Builder builder) {
+        builder.type("Mutation", typeWiring -> typeWiring
+            .dataFetcher("deleteMonitor", new DeleteMonitorResolver(entityClient, entityService))
+            .dataFetcher("createAssertionMonitor", new CreateAssertionMonitorResolver(monitorService))
+        );
+        builder.type("AssertionEvaluationSpec", typeWiring -> typeWiring
+            .dataFetcher("assertion", new LoadableTypeResolver<>(assertionType,
+                (env) -> {
+                    final AssertionEvaluationSpec evaluationSpec = env.getSource();
+                    return evaluationSpec.getAssertion() != null ? evaluationSpec.getAssertion().getUrn() : null;
+                })
+        ));
+        builder.type("Monitor", typeWiring -> typeWiring
+            .dataFetcher("entity", new EntityTypeResolver(
+                entityTypes,
+                (env) -> ((Monitor) env.getSource()).getEntity()))
+        );
     }
 }

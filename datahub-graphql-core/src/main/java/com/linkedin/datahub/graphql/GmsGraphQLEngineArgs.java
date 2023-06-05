@@ -29,6 +29,7 @@ import com.linkedin.metadata.service.DataProductService;
 import com.linkedin.metadata.service.AssertionService;
 import com.linkedin.metadata.service.LineageService;
 import com.linkedin.metadata.service.OwnershipTypeService;
+import com.linkedin.metadata.service.MonitorService;
 import com.linkedin.metadata.service.QueryService;
 import com.linkedin.metadata.service.SettingsService;
 import com.linkedin.metadata.service.ViewService;
@@ -83,4 +84,5 @@ public class GmsGraphQLEngineArgs {
     EntitySearchService entitySearchService;
     TestEngine testEngine;
     ProposalService proposalService;
+    MonitorService monitorService;
 }

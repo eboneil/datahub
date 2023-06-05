@@ -4,7 +4,7 @@ import com.linkedin.common.CustomProperties
 import com.linkedin.common.ExternalReference
 
 /**
- * Information about a data monitor.
+ * Information about an asset monitor.
  */
 @Aspect = {
   "name": "monitorInfo"
@@ -20,6 +20,11 @@ record MonitorInfo includes CustomProperties, ExternalReference {
        */
       ASSERTION
     }
+
+    /**
+    * Information about the status of a monitor.
+    */
+    status: MonitorStatus
 
     /**
     * Information about the assertions being monitored. Required if type is ASSERTION.
