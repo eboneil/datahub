@@ -8,9 +8,9 @@ import com.linkedin.assertion.AssertionActionArray;
 import com.linkedin.assertion.AssertionActions;
 import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.assertion.AssertionType;
-import com.linkedin.assertion.CronSchedule;
 import com.linkedin.assertion.SlaAssertionInfo;
 import com.linkedin.assertion.SlaAssertionSchedule;
+import com.linkedin.assertion.SlaCronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.datahub.graphql.QueryContext;
@@ -66,7 +66,7 @@ public class CreateSlaAssertionResolverTest {
               .setType(com.linkedin.assertion.SlaAssertionType.DATASET_CHANGE)
               .setSchedule(new SlaAssertionSchedule()
                   .setType(com.linkedin.assertion.SlaAssertionScheduleType.CRON)
-                  .setCron(new CronSchedule()
+                  .setCron(new SlaCronSchedule()
                     .setCron("* * * * *")
                     .setTimezone("America / Los_Angeles")
                   )

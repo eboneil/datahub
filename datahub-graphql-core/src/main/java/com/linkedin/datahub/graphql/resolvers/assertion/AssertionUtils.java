@@ -9,9 +9,9 @@ import com.linkedin.assertion.AssertionActionType;
 import com.linkedin.assertion.AssertionActions;
 import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.assertion.AssertionStdParameterType;
-import com.linkedin.assertion.CronSchedule;
 import com.linkedin.assertion.FixedIntervalSchedule;
 import com.linkedin.assertion.SlaAssertionScheduleType;
+import com.linkedin.assertion.SlaCronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.data.template.SetMode;
 import com.linkedin.datahub.graphql.QueryContext;
@@ -56,7 +56,7 @@ public class AssertionUtils {
     final com.linkedin.assertion.SlaAssertionSchedule result = new com.linkedin.assertion.SlaAssertionSchedule();
     result.setType(SlaAssertionScheduleType.valueOf(schedule.getType().toString()));
     if (schedule.getCron() != null) {
-      result.setCron(new CronSchedule()
+      result.setCron(new SlaCronSchedule()
         .setCron(schedule.getCron().getCron())
         .setTimezone(schedule.getCron().getTimezone())
         .setWindowStartOffsetMs(schedule.getCron().getWindowStartOffsetMs(), SetMode.IGNORE_NULL)

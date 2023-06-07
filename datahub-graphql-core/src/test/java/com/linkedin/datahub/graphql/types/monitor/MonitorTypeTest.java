@@ -99,7 +99,7 @@ public class MonitorTypeTest {
     assertEquals(monitor.getType(), EntityType.MONITOR);
     assertEquals(monitor.getEntity().getUrn(), TEST_ENTITY_URN.toString());
     assertEquals(monitor.getInfo().getType().toString(), MonitorType.ASSERTION.toString());
-    assertEquals(monitor.getInfo().getAssertion(), null);
+    assertEquals(monitor.getInfo().getAssertionMonitor(), null);
 
     // Assert second element is null.
     assertNull(result.get(1));

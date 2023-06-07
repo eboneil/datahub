@@ -61,7 +61,7 @@ input CreateDatasetAssertionInput {
 }
 
 """
-Input for updating an SLA Assertion
+Input for creating an SLA Assertion
 """
 input CreateSlaAssertionInput {
   """
@@ -118,6 +118,7 @@ input UpdateDatasetAssertionInput {
   Optional actions to apply on success or failure of the assertion
   """
   actions: AssertionActionsInput
+
 }
 
 """
@@ -360,7 +361,7 @@ type SlaAssertionInfo {
   """
   Produce FAIL Assertion Result if the asset is not updated on the cadence and within the time range described by the schedule.
   """
-  schedule: SlaAssertionSchedule
+  schedule: SlaAssertionSchedule!
 }
 
 """

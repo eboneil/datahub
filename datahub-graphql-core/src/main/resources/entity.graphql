@@ -6587,10 +6587,10 @@ type PartitionSpec {
   """
   The partition identifier
   """
-  partition: String!
+  partition: String
 
   """
-  The optional time window partition information
+  The optional time window partition information - required if type is TIMESTAMP_FIELD.
   """
   timePartition: TimeWindow
 }
@@ -6615,7 +6615,6 @@ type TimeWindow {
   """
   durationMillis: Long!
 }
-
 
 """
 An assertion represents a programmatic validation, check, or test performed periodically against another Entity.

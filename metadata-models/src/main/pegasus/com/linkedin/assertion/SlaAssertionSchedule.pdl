@@ -56,7 +56,7 @@ record SlaAssertionSchedule {
   /**
    * A cron schedule. This field is required when type is CRON.
    */
-  cron: optional CronSchedule
+  cron: optional SlaCronSchedule
 
   /**
    * A fixed interval schedule. This field is required when type is FIXED_INTERVAL.

@@ -225,7 +225,7 @@ public class AssertionMapper {
   }
 
   private static SlaCronSchedule mapCronSchedule(
-      final com.linkedin.assertion.CronSchedule gmsCronSchedule) {
+      final com.linkedin.assertion.SlaCronSchedule gmsCronSchedule) {
     SlaCronSchedule cronSchedule = new SlaCronSchedule();
     cronSchedule.setCron(gmsCronSchedule.getCron());
     cronSchedule.setTimezone(gmsCronSchedule.getTimezone());

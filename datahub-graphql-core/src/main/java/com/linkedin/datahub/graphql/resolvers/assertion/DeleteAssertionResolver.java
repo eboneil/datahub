@@ -45,6 +45,7 @@ public class DeleteAssertionResolver implements DataFetcher<CompletableFuture<Bo
             _entityClient.deleteEntity(assertionUrn, context.getAuthentication());
 
             // Asynchronously Delete all references to the entity (to return quickly)
+            // TODO: Actually delete any monitors associated with the assertion.
             CompletableFuture.runAsync(() -> {
               try {
                 _entityClient.deleteEntityReferences(assertionUrn, context.getAuthentication());

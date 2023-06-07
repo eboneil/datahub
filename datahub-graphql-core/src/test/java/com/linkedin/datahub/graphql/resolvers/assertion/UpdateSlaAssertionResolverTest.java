@@ -8,10 +8,10 @@ import com.linkedin.assertion.AssertionActionArray;
 import com.linkedin.assertion.AssertionActions;
 import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.assertion.AssertionType;
-import com.linkedin.assertion.CronSchedule;
 import com.linkedin.assertion.SlaAssertionInfo;
 import com.linkedin.assertion.SlaAssertionSchedule;
 import com.linkedin.assertion.SlaAssertionType;
+import com.linkedin.assertion.SlaCronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.datahub.graphql.QueryContext;
@@ -65,7 +65,7 @@ public class UpdateSlaAssertionResolverTest {
               .setType(SlaAssertionType.DATASET_CHANGE)
               .setSchedule(new SlaAssertionSchedule()
                   .setType(com.linkedin.assertion.SlaAssertionScheduleType.CRON)
-                  .setCron(new CronSchedule()
+                  .setCron(new SlaCronSchedule()
                       .setCron("* * * * *")
                       .setTimezone("America / Los Angeles")
                   )
@@ -156,10 +156,7 @@ public class UpdateSlaAssertionResolverTest {
   public void testGetAssertionServiceException() throws Exception {
     // Update resolver
     AssertionService mockService = Mockito.mock(AssertionService.class);
-    Mockito.doThrow(RuntimeException.class).when(mockService).createDatasetAssertion(
-        Mockito.any(),
-        Mockito.any(),
-        Mockito.any(),
+    Mockito.doThrow(RuntimeException.class).when(mockService).createSlaAssertion(
         Mockito.any(),
         Mockito.any(),
         Mockito.any(),

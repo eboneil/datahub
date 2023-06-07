@@ -60,7 +60,7 @@ public class MonitorMapperTest {
     Assert.assertEquals(info.getType().toString(), output.getInfo().getType().toString());
     Assert.assertEquals(info.getStatus().getMode().toString(), output.getInfo().getStatus().getMode().toString());
     if (info.hasAssertionMonitor()) {
-      verifyAssertionMonitor(info.getAssertionMonitor(), output.getInfo().getAssertion());
+      verifyAssertionMonitor(info.getAssertionMonitor(), output.getInfo().getAssertionMonitor());
     }
   }
 

@@ -54,7 +54,7 @@ type MonitorInfo {
     """
     Information about an assertion evaluator monitor. Present if type is ASSERTION.
     """
-    assertion: AssertionMonitor
+    assertionMonitor: AssertionMonitor
 
     """
     Information about the current status of a Monitor.

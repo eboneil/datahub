@@ -8,7 +8,7 @@ import com.linkedin.assertion.AssertionStdParameter;
 import com.linkedin.assertion.AssertionStdParameterType;
 import com.linkedin.assertion.AssertionStdParameters;
 import com.linkedin.assertion.AssertionType;
-import com.linkedin.assertion.CronSchedule;
+import com.linkedin.assertion.SlaCronSchedule;
 import com.linkedin.assertion.DatasetAssertionInfo;
 import com.linkedin.assertion.DatasetAssertionScope;
 import com.linkedin.assertion.SlaAssertionInfo;
@@ -110,7 +110,7 @@ public class AssertionMapperTest {
     }
   }
 
-  private void verifyCronSchedule(CronSchedule input, com.linkedin.datahub.graphql.generated.SlaCronSchedule output) {
+  private void verifyCronSchedule(SlaCronSchedule input, com.linkedin.datahub.graphql.generated.SlaCronSchedule output) {
     Assert.assertEquals(output.getCron(), input.getCron());
     Assert.assertEquals(output.getTimezone(), input.getTimezone());
     if (input.hasWindowStartOffsetMs()) {
@@ -224,8 +224,8 @@ public class AssertionMapperTest {
     return schedule;
   }
 
-  private CronSchedule createCronSchedule() {
-    CronSchedule cronSchedule = new CronSchedule();
+  private SlaCronSchedule createCronSchedule() {
+    SlaCronSchedule cronSchedule = new SlaCronSchedule();
     cronSchedule.setCron("0 0 * * *");
     cronSchedule.setTimezone("UTC");
     return cronSchedule;

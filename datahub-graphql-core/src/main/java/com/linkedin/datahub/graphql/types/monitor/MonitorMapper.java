@@ -58,7 +58,7 @@ public class MonitorMapper {
     MonitorInfo monitorInfo = new MonitorInfo();
     monitorInfo.setType(MonitorType.valueOf(backendMonitorInfo.getType().name()));
     if (backendMonitorInfo.hasAssertionMonitor()) {
-      monitorInfo.setAssertion(mapAssertionMonitor(backendMonitorInfo.getAssertionMonitor()));
+      monitorInfo.setAssertionMonitor(mapAssertionMonitor(backendMonitorInfo.getAssertionMonitor()));
     }
     monitorInfo.setStatus(mapMonitorStatus(backendMonitorInfo.getStatus()));
     return monitorInfo;

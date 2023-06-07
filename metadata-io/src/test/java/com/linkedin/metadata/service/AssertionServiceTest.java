@@ -197,7 +197,8 @@ public class AssertionServiceTest {
         Mockito.mock(Authentication.class));
 
     // Test method
-    Urn result = service.createDatasetAssertion(entityUrn, scope, null, null, operator, null, null, Mockito.mock(Authentication.class));
+    Urn result = service.createDatasetAssertion(entityUrn, scope, null, null, operator, null,
+        null, Mockito.mock(Authentication.class));
 
     // Assert result
     Assert.assertEquals(result.getEntityType(), "assertion");
@@ -237,7 +238,7 @@ public class AssertionServiceTest {
         operator,
         parameters,
         actions,
-      Mockito.mock(Authentication.class));
+       Mockito.mock(Authentication.class));
 
     // Assert result
     Assert.assertEquals(result.getEntityType(), "assertion");
