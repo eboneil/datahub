@@ -1,6 +1,7 @@
 package com.linkedin.datahub.graphql.types.common.mappers;
 
 import com.linkedin.common.urn.Urn;
+import com.linkedin.datahub.graphql.generated.Anomaly;
 import com.linkedin.datahub.graphql.generated.Assertion;
 import com.linkedin.datahub.graphql.generated.Chart;
 import com.linkedin.datahub.graphql.generated.Container;
@@ -204,6 +205,11 @@ public class UrnToEntityMapper implements ModelMapper<com.linkedin.common.urn.Ur
       partialEntity = new Incident();
       ((Incident) partialEntity).setUrn(input.toString());
       ((Incident) partialEntity).setType(EntityType.INCIDENT);
+    }
+    if (input.getEntityType().equals(ANOMALY_ENTITY_NAME)) {
+      partialEntity = new Anomaly();
+      ((Anomaly) partialEntity).setUrn(input.toString());
+      ((Anomaly) partialEntity).setType(EntityType.ANOMALY);
     }
     return partialEntity;
   }

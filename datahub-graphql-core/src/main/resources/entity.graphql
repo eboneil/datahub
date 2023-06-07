@@ -936,6 +936,11 @@ enum EntityType {
     A DataHub incident - SaaS only
     """
     INCIDENT
+
+    """
+    An anomaly detected or an asset
+    """
+    ANOMALY
 }
 
 """

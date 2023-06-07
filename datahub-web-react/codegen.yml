@@ -14,6 +14,7 @@ schema:
     - '../datahub-graphql-core/src/main/resources/step.graphql'
     - '../datahub-graphql-core/src/main/resources/lineage.graphql'
     - '../datahub-graphql-core/src/main/resources/incident.graphql'
+    - '../datahub-graphql-core/src/main/resources/anomaly.graphql'
 config:
     scalars:
         Long: number

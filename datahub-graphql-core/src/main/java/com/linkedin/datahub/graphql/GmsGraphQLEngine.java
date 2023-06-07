@@ -25,6 +25,8 @@ import com.linkedin.datahub.graphql.generated.AccessTokenMetadata;
 import com.linkedin.datahub.graphql.generated.ActionRequest;
 import com.linkedin.datahub.graphql.generated.ActorFilter;
 import com.linkedin.datahub.graphql.generated.AggregationMetadata;
+import com.linkedin.datahub.graphql.generated.Anomaly;
+import com.linkedin.datahub.graphql.generated.AnomalySource;
 import com.linkedin.datahub.graphql.generated.Assertion;
 import com.linkedin.datahub.graphql.generated.AssertionEvaluationSpec;
 import com.linkedin.datahub.graphql.generated.AutoCompleteResultForEntity;
@@ -40,6 +42,7 @@ import com.linkedin.datahub.graphql.generated.CorpUser;
 import com.linkedin.datahub.graphql.generated.CorpUserInfo;
 import com.linkedin.datahub.graphql.generated.CreateGlossaryEntityProposalProperties;
 import com.linkedin.datahub.graphql.generated.CorpUserViewsSettings;
+import com.linkedin.datahub.graphql.generated.EntityAnomaliesResult;
 import com.linkedin.datahub.graphql.generated.Monitor;
 import com.linkedin.datahub.graphql.generated.OwnershipTypeEntity;
 import com.linkedin.datahub.graphql.generated.Dashboard;
@@ -105,6 +108,7 @@ import com.linkedin.datahub.graphql.generated.UserUsageCounts;
 import com.linkedin.datahub.graphql.resolvers.MeResolver;
 import com.linkedin.datahub.graphql.resolvers.actionrequest.ListActionRequestsResolver;
 import com.linkedin.datahub.graphql.resolvers.actionrequest.ListRejectedActionRequestsResolver;
+import com.linkedin.datahub.graphql.resolvers.anomaly.EntityAnomaliesResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.AssertionRunEventResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.CreateDatasetAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.CreateSlaAssertionResolver;
@@ -297,6 +301,7 @@ import com.linkedin.datahub.graphql.types.BrowsableEntityType;
 import com.linkedin.datahub.graphql.types.EntityType;
 import com.linkedin.datahub.graphql.types.LoadableType;
 import com.linkedin.datahub.graphql.types.SearchableEntityType;
+import com.linkedin.datahub.graphql.types.anomaly.AnomalyType;
 import com.linkedin.datahub.graphql.types.aspect.AspectType;
 import com.linkedin.datahub.graphql.types.assertion.AssertionType;
 import com.linkedin.datahub.graphql.types.auth.AccessTokenMetadataType;
@@ -481,6 +486,7 @@ public class GmsGraphQLEngine {
     private final IncidentType incidentType; // SaaS only
 
     // SaaS only
+    private final AnomalyType anomalyType;
     private final ProposalService proposalService;
 
     /**
@@ -585,6 +591,7 @@ public class GmsGraphQLEngine {
         this.connectionType = new DataHubConnectionType(entityClient, secretService); // SaaS only
         this.monitorType = new MonitorType(entityClient); // SaaS only
         this.incidentType = new IncidentType(entityClient); // SaaS only
+        this.anomalyType = new AnomalyType(entityClient); // SaaS only
 
         // Init Lists
         this.entityTypes = ImmutableList.of(
@@ -621,7 +628,8 @@ public class GmsGraphQLEngine {
             queryType,
             connectionType, // Saas only
             monitorType, // SaaS only
-            incidentType // SaaS only
+            incidentType, // SaaS only
+            anomalyType // SaaS only
         );
         this.loadableTypes = new ArrayList<>(entityTypes);
         this.ownerTypes = ImmutableList.of(corpUserType, corpGroupType);
@@ -687,6 +695,7 @@ public class GmsGraphQLEngine {
         configureSchemaFieldResolvers(builder);
         configureEntityPathResolvers(builder);
         configureActionRequestResolvers(builder); // Not in OSS
+        configureAnomalyResolvers(builder); // Not in OSS
         configureResolvedAuditStampResolvers(builder);
         configureGlobalSettingsResolvers(builder);
         configureRoleResolvers(builder);
@@ -724,6 +733,8 @@ public class GmsGraphQLEngine {
             .addSchema(fileBasedSchema(CONNECTIONS_SCHEMA_FILE))
             // Monitors not in OSS
             .addSchema(fileBasedSchema(MONITORS_SCHEMA_FILE))
+            // Anomalies not in OSS
+            .addSchema(fileBasedSchema(ANOMALY_SCHEMA_FILE))
             .addDataLoaders(loaderSuppliers(loadableTypes))
             .addDataLoader("Aspect", context -> createDataLoader(aspectType, context))
             .configureRuntimeWiring(this::configureRuntimeWiring);
@@ -2026,6 +2037,43 @@ public class GmsGraphQLEngine {
                         final IncidentSource incidentSource = env.getSource();
                         return incidentSource.getSource() != null ? incidentSource.getSource().getUrn() : null;
                     }))
+        );
+    }
+
+
+    private void configureAnomalyResolvers(final RuntimeWiring.Builder builder) {
+        builder.type("Anomaly", typeWiring -> typeWiring
+            .dataFetcher("entity", new EntityTypeResolver(
+                entityTypes,
+                (env) -> ((Anomaly) env.getSource()).getEntity()))
+            .dataFetcher("relationships", new EntityRelationshipsResultResolver(graphClient))
+        );
+        builder.type("AnomalySource", typeWiring -> typeWiring
+            .dataFetcher("source",
+                new LoadableTypeResolver<>(assertionType,
+                    (env) -> {
+                        final AnomalySource anomalySource = env.getSource();
+                        return anomalySource.getSource() != null ? anomalySource.getSource().getUrn() : null;
+                    }
+                )
+            )
+        );
+        builder.type("EntityAnomaliesResult", typeWiring -> typeWiring
+            .dataFetcher("anomalies",
+                new LoadableTypeBatchResolver<>(anomalyType,
+                    (env) -> ((EntityAnomaliesResult) env.getSource()).getAnomalies().stream()
+                        .map(Anomaly::getUrn)
+                        .collect(Collectors.toList())))
+        );
+        builder.type("Dataset", typeWiring -> typeWiring
+            .dataFetcher("anomalies",
+                new EntityAnomaliesResolver(entityClient)
+            )
+        );
+        builder.type("DataJob", typeWiring -> typeWiring
+            .dataFetcher("anomalies",
+                new EntityAnomaliesResolver(entityClient)
+            )
         );
     }
 

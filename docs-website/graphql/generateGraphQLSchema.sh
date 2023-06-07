@@ -17,3 +17,5 @@ cat ../../datahub-graphql-core/src/main/resources/timeline.graphql >> combined.g
 cat ../../datahub-graphql-core/src/main/resources/step.graphql >> combined.graphql
 cat ../../datahub-graphql-core/src/main/resources/lineage.graphql >> combined.graphql
 cat ../../datahub-graphql-core/src/main/resources/incident.graphql >> combined.graphql
+cat ../../datahub-graphql-core/src/main/resources/anomaly.graphql >> combined.graphql
+cat ../../datahub-graphql-core/src/main/resources/monitor.graphql >> combined.graphql

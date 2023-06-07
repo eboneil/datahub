@@ -23,6 +23,7 @@ public class Constants {
     public static final String TESTS_SCHEMA_FILE = "tests.graphql";
     public static final String STEPS_SCHEMA_FILE = "step.graphql";
     public static final String LINEAGE_SCHEMA_FILE = "lineage.graphql";
+    public static final String ANOMALY_SCHEMA_FILE = "anomaly.graphql";
     public static final String BROWSE_PATH_DELIMITER = "/";
     public static final String VERSION_STAMP_FIELD_NAME = "versionStamp";
     // Assertion extensions not in OSS
