@@ -112,7 +112,7 @@ export const IncidentTab = () => {
         customType: incident.customType,
         description: incident.description,
         status: incident.status,
-        type: incident?.type,
+        type: incident?.incidentType,
         title: incident?.title,
     }));
 

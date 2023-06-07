@@ -4,7 +4,7 @@ import time
 from tests.utils import delete_urns_from_file, get_frontend_url, get_gms_url, ingest_file_via_rest
 
 
-@pytest.fixture(scope="module", autouse=False)
+@pytest.fixture(scope="module", autouse=True)
 def ingest_cleanup_data(request):
     print("ingesting incidents test data")
     ingest_file_via_rest("tests/incidents/data.json")
@@ -21,7 +21,7 @@ TEST_DATASET_URN = "urn:li:dataset:(urn:li:dataPlatform:kafka,incidents-sample-d
 TEST_INCIDENT_URN = "urn:li:incident:test"
 
 @pytest.mark.dependency(depends=["test_healthchecks"])
-def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
+def test_list_dataset_incidents(frontend_session):
 
     # Sleep for eventual consistency (not ideal)
     time.sleep(2)
@@ -36,6 +36,7 @@ def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
                 incidents {\n
                   urn\n
                   type\n
+                  incidentType\n
                   title\n
                   description\n
                   status {\n
@@ -44,6 +45,17 @@ def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
                     lastUpdated {\n
                       time\n
                       actor\n
+                    }\n
+                  }\n
+                  source {\n
+                    type\n
+                    source {\n
+                      ... on Assertion {\n
+                        urn\n
+                        info {\n
+                          type
+                        }\n
+                      }\n
                     }\n
                   }\n
                   entity {\n
@@ -78,7 +90,8 @@ def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
      'incidents': [
         {
           "urn": TEST_INCIDENT_URN,
-          "type": "OPERATIONAL",
+          "type": "INCIDENT",
+          "incidentType": "OPERATIONAL",
           "title": "test title",
           "description": "test description",
           "status": {
@@ -87,6 +100,15 @@ def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
             "lastUpdated": {
               "time": 0,
               "actor": "urn:li:corpuser:admin"
+            }
+          },
+          "source": {
+            "type": "ASSERTION_FAILURE",
+            "source": {
+              "urn": "urn:li:assertion:assertion-test",
+              "info": {
+                "type": "DATASET"
+              }
             }
           },
           "entity": { "urn": TEST_DATASET_URN },
@@ -98,9 +120,8 @@ def test_list_dataset_incidents(frontend_session, ingest_cleanup_data):
      ]
     }
 
-
-@pytest.mark.dependency(depends=["test_healthchecks", "test_list_dataset_incidents"])
-def test_raise_resolve_incident(frontend_session, ingest_cleanup_data):
+@pytest.mark.dependency(depends=["test_healthchecks", "test_list_dataset_incidents", "test_search_all_incidents"])
+def test_raise_resolve_incident(frontend_session):
 
     # Raise new incident
     raise_incident_json = {
@@ -112,7 +133,8 @@ def test_raise_resolve_incident(frontend_session, ingest_cleanup_data):
               "type": "OPERATIONAL",
               "title": "test title 2",
               "description": "test description 2",
-              "resourceUrn": TEST_DATASET_URN
+              "resourceUrn": TEST_DATASET_URN,
+              "priority": 0
           }
         }
     }
@@ -169,8 +191,10 @@ def test_raise_resolve_incident(frontend_session, ingest_cleanup_data):
                 incidents {\n
                   urn\n
                   type\n
+                  incidentType\n
                   title\n
                   description\n
+                  priority\n
                   status {\n
                     state\n
                     message\n
@@ -214,6 +238,7 @@ def test_raise_resolve_incident(frontend_session, ingest_cleanup_data):
     assert new_incident["title"] == "test title 2"
     assert new_incident["description"] == "test description 2"
     assert new_incident["status"]["state"] == "RESOLVED"
+    assert new_incident["priority"] == 0
 
     delete_json = {
       "urn": new_incident_urn

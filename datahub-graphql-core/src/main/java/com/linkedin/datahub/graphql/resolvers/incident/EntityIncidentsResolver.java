@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
  */
 public class EntityIncidentsResolver implements DataFetcher<CompletableFuture<EntityIncidentsResult>> {
 
-  private static final String INCIDENT_ENTITIES_SEARCH_INDEX_FIELD_NAME = "entities.keyword";
-  private static final String INCIDENT_STATE_SEARCH_INDEX_FIELD_NAME = "state";
-  private static final String CREATED_TIME_SEARCH_INDEX_FIELD_NAME = "created";
+  static final String INCIDENT_ENTITIES_SEARCH_INDEX_FIELD_NAME = "entities.keyword";
+  static final String INCIDENT_STATE_SEARCH_INDEX_FIELD_NAME = "state";
+  static final String CREATED_TIME_SEARCH_INDEX_FIELD_NAME = "created";
 
   private final EntityClient _entityClient;
 
@@ -67,6 +67,7 @@ public class EntityIncidentsResolver implements DataFetcher<CompletableFuture<En
             start,
             count,
             context.getAuthentication());
+
         final List<Urn> incidentUrns = searchResult.getEntities()
             .stream()
             .map(SearchEntity::getEntity)

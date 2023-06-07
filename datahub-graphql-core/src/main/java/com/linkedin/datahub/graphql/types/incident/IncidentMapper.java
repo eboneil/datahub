@@ -2,6 +2,7 @@ package com.linkedin.datahub.graphql.types.incident;
 
 import com.linkedin.common.urn.Urn;
 import com.linkedin.data.template.GetMode;
+import com.linkedin.datahub.graphql.generated.EntityType;
 import com.linkedin.datahub.graphql.generated.Incident;
 import com.linkedin.datahub.graphql.generated.IncidentSource;
 import com.linkedin.datahub.graphql.generated.IncidentSourceType;
@@ -26,16 +27,18 @@ public class IncidentMapper {
     final Incident result = new Incident();
     final Urn entityUrn = entityResponse.getUrn();
     final EnvelopedAspectMap aspects = entityResponse.getAspects();
-
+    result.setType(EntityType.INCIDENT);
     result.setUrn(entityUrn.toString());
 
     final EnvelopedAspect envelopedIncidentInfo = aspects.get(Constants.INCIDENT_INFO_ASPECT_NAME);
     if (envelopedIncidentInfo != null) {
       final IncidentInfo info = new IncidentInfo(envelopedIncidentInfo.getValue().data());
-      result.setType(IncidentType.valueOf(info.getType().name())); // Assumption alert! This assumes the incident type in GMS exactly equals that in GraphQL.
+      // Assumption alert! This assumes the incident type in GMS exactly equals that in GraphQL
+      result.setIncidentType(IncidentType.valueOf(info.getType().name()));
       result.setCustomType(info.getCustomType(GetMode.NULL));
       result.setTitle(info.getTitle(GetMode.NULL));
       result.setDescription(info.getDescription(GetMode.NULL));
+      result.setPriority(info.getPriority(GetMode.NULL));
       // TODO: Support multiple entities per incident.
       result.setEntity(UrnToEntityMapper.map(info.getEntities().get(0)));
       if (info.hasSource()) {
@@ -62,6 +65,9 @@ public class IncidentMapper {
   private static IncidentSource mapIncidentSource(final com.linkedin.incident.IncidentSource incidentSource) {
     final IncidentSource result = new IncidentSource();
     result.setType(IncidentSourceType.valueOf(incidentSource.getType().name()));
+    if (incidentSource.hasSourceUrn()) {
+      result.setSource(UrnToEntityMapper.map(incidentSource.getSourceUrn()));
+    }
     return result;
   }
 

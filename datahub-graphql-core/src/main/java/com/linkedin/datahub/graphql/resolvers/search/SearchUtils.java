@@ -71,7 +71,9 @@ public class SearchUtils {
           EntityType.CONTAINER,
           EntityType.DOMAIN,
           EntityType.NOTEBOOK,
-          EntityType.DATA_PRODUCT);
+          EntityType.DATA_PRODUCT
+      );
+
 
   /**
    * Entities that are part of autocomplete by default in Auto Complete Across Entities

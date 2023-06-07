@@ -48,6 +48,8 @@ graphqlCodegen {
         "$projectDir/src/main/resources/connection.graphql".toString(),
         // Monitor not in OSS
         "$projectDir/src/main/resources/monitor.graphql".toString(),
+        // Incidents not in OSS
+        "$projectDir/src/main/resources/incident.graphql".toString(),
     ]
     outputDir = new File("$projectDir/src/mainGeneratedGraphQL/java")
     packageName = "com.linkedin.datahub.graphql.generated"

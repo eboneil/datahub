@@ -66,6 +66,7 @@ import com.linkedin.datahub.graphql.generated.GlossaryNode;
 import com.linkedin.datahub.graphql.generated.GlossaryTerm;
 import com.linkedin.datahub.graphql.generated.GlossaryTermAssociation;
 import com.linkedin.datahub.graphql.generated.GlossaryTermProposalParams;
+import com.linkedin.datahub.graphql.generated.IncidentSource;
 import com.linkedin.datahub.graphql.generated.IngestionSource;
 import com.linkedin.datahub.graphql.generated.InstitutionalMemoryMetadata;
 import com.linkedin.datahub.graphql.generated.LineageRelationship;
@@ -319,6 +320,7 @@ import com.linkedin.datahub.graphql.types.dataset.mappers.DatasetProfileMapper;
 import com.linkedin.datahub.graphql.types.domain.DomainType;
 import com.linkedin.datahub.graphql.types.glossary.GlossaryNodeType;
 import com.linkedin.datahub.graphql.types.glossary.GlossaryTermType;
+import com.linkedin.datahub.graphql.types.incident.IncidentType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLFeatureTableType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLFeatureType;
 import com.linkedin.datahub.graphql.types.mlmodel.MLModelGroupType;
@@ -475,7 +477,8 @@ public class GmsGraphQLEngine {
     private final DataProductType dataProductType;
     private final OwnershipType ownershipType;
     private final DataHubConnectionType connectionType; // Saas-ONLY
-    private final MonitorType monitorType; // Saas-ONLY
+    private final MonitorType monitorType; // SaaS only
+    private final IncidentType incidentType; // SaaS only
 
     // SaaS only
     private final ProposalService proposalService;
@@ -581,6 +584,7 @@ public class GmsGraphQLEngine {
         this.ownershipType = new OwnershipType(entityClient);
         this.connectionType = new DataHubConnectionType(entityClient, secretService); // SaaS only
         this.monitorType = new MonitorType(entityClient); // SaaS only
+        this.incidentType = new IncidentType(entityClient); // SaaS only
 
         // Init Lists
         this.entityTypes = ImmutableList.of(
@@ -616,7 +620,8 @@ public class GmsGraphQLEngine {
             ownershipType,
             queryType,
             connectionType, // Saas only
-            monitorType
+            monitorType, // SaaS only
+            incidentType // SaaS only
         );
         this.loadableTypes = new ArrayList<>(entityTypes);
         this.ownerTypes = ImmutableList.of(corpUserType, corpGroupType);
@@ -681,9 +686,7 @@ public class GmsGraphQLEngine {
         configureTestResultResolvers(builder);
         configureSchemaFieldResolvers(builder);
         configureEntityPathResolvers(builder);
-
-        // Not in OSS
-        configureActionRequestResolvers(builder);
+        configureActionRequestResolvers(builder); // Not in OSS
         configureResolvedAuditStampResolvers(builder);
         configureGlobalSettingsResolvers(builder);
         configureRoleResolvers(builder);
@@ -693,6 +696,7 @@ public class GmsGraphQLEngine {
         configureOwnershipTypeResolver(builder);
         configureConnectionResolvers(builder); // Not in OSS
         configureMonitorResolvers(builder); // Not in OSS
+        configureIncidentResolvers(builder); // Not in OSS
     }
 
     public GraphQLEngine.Builder builder() {
@@ -712,6 +716,8 @@ public class GmsGraphQLEngine {
             .addSchema(fileBasedSchema(CONSTRAINTS_SCHEMA_FILE))
             // Assertion extensions not in OSS
             .addSchema(fileBasedSchema(ASSERTIONS_SCHEMA_FILE))
+            // Incidents not in OSS
+            .addSchema(fileBasedSchema(INCIDENTS_SCHEMA_FILE))
             .addSchema(fileBasedSchema(STEPS_SCHEMA_FILE))
             .addSchema(fileBasedSchema(LINEAGE_SCHEMA_FILE))
             // Connections not in OSS
@@ -2000,20 +2006,27 @@ public class GmsGraphQLEngine {
     }
 
     private void configureConnectionResolvers(final RuntimeWiring.Builder builder) {
-        builder.type("Mutation", typeWiring -> typeWiring
-            .dataFetcher("upsertConnection", new UpsertConnectionResolver(entityClient, secretService))
+        builder.type("Mutation", typeWiring -> typeWiring.dataFetcher("upsertConnection", new UpsertConnectionResolver(entityClient, secretService)));
+        builder.type("Query", typeWiring -> typeWiring.dataFetcher("connection", getResolver(connectionType)));
+        builder.type("DataHubConnection",
+            typeWiring -> typeWiring.dataFetcher("platform", new LoadableTypeResolver<>(dataPlatformType, (env) -> {
+                final DataHubConnection connection = env.getSource();
+                return connection.getPlatform() != null ? connection.getPlatform().getUrn() : null;
+            })));
+    }
+
+    private void configureIncidentResolvers(final RuntimeWiring.Builder builder) {
+        builder.type("Incident", typeWiring -> typeWiring
+            .dataFetcher("relationships", new EntityRelationshipsResultResolver(graphClient))
         );
-        builder.type("Query", typeWiring -> typeWiring
-            .dataFetcher("connection", getResolver(connectionType))
-        );
-        builder.type("DataHubConnection", typeWiring -> typeWiring
-            .dataFetcher("platform",
-                new LoadableTypeResolver<>(dataPlatformType,
+        builder.type("IncidentSource", typeWiring -> typeWiring
+            .dataFetcher("source",
+                new LoadableTypeResolver<>(assertionType,
                     (env) -> {
-                        final DataHubConnection connection = env.getSource();
-                        return connection.getPlatform() != null ? connection.getPlatform().getUrn() : null;
-                    })
-            ));
+                        final IncidentSource incidentSource = env.getSource();
+                        return incidentSource.getSource() != null ? incidentSource.getSource().getUrn() : null;
+                    }))
+        );
     }
 
     private void configureMonitorResolvers(final RuntimeWiring.Builder builder) {

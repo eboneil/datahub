@@ -955,6 +955,7 @@ fragment incidentsFields on EntityIncidentsResult {
     incidents {
         urn
         type
+        incidentType
         customType
         title
         description

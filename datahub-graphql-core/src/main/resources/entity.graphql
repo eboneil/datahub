@@ -589,29 +589,6 @@ type Mutation {
     batchAssignRole(input: BatchAssignRoleInput!): Boolean
 
     """
-    Create a new incident for a resource (asset)
-    """
-    raiseIncident(
-      """
-      Input required to create a new incident
-      """
-      input: RaiseIncidentInput!): String
-
-    """
-    Update an existing incident for a resource (asset)
-    """
-    updateIncidentStatus(
-      """
-      The urn for an existing incident
-      """
-      urn: String!
-
-      """
-      Input required to update the state of an existing incident
-      """
-      input: UpdateIncidentStatusInput!): Boolean
-
-    """
     Accept role using invite token
     """
     acceptRole(input: AcceptRoleInput!): Boolean
@@ -954,6 +931,11 @@ enum EntityType {
     An asset monitor
     """
     MONITOR
+
+    """
+    A DataHub incident - SaaS only
+    """
+    INCIDENT
 }
 
 """
@@ -9923,206 +9905,6 @@ input StringMapEntryInput {
   The value fo the map entry
   """
   value: String
-}
-
-"""
-A list of Incidents Associated with an Entity
-"""
-type EntityIncidentsResult {
-  """
-  The starting offset of the result set returned
-  """
-  start: Int!
-
-  """
-  The number of assertions in the returned result set
-  """
-  count: Int!
-
-  """
-  The total number of assertions in the result set
-  """
-  total: Int!
-
-  """
-  The incidents themselves
-  """
-  incidents: [Incident!]!
-}
-
-"""
-An incident represents an active issue on a data asset.
-"""
-type Incident {
-  """
-  The primary key of the Incident
-  """
-  urn: String!
-
-  """
-  The type of incident
-  """
-  type: IncidentType!
-
-  """
-  A custom type of incident. Present only if type is 'CUSTOM'
-  """
-  customType: String
-
-  """
-  An optional title associated with the incident
-  """
-  title: String
-
-  """
-  An optional description associated with the incident
-  """
-  description: String
-
-  """
-  The status of an incident
-  """
-  status: IncidentStatus!
-
-  """
-  The entity that the incident is associated with.
-  """
-  entity: Entity!
-
-  """
-  The source of the incident, i.e. how it was generated
-  """
-  source: IncidentSource
-
-  """
-  The time at which the incident was initially created
-  """
-  created: AuditStamp!
-}
-
-"""
-The state of an incident.
-"""
-enum IncidentState {
-  """
-  The incident is ongoing, or active.
-  """
-  ACTIVE
-  """
-  The incident is resolved.
-  """
-  RESOLVED
-}
-
-"""
-A specific type of incident
-"""
-enum IncidentType {
-  """
-  An operational incident, e.g. failure to materialize a dataset, or failure to execute a task / pipeline.
-  """
-  OPERATIONAL
-  """
-  An incident raised when an SLA assertion has failed.
-  """
-  SLA
-  """
-  A custom type of incident
-  """
-  CUSTOM
-}
-
-"""
-Details about the status of an asset incident
-"""
-type IncidentStatus {
-  """
-  The state of the incident
-  """
-  state: IncidentState!
-  """
-  An optional message associated with the status
-  """
-  message: String
-  """
-  The time that the status last changed
-  """
-  lastUpdated: AuditStamp!
-}
-
-"""
-The source type of an incident, implying how it was created.
-"""
-enum IncidentSourceType {
-  """
-  The incident was created manually, from either the API or the UI.
-  """
-  MANUAL
-}
-
-"""
-Details about the source of an incident, e.g. how it was created.
-"""
-type IncidentSource {
-  """
-  The type of the incident source
-  """
-  type: IncidentSourceType!
-}
-
-"""
-Input required to create a new incident in the 'Active' state.
-"""
-input RaiseIncidentInput {
-  """
-  The type of incident
-  """
-  type: IncidentType!
-  """
-  A custom type of incident. Present only if type is 'CUSTOM'
-  """
-  customType: String
-  """
-  An optional title associated with the incident
-  """
-  title: String
-  """
-  An optional description associated with the incident
-  """
-  description: String
-  """
-  The resource (dataset, dashboard, chart, dataFlow, etc) that the incident is associated with.
-  """
-  resourceUrn: String!
-
-  """
-  The source of the incident, i.e. how it was generated
-  """
-  source: IncidentSourceInput
-}
-
-"""
-Input required to create an incident source
-"""
-input IncidentSourceInput {
-  """
-  The type of the incident source
-  """
-  type: IncidentSourceType!
-}
-
-"""
-Input required to update status of an existing incident
-"""
-input UpdateIncidentStatusInput {
-  """
-  The new state of the incident
-  """
-  state: IncidentState!
-  """
-  An optional message associated with the new state
-  """
-  message: String
 }
 
 """

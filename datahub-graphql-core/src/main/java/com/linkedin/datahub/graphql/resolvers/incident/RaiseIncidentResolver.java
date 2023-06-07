@@ -97,6 +97,7 @@ public class RaiseIncidentResolver implements DataFetcher<CompletableFuture<Stri
     );
     result.setSource(new IncidentSource()
         .setType(IncidentSourceType.MANUAL), SetMode.IGNORE_NULL);
+    result.setPriority(input.getPriority(), SetMode.IGNORE_NULL);
     return result;
   }
 
