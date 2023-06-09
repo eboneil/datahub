@@ -410,7 +410,9 @@ public class RestliEntityClient extends BaseClient implements EntityClient {
 
     if (searchFlags != null) {
       requestBuilder.searchFlagsParam(searchFlags);
-      requestBuilder.fulltextParam(searchFlags.isFulltext());
+      if (searchFlags.isFulltext() != null) {
+        requestBuilder.fulltextParam(searchFlags.isFulltext());
+      }
     }
 
     return sendClientRequest(requestBuilder, authentication).getEntity();

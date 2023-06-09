@@ -582,7 +582,7 @@ public class AssertionActionsHook implements MetadataChangeLogHook {
         null,
         0, SEARCH_BATCH_SIZE, // This SHOULD NOT exceed 1 in reality.
         _authentication,
-        new SearchFlags().setSkipCache(true));
+        new SearchFlags().setSkipCache(true).setFulltext(false));
 
     if (searchResult.hasEntities() && searchResult.getEntities().size() > 0) {
       log.info(String.format(
