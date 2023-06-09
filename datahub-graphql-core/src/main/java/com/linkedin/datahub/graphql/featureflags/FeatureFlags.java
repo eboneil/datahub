@@ -11,5 +11,6 @@ public class FeatureFlags {
   private boolean pointInTimeCreationEnabled = false;
   private boolean alwaysEmitChangeLog = false;
   private boolean readOnlyModeEnabled = false;
+  private boolean assertionMonitorsEnabled = false;
   private PreProcessHooks preProcessHooks;
 }

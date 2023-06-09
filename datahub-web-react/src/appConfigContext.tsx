@@ -42,6 +42,7 @@ export const DEFAULT_APP_CONFIG = {
     },
     featureFlags: {
         readOnlyModeEnabled: false,
+        assertionMonitorsEnabled: false,
     },
     chromeExtensionConfig: {
         enabled: false,

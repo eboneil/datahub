@@ -46,6 +46,23 @@ fragment assertionDetails on Assertion {
             }
             logic
         }
+        slaAssertion {
+            type
+            schedule {
+                type
+                cron {
+                    cron
+                    timezone
+                }
+                fixedInterval {
+                    unit
+                    multiple
+                }
+            }
+        }
+        source {
+            type
+        }
     }
 }
 
@@ -88,4 +105,16 @@ query getAssertionRuns($assertionUrn: String!, $startTime: Long, $endTime: Long,
 
 mutation deleteAssertion($urn: String!) {
     deleteAssertion(urn: $urn)
+}
+
+mutation createSlaAssertion($input: CreateSlaAssertionInput!) {
+    createSlaAssertion(input: $input) {
+        ...assertionDetails
+    }
+}
+
+mutation updateSlaAssertion($urn: String!, $input: UpdateSlaAssertionInput!) {
+    updateSlaAssertion(urn: $urn, input: $input) {
+        ...assertionDetails
+    }
 }

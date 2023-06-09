@@ -155,14 +155,7 @@ export class DatasetEntity implements Entity<Dataset> {
                 {
                     name: 'Validation',
                     component: ValidationsTab,
-                    display: {
-                        visible: (_, _1) => true,
-                        enabled: (_, dataset: GetDatasetQuery) => {
-                            return (
-                                (dataset?.dataset?.assertions?.total || 0) > 0 || dataset?.dataset?.testResults !== null
-                            );
-                        },
-                    },
+                    // In SaaS, Validations tab is always enabled due to native assertion monitoring / observability module.
                 },
                 {
                     name: 'Operations',

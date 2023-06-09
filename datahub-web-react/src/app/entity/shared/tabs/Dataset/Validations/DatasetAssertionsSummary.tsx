@@ -57,12 +57,12 @@ const getSummaryMessage = (summary: AssertionsSummary) => {
         return 'No assertions have run';
     }
     if (summary.succeededRuns === summary.totalRuns) {
-        return 'All assertions have passed';
+        return 'All assertions are passing';
     }
     if (summary.failedRuns === summary.totalRuns) {
-        return 'All assertions have failed';
+        return 'All assertions are failing';
     }
-    return 'Some assertions have failed';
+    return 'Some assertions are failing';
 };
 
 export const DatasetAssertionsSummary = ({ summary }: Props) => {

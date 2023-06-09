@@ -74,6 +74,7 @@ export enum EventType {
     CreateTestEvent,
     UpdateTestEvent,
     DeleteTestEvent,
+    CreateAssertionMonitorEvent,
 }
 
 /**
@@ -432,6 +433,12 @@ export interface UpdateTestEvent extends BaseEvent {
 export interface DeleteTestEvent extends BaseEvent {
     type: EventType.DeleteTestEvent;
 }
+
+export interface CreateAssertionMonitorEvent extends BaseEvent {
+    type: EventType.CreateAssertionMonitorEvent;
+    assertionType: string;
+}
+
 export interface ManuallyCreateLineageEvent extends BaseEvent {
     type: EventType.ManuallyCreateLineageEvent;
     direction: Direction;
@@ -615,4 +622,5 @@ export type Event =
     | DeselectQuickFilterEvent
     | EmbedProfileViewEvent
     | EmbedProfileViewInDataHubEvent
-    | EmbedLookupNotFoundEvent;
+    | EmbedLookupNotFoundEvent
+    | CreateAssertionMonitorEvent;

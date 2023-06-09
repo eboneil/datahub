@@ -1,4 +1,4 @@
-import { FileDoneOutlined, FileProtectOutlined } from '@ant-design/icons';
+import { FileDoneOutlined, FileProtectOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useGetDatasetAssertionsQuery } from '../../../../../../graphql/dataset.generated';
@@ -10,6 +10,9 @@ import { DatasetAssertionsSummary } from './DatasetAssertionsSummary';
 import { sortAssertions } from './assertionUtils';
 import { TestResults } from './TestResults';
 import { combineEntityDataWithSiblings, useIsSeparateSiblingsMode } from '../../../siblingUtils';
+import { AssertionMonitorBuilderModal } from './assertion/builder/AssertionMonitorBuilderModal';
+import { isEntityEligibleForAssertionMonitoring } from './assertion/builder/utils';
+import { useAppConfig } from '../../../../../useAppConfig';
 
 /**
  * Returns a status summary for the assertions associated with a Dataset.
@@ -46,12 +49,15 @@ enum ViewType {
  * Component used for rendering the Validations Tab on the Dataset Page.
  */
 export const ValidationsTab = () => {
-    const { urn, entityData } = useEntityData();
+    const { urn, entityType, entityData } = useEntityData();
     const { data, refetch } = useGetDatasetAssertionsQuery({ variables: { urn }, fetchPolicy: 'cache-first' });
     const isHideSiblingMode = useIsSeparateSiblingsMode();
+    const { config } = useAppConfig();
+    const assertionMonitorsEnabled = config?.featureFlags?.assertionMonitorsEnabled || false;
 
     const combinedData = isHideSiblingMode ? data : combineEntityDataWithSiblings(data);
     const [removedUrns, setRemovedUrns] = useState<string[]>([]);
+    const [showAssertionBuilder, setShowAssertionBuilder] = useState(false);
     /**
      * Determines which view should be visible: assertions or tests.
      */
@@ -82,7 +88,7 @@ export const ValidationsTab = () => {
         <>
             <TabToolbar>
                 <div>
-                    <Button type="text" disabled={numAssertions === 0} onClick={() => setView(ViewType.ASSERTIONS)}>
+                    <Button type="text" onClick={() => setView(ViewType.ASSERTIONS)}>
                         <FileProtectOutlined />
                         Assertions ({numAssertions})
                     </Button>
@@ -94,6 +100,13 @@ export const ValidationsTab = () => {
             </TabToolbar>
             {(view === ViewType.ASSERTIONS && (
                 <>
+                    {assertionMonitorsEnabled && isEntityEligibleForAssertionMonitoring(entityData?.platform?.urn) && (
+                        <TabToolbar>
+                            <Button type="text" onClick={() => setShowAssertionBuilder(true)}>
+                                <PlusOutlined /> Create Assertion
+                            </Button>
+                        </TabToolbar>
+                    )}
                     <DatasetAssertionsSummary summary={getAssertionsStatusSummary(filteredAssertions)} />
                     {entityData && (
                         <DatasetAssertionsList
@@ -107,6 +120,19 @@ export const ValidationsTab = () => {
                     )}
                 </>
             )) || <TestResults passing={passingTests} failing={maybeFailingTests} />}
+            {showAssertionBuilder && (
+                <AssertionMonitorBuilderModal
+                    entityUrn={urn}
+                    entityType={entityType}
+                    platformUrn={entityData?.platform?.urn as string}
+                    onSubmit={() => {
+                        setShowAssertionBuilder(false);
+                        // TODO: Use the Apollo Cache.
+                        setTimeout(() => refetch(), 3000);
+                    }}
+                    onCancel={() => setShowAssertionBuilder(false)}
+                />
+            )}
         </>
     );
 };

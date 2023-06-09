@@ -1,0 +1,43 @@
+fragment monitorDetails on Monitor {
+    urn
+    type
+    info {
+        type
+        assertionMonitor {
+            assertions {
+                assertion {
+                    ...assertionDetails
+                }
+                schedule {
+                    cron
+                    timezone
+                }
+                parameters {
+                    type
+                    datasetSlaParameters {
+                        sourceType
+                        auditLog {
+                            operationTypes
+                            userName
+                        }
+                        field {
+                            type
+                            nativeType
+                            path
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+mutation deleteMonitor($urn: String!) {
+    deleteMonitor(urn: $urn)
+}
+
+mutation createAssertionMonitor($input: CreateAssertionMonitorInput!) {
+    createAssertionMonitor(input: $input) {
+        ...monitorDetails
+    }
+}

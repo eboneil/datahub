@@ -72,7 +72,8 @@ public enum DataHubUsageEventType {
   // SaaS only events
   CREATE_TEST_EVENT("CreateTestEvent"),
   UPDATE_TEST_EVENT("UpdateTestEvent"),
-  DELETE_TEST_EVENT("DeleteTestEvent");
+  DELETE_TEST_EVENT("DeleteTestEvent"),
+  CREATE_ASSERTION_MONITOR_EVENT("CreateAssertionMonitorEvent");
 
   private final String type;
 
