@@ -67,7 +67,8 @@ public class IngestionNotificationGenerator extends BaseMclNotificationGenerator
       return false;
     }
     return Constants.EXECUTION_REQUEST_RESULT_ASPECT_NAME.equals(event.getAspectName())
-        && (ChangeType.UPSERT.equals(event.getChangeType()) || ChangeType.CREATE.equals(event.getChangeType()));
+        && (ChangeType.UPSERT.equals(event.getChangeType()) || ChangeType.CREATE.equals(event.getChangeType()))
+        && !event.hasPreviousAspectValue(); // If there is a previous result, we've already sent a notification.
   }
 
   public void generateIngestionRunChangeNotifications(
