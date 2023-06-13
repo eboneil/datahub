@@ -30,7 +30,9 @@ public class AspectTemplateEngine {
       UPSTREAM_LINEAGE_ASPECT_NAME,
       DATA_FLOW_INFO_ASPECT_NAME,
       DATA_JOB_INFO_ASPECT_NAME,
-      DATA_PRODUCT_PROPERTIES_ASPECT_NAME).collect(Collectors.toSet());
+      DATA_PRODUCT_PROPERTIES_ASPECT_NAME,
+      MONITOR_INFO_ASPECT_NAME // SaaS only
+      ).collect(Collectors.toSet());
 
   private final Map<String, Template<? extends RecordTemplate>> _aspectTemplateMap;
 

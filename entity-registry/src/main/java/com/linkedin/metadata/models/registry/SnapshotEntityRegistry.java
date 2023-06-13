@@ -18,6 +18,7 @@ import com.linkedin.metadata.models.registry.template.dataproduct.DataProductPro
 import com.linkedin.metadata.models.registry.template.dataset.DatasetPropertiesTemplate;
 import com.linkedin.metadata.models.registry.template.dataset.EditableSchemaMetadataTemplate;
 import com.linkedin.metadata.models.registry.template.dataset.UpstreamLineageTemplate;
+import com.linkedin.metadata.models.registry.template.monitor.MonitorInfoTemplate;
 import com.linkedin.metadata.snapshot.Snapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ public class SnapshotEntityRegistry implements EntityRegistry {
     aspectSpecTemplateMap.put(DATA_FLOW_INFO_ASPECT_NAME, new DataFlowInfoTemplate());
     aspectSpecTemplateMap.put(DATA_JOB_INFO_ASPECT_NAME, new DataJobInfoTemplate());
     aspectSpecTemplateMap.put(DATA_PRODUCT_PROPERTIES_ASPECT_NAME, new DataProductPropertiesTemplate());
+    aspectSpecTemplateMap.put(MONITOR_INFO_ASPECT_NAME, new MonitorInfoTemplate()); // SaaS only!
     return new AspectTemplateEngine(aspectSpecTemplateMap);
   }
 
