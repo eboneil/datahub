@@ -96,4 +96,8 @@ public class ConfigurationProvider {
   private CacheConfiguration cache;
 
   private ChromeExtensionConfiguration chromeExtension;
+  /**
+   * Configuration for the health check server
+   */
+  private HealthCheckConfiguration healthCheck;
 }
