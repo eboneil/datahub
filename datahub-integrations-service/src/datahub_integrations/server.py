@@ -1,7 +1,10 @@
+import os
+
 from fastapi import HTTPException, status
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from datahub_integrations.app import app
+from datahub_integrations.app import STATIC_ASSETS_DIR, app
 from datahub_integrations.slack.slack import (
     SlackLinkPreview,
     external_router,
@@ -30,12 +33,25 @@ def get_link_preview(input: GetLinkPreviewInput) -> SlackLinkPreview:
     if input.type == "SLACK_MESSAGE":
         return get_slack_link_preview(input.url)
     else:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Unknown link type: {type}")
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, f"Unknown link type: {input.type}"
+        )
 
 
 app.include_router(internal_router, prefix="/private")
+
+# Using .mount() on ApiRouter doesn't work. See https://github.com/tiangolo/fastapi/issues/1469.
+# As such, we have to mount it directly on the app.
+app.mount(
+    "/public/static",
+    StaticFiles(directory=STATIC_ASSETS_DIR),
+    name="integrations-static-dir",
+)
 app.include_router(external_router, prefix="/public")
 
-# TODO: [temporary hack] mounting the external router twice so that it mirrors the
-# route used by the frontend.
-app.include_router(external_router, prefix="/integrations")
+if os.environ.get("DEV_MODE_BYPASS_FRONTEND", False):
+    # This is only for development purposes.
+    # When running this directly instead of through the frontend server's proxy, we
+    # need to mount the external router on /integrations because that's what the frontend
+    # route is.
+    app.include_router(external_router, prefix="/integrations")

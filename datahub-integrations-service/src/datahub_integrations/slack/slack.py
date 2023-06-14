@@ -14,7 +14,6 @@ from loguru import logger
 from pydantic import BaseModel
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_sdk.oauth import AuthorizeUrlGenerator
-from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 from datahub_integrations.app import DATAHUB_FRONTEND_URL, graph
 from datahub_integrations.graphql.social_query import get_entity
@@ -24,6 +23,7 @@ from datahub_integrations.slack.app_manifest import (
     upsert_app_with_manifest,
 )
 from datahub_integrations.slack.config import SlackConnection, slack_config
+from datahub_integrations.slack.oauth_state_store import InMemoryStateStore
 
 external_router = fastapi.APIRouter()
 internal_router = fastapi.APIRouter(
@@ -32,7 +32,11 @@ internal_router = fastapi.APIRouter(
     ]
 )
 
-_state_store = FileOAuthStateStore(expiration_seconds=300, base_dir="./data-state")
+_state_store = InMemoryStateStore(expiration_seconds=300)
+
+ACRYL_SLACK_ICON_URL = (
+    f"{DATAHUB_FRONTEND_URL}/integrations/static/acryl-slack-icon.png"
+)
 
 
 def get_oauth_url_generator(config: SlackConnection) -> AuthorizeUrlGenerator:
@@ -124,7 +128,9 @@ def oauth_callback(
     # TODO: Add more context to this message + a link back to the integrations page.
     app = get_slack_app(new_config)
     app.client.chat_postMessage(
-        channel=authed_user["id"], text="Acryl has been connected to Slack!"
+        channel=authed_user["id"],
+        text="Acryl has been connected to Slack!",
+        icon_url=ACRYL_SLACK_ICON_URL,
     )
 
     return RedirectResponse(url="/settings/integrations/slack")
@@ -149,14 +155,25 @@ def get_slack_app(config: SlackConnection) -> slack_bolt.App:
     app = slack_bolt.App(
         token=config.bot_token,
         signing_secret=config.app_details.signing_secret,
+        # As per the docs:
+        # > One secret is the new Signing Secret, and one is the deprecated verification token.
+        # > We strongly recommend you only use the Signing Secret from now on.
+        # verification_token=config.app_details.verification_token,
     )
+
+    # @app.middleware  # or app.use(log_request)
+    # def log_request(
+    #     body: dict, next: Callable[[], slack_bolt.BoltResponse]
+    # ) -> slack_bolt.BoltResponse:
+    #     logger.debug(body)
+    #     return next()
 
     # Listen for unfurl events
     @app.event("link_shared")
     def handle_link_shared(ack, body):
         ack()
 
-        logger.info(f"Link unfurl request: {body}")
+        logger.info(f"Got link unfurl request: {body}")
         event = body["event"]
 
         # TODO: unfurl multiple links
@@ -178,37 +195,80 @@ def get_slack_app(config: SlackConnection) -> slack_bolt.App:
         )
 
         # Log the API call response
-        print(response)
+        logger.debug(response)
 
-    @app.message("hello")
-    def message_hello(message, say):
+    @app.message("test-acryl-bot")
+    def handle_test_message(message, say):
         logger.info(message)
-        say(f'Hello <@{message["user"]}>!')
+        say(
+            f'Hey <@{message["user"]}>, Acryl is available in this channel!',
+            icon_url=ACRYL_SLACK_ICON_URL,
+        )
 
     @app.event("message")
     def handle_message_events(body):
-        # logger.info(f"message handler: {body}")
+        logger.info(f"message handler: {body}")
         pass
 
     @app.event("app_mention")
-    def handle_app_mention_events(body):
+    def handle_app_mention_events(event, say):
+        logger.info(event)
+        say(
+            f'Hey <@{event["user"]}>! Acryl commands are coming soon!',
+            icon_url=ACRYL_SLACK_ICON_URL,
+        )
+
+    @app.command("/acryl")
+    def handle_command_events(ack, body):
+        # Reply saying 'Acryl slack commands are coming soon!'
         logger.info(body)
+        # TODO: How do we set icon_url here?
+        ack("Acryl slash commands are coming soon!")
 
     return app
 
 
-@external_router.post("/slack/events")
-async def slack_event_endpoint(req: fastapi.Request) -> fastapi.Response:
-    # Attach the slack event handler.
+def get_slack_request_handler() -> SlackRequestHandler:
+    # Attach the slack event handler to the app.
     app = get_slack_app(slack_config.get_config())
     app_handler = SlackRequestHandler(app)
-    return await app_handler.handle(req)
+    return app_handler
+
+
+@external_router.post("/slack/events")
+async def slack_event_endpoint(req: fastapi.Request) -> fastapi.Response:
+    body = await req.body()
+    logger.debug(f"Received slack event: {body!r}\nHeaders: {req.headers}")
+
+    return await get_slack_request_handler().handle(req)
+
+
+@external_router.post("/slack/actions")
+async def slack_action_endpoint(req: fastapi.Request) -> fastapi.Response:
+    body = await req.body()
+    logger.debug(f"Received slack action: {body!r}\nHeaders: {req.headers}")
+
+    return await get_slack_request_handler().handle(req)
+
+
+@external_router.post("/slack/commands")
+async def slack_command_endpoint(req: fastapi.Request) -> fastapi.Response:
+    body = await req.body()
+    # Workaround issue in frontend proxy
+    # headers = req.headers.mutablecopy()
+    # headers["content-type"] = "application/x-www-form-urlencoded"
+    # req._headers = headers
+    logger.debug(f"Received slack command: {body!r}\nHeaders: {req.headers}")
+
+    return await get_slack_request_handler().handle(req)
 
 
 def make_slack_preview(urn: str) -> Optional[dict]:
     entity = get_entity(graph, urn)
     logger.debug(f"entity: {entity}")
-    if not entity:
+    if not entity or not entity["properties"]:
+        # If the entity doesn't exist, GMS may "mint" the entity at read time.
+        # If that happens, we can expect properties to be None.
         return None
 
     # Example entity:
@@ -369,12 +429,12 @@ def get_slack_link_preview(url: str) -> SlackLinkPreview:
     if not parsed_url:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid slack message url")
 
-    workspace_name, converation_id, message_id, thread_ts = parsed_url
+    workspace_name, conversation_id, message_id, thread_ts = parsed_url
 
     try:
         # First, get the conversation (channel/DM/MPIM) info.
         # TODO: Add caching around this.
-        conversation = app.client.conversations_info(channel=converation_id).validate()
+        conversation = app.client.conversations_info(channel=conversation_id).validate()
         conversation_name = conversation["channel"]["name"]
 
         # Next, get the message info.
@@ -384,7 +444,7 @@ def get_slack_link_preview(url: str) -> SlackLinkPreview:
             slack_message_ts, oldest = thread_ts, slack_message_ts
 
         messages = app.client.conversations_replies(
-            channel=converation_id,
+            channel=conversation_id,
             ts=slack_message_ts,
             oldest=oldest,
             limit=1,
@@ -401,16 +461,21 @@ def get_slack_link_preview(url: str) -> SlackLinkPreview:
             message = messages[0]
 
         # Get more details about the message author.
-        # TODO: Add caching around this.
-        user_id = message["user"]
-        user_details = app.client.users_info(user=user_id).validate()["user"]
-        author_name = (
-            user_details["profile"]["display_name_normalized"]
-            or user_details["profile"]["display_name"]
-            or user_details["profile"]["real_name_normalized"]
-            or user_details["profile"]["real_name"]
-        )
-        author_image_url = user_details["profile"]["image_72"]
+        if "user" in message:
+            user_id = message["user"]
+
+            # TODO: Add caching around this.
+            user_details = app.client.users_info(user=user_id).validate()["user"]
+            author_name = (
+                user_details["profile"]["display_name_normalized"]
+                or user_details["profile"]["display_name"]
+                or user_details["profile"]["real_name_normalized"]
+                or user_details["profile"]["real_name"]
+            )
+            author_image_url = user_details["profile"]["image_72"]
+        else:
+            author_name = message["username"]
+            author_image_url = message["icons"].get("image_48")
 
         preview = SlackLinkPreview(
             url=url,
@@ -433,7 +498,9 @@ def get_slack_link_preview(url: str) -> SlackLinkPreview:
 
         return preview
     except slack_sdk.errors.SlackApiError as e:
+        error_message = e.response["error"]
+        logger.exception(f"Error getting slack message preview: {error_message}")
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
-            f"You do not have permission to view conversation {converation_id} message {message_id}: {e.response['error']}",
+            f"You do not have permission to view conversation {conversation_id} message {message_id}: {error_message}",
         ) from e

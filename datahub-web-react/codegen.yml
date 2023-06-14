@@ -13,10 +13,12 @@ schema:
     - '../datahub-graphql-core/src/main/resources/tests.graphql'
     - '../datahub-graphql-core/src/main/resources/step.graphql'
     - '../datahub-graphql-core/src/main/resources/lineage.graphql'
-    - '../datahub-graphql-core/src/main/resources/incident.graphql'
-    - '../datahub-graphql-core/src/main/resources/anomaly.graphql'
     - '../datahub-graphql-core/src/main/resources/assertions.graphql'
-    - '../datahub-graphql-core/src/main/resources/monitor.graphql'
+    - '../datahub-graphql-core/src/main/resources/monitor.graphql' # Acryl SaaS only.
+    - '../datahub-graphql-core/src/main/resources/anomaly.graphql' # Acryl SaaS only.
+    - '../datahub-graphql-core/src/main/resources/incident.graphql' # Acryl SaaS only.
+    - '../datahub-graphql-core/src/main/resources/connection.graphql' # Acryl SaaS only.
+    - '../datahub-graphql-core/src/main/resources/integration.graphql' # Acryl SaaS only.
 config:
     scalars:
         Long: number

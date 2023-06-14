@@ -23,9 +23,9 @@ class SlackAppConfigCredentials(_FrozenConnectionModel):
     access_token: str
     refresh_token: str
 
-    # Default expiry is 12 hours from now.
+    # Default is to consider the token already expired.
     exp: datetime = pydantic.Field(
-        default_factory=lambda: datetime.now(tz=timezone.utc) + timedelta(hours=12)
+        default_factory=lambda: datetime.now(tz=timezone.utc) - timedelta(days=1)
     )
 
     def is_expired(self):
@@ -99,8 +99,8 @@ class _SlackConfigManager:
 
     def save_config(self, config: SlackConnection) -> None:
         logger.info("Setting slack config")
-        _set_current_slack_config(config)
         self._config = config
+        _set_current_slack_config(config)
 
 
 slack_config = _SlackConfigManager()

@@ -91,10 +91,10 @@ public class SettingsMapper {
   private SlackIntegrationSettings mapSlackIntegrationSettings(
       @Nonnull com.linkedin.settings.global.SlackIntegrationSettings input) {
     final SlackIntegrationSettings result = new SlackIntegrationSettings();
-    result.setEnabled(input.isEnabled());
     if (input.hasDefaultChannelName()) {
       result.setDefaultChannelName(input.getDefaultChannelName());
     }
+    // Legacy
     if (input.hasEncryptedBotToken()) {
       result.setBotToken(_secretService.decrypt(input.getEncryptedBotToken()));
     }

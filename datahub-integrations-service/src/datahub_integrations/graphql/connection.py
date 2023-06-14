@@ -4,6 +4,17 @@ from typing import Optional
 from datahub.ingestion.graph.client import DataHubGraph
 from loguru import logger
 
+_connection_urn_prefix = "urn:li:dataHubConnection:"
+
+
+def _is_connection_urn(urn: str) -> bool:
+    return urn.startswith(_connection_urn_prefix)
+
+
+def _get_id_from_connection_urn(urn: str) -> str:
+    assert _is_connection_urn(urn)
+    return urn[len(_connection_urn_prefix) :]
+
 
 def get_connection(graph: DataHubGraph, urn: str) -> Optional[dict]:
     res = graph.execute_graphql(
@@ -29,9 +40,9 @@ query GetSlackConnection($urn: String!) {
         return None
 
     connection_type = res["connection"]["details"]["type"]
-    if connection_type != "json":
+    if connection_type != "JSON":
         logger.error(
-            f"Expected connection details type to be 'json', but got {connection_type}"
+            f"Expected connection details type to be 'JSON', but got {connection_type}"
         )
         return None
 
@@ -42,6 +53,8 @@ query GetSlackConnection($urn: String!) {
 
 
 def save_connection(graph: DataHubGraph, urn: str, blob: str) -> None:
+    id = _get_id_from_connection_urn(urn)
+
     res = graph.execute_graphql(
         query="""
 mutation SetSlackConnection($id: String!, $blob: String!) {
@@ -58,7 +71,7 @@ mutation SetSlackConnection($id: String!, $blob: String!) {
 }
 """.strip(),
         variables={
-            "id": urn,
+            "id": id,
             "blob": blob,
         },
     )

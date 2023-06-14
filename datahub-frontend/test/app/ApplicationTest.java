@@ -53,12 +53,13 @@ public class ApplicationTest extends WithBrowser {
 
   @Override
   protected Application provideApplication() {
-
     return new GuiceApplicationBuilder()
             .configure("metadataService.port", String.valueOf(gmsServerPort()))
             .configure("auth.baseUrl", "http://localhost:" +  providePort())
             .configure("auth.oidc.discoveryUri", "http://localhost:" + oauthServerPort()
-                   + "/testIssuer/.well-known/openid-configuration")
+                       + "/testIssuer/.well-known/openid-configuration")
+            .configure("integrationsService.port", String.valueOf(integrationsServerPort()))
+
             .in(new Environment(Mode.TEST)).build();
   }
 
@@ -77,8 +78,15 @@ public class ApplicationTest extends WithBrowser {
     return providePort() + 2;
   }
 
+  public int integrationsServerPort() {
+    return providePort() + 3;
+  }
+
   private MockOAuth2Server _oauthServer;
   private MockWebServer _gmsServer;
+  // Start SaaS only
+  private MockWebServer _integrationsServer;
+  // End SaaS only
 
   private String _wellKnownUrl;
 
@@ -92,6 +100,9 @@ public class ApplicationTest extends WithBrowser {
     _gmsServer.enqueue(new MockResponse().setResponseCode(404)); // dynamic settings - not tested
     _gmsServer.enqueue(new MockResponse().setResponseCode(404)); // dynamic settings - not tested
     _gmsServer.enqueue(new MockResponse().setResponseCode(404)); // dynamic settings - not tested
+    _integrationsServer = new MockWebServer();
+    _integrationsServer.enqueue(new MockResponse().setBody(String.format("{\"proxyResponse\":\"%s\"}", "test")));
+    _integrationsServer.start(integrationsServerPort());
     /* End Saas Only */
     _gmsServer.enqueue(new MockResponse().setBody(String.format("{\"value\":\"%s\"}", TEST_USER)));
     _gmsServer.enqueue(new MockResponse().setBody(String.format("{\"accessToken\":\"%s\"}", TEST_TOKEN)));
@@ -122,6 +133,11 @@ public class ApplicationTest extends WithBrowser {
     if (_oauthServer != null) {
       _oauthServer.shutdown();
     }
+    // Start SaaS only
+    if (_integrationsServer != null) {
+      _integrationsServer.shutdown();
+    }
+    // End SaaS only
     stopServer();
   }
 
@@ -172,4 +188,13 @@ public class ApplicationTest extends WithBrowser {
     browser.goTo("/authenticate?redirect_uri=%2Fcontainer%2Furn%3Ali%3Acontainer%3ADATABASE");
     assertEquals("container/urn:li:container:DATABASE", browser.url());
   }
+
+  // Start saas only
+  @Test
+  public void testProxy() {
+    Http.RequestBuilder request = fakeRequest(routes.IntegrationsController.proxyToIntegrationsService("/integrations/oauth"));
+    Result result = route(app, request);
+    assertEquals(OK, result.status());
+  }
+  // End saas only
 }

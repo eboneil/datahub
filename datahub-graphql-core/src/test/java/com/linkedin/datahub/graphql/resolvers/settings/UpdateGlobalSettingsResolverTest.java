@@ -54,7 +54,7 @@ public class UpdateGlobalSettingsResolverTest {
   @BeforeMethod
   public void setUp() {
     TEST_INPUT.setIntegrationSettings(
-        new UpdateGlobalIntegrationSettingsInput(new UpdateSlackIntegrationSettingsInput(true, "channel", "token")));
+        new UpdateGlobalIntegrationSettingsInput(new UpdateSlackIntegrationSettingsInput("channel", "token")));
     TEST_INPUT.setNotificationSettings(new UpdateGlobalNotificationSettingsInput(ImmutableList.of(
         new NotificationSettingInput(NotificationScenarioType.DATASET_SCHEMA_CHANGE, NotificationSettingValue.ENABLED,
             ImmutableList.of(new StringMapEntryInput("key", "value"))))));

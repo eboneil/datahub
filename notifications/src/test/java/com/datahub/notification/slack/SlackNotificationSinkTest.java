@@ -9,16 +9,21 @@ import com.datahub.notification.provider.SettingsProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.linkedin.common.urn.Urn;
+import com.linkedin.connection.DataHubConnectionDetails;
+import com.linkedin.connection.DataHubConnectionDetailsType;
+import com.linkedin.connection.DataHubJsonConnection;
 import com.linkedin.data.template.StringMap;
 import com.linkedin.event.notification.NotificationMessage;
 import com.linkedin.event.notification.NotificationRecipient;
 import com.linkedin.event.notification.NotificationRecipientArray;
 import com.linkedin.event.notification.NotificationRecipientType;
 import com.linkedin.event.notification.NotificationRequest;
+import com.linkedin.metadata.connection.ConnectionService;
 import com.linkedin.settings.global.GlobalIntegrationSettings;
 import com.linkedin.settings.global.GlobalNotificationSettings;
 import com.linkedin.settings.global.GlobalSettingsInfo;
 import com.linkedin.settings.global.SlackIntegrationSettings;
+import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.request.users.UsersLookupByEmailRequest;
@@ -27,8 +32,11 @@ import com.slack.api.methods.response.users.UsersLookupByEmailResponse;
 import com.slack.api.model.User;
 import java.util.Collections;
 import org.mockito.Mockito;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static com.datahub.notification.slack.SlackNotificationSink.*;
+import static com.linkedin.metadata.AcrylConstants.*;
 import static com.linkedin.metadata.Constants.*;
 
 
@@ -46,16 +54,24 @@ public class SlackNotificationSinkTest {
     SecretProvider mockSecretProvider = Mockito.mock(SecretProvider.class);
     SlackNotificationSink sink = new SlackNotificationSink();
 
-    // Case 1: Empty Static Config
+    ConnectionService mockConnectionService = Mockito.mock(ConnectionService.class);
+    mockConnectionService = Mockito.mock(ConnectionService.class);
+    Mockito.when(mockConnectionService.getConnectionDetails(Mockito.any(Urn.class)))
+      .thenReturn(
+          null
+      );
+
+    // Case 1: No Connection, Empty Static Config
     sink.init(new NotificationSinkConfig(
         Collections.emptyMap(),
         mockSettingsProvider,
         mockIdentityProvider,
         mockSecretProvider,
+        mockConnectionService,
         TEST_BASE_URL
     ));
 
-    // Case 2: Static config with bot token and default channel
+    // Case 2: No Connection, Static config with bot token and default channel
     sink.init(new NotificationSinkConfig(
         ImmutableMap.of(
             "botToken",
@@ -66,8 +82,102 @@ public class SlackNotificationSinkTest {
         mockSettingsProvider,
         mockIdentityProvider,
         mockSecretProvider,
+        mockConnectionService,
         TEST_BASE_URL
     ));
+  }
+
+  @Test
+  public void testIsEnabled() {
+
+    // Case 1: Slack configs are stored in new connection object
+    SettingsProvider mockSettingsProvider = Mockito.mock(SettingsProvider.class);
+    Mockito.when(mockSettingsProvider.getGlobalSettings()).thenReturn(
+        enabledSettings()
+    );
+    ConnectionService mockConnectionService = Mockito.mock(ConnectionService.class);
+    Mockito.when(mockConnectionService.getConnectionDetails(Mockito.eq(SLACK_CONNECTION_URN)))
+        .thenReturn(
+            new DataHubConnectionDetails()
+                .setType(DataHubConnectionDetailsType.JSON)
+                .setJson(new DataHubJsonConnection()
+                    .setEncryptedBlob("blob")
+                )
+        );
+    IdentityProvider mockIdentityProvider = Mockito.mock(IdentityProvider.class);
+    Mockito.when(mockIdentityProvider.getUser(TEST_USER_URN)).thenReturn(testUser());
+    SecretProvider mockSecretProvider = Mockito.mock(SecretProvider.class);
+    Mockito.when(mockSecretProvider.decryptSecret("blob")).thenReturn("{\"bot_token\": \"test-token\"}");
+
+    Slack mockSlack = Mockito.mock(Slack.class);
+    Mockito.when(mockSlack.methods(Mockito.anyString())).thenReturn(Mockito.mock(MethodsClient.class));
+
+    SlackNotificationSink sink = new SlackNotificationSink(mockSlack);
+
+    sink.init(new NotificationSinkConfig(
+        ImmutableMap.of(
+            "botToken",
+            "abc",
+            "defaultChannel",
+            "#test"
+        ),
+        mockSettingsProvider,
+        mockIdentityProvider,
+        mockSecretProvider,
+        mockConnectionService,
+        TEST_BASE_URL
+    ));
+
+    Assert.assertTrue(sink.isEnabled());
+
+    // Case 2: Slack configs are stored in legacy settings.
+    mockConnectionService = Mockito.mock(ConnectionService.class);
+    Mockito.when(mockConnectionService.getConnectionDetails(Mockito.eq(SLACK_CONNECTION_URN)))
+        .thenReturn(
+            null
+        );
+    sink.init(new NotificationSinkConfig(
+        ImmutableMap.of(
+            "botToken",
+            "abc",
+            "defaultChannel",
+            "#test"
+        ),
+        mockSettingsProvider,
+        mockIdentityProvider,
+        mockSecretProvider,
+        mockConnectionService,
+        TEST_BASE_URL
+    ));
+
+    Assert.assertTrue(sink.isEnabled());
+
+    // Case 3: Slack configs are stored in static configs
+    mockSettingsProvider = Mockito.mock(SettingsProvider.class);
+    Mockito.when(mockSettingsProvider.getGlobalSettings())
+        .thenReturn(
+            emptySettings()
+        );
+    mockConnectionService = Mockito.mock(ConnectionService.class);
+    Mockito.when(mockConnectionService.getConnectionDetails(Mockito.eq(SLACK_CONNECTION_URN)))
+        .thenReturn(
+            null
+        );
+    sink.init(new NotificationSinkConfig(
+        ImmutableMap.of(
+            "botToken",
+            "abc",
+            "defaultChannel",
+            "#test"
+        ),
+        mockSettingsProvider,
+        mockIdentityProvider,
+        mockSecretProvider,
+        mockConnectionService,
+        TEST_BASE_URL
+    ));
+
+    Assert.assertTrue(sink.isEnabled());
   }
 
   @Test
@@ -83,6 +193,11 @@ public class SlackNotificationSinkTest {
     Mockito.when(mockSettingsProvider.getGlobalSettings()).thenReturn(
         enabledSettings()
     );
+    ConnectionService mockConnectionService = Mockito.mock(ConnectionService.class);
+    Mockito.when(mockConnectionService.getConnectionDetails(Mockito.any(Urn.class)))
+      .thenReturn(
+          null
+      );
     IdentityProvider mockIdentityProvider = Mockito.mock(IdentityProvider.class);
     Mockito.when(mockIdentityProvider.getUser(TEST_USER_URN)).thenReturn(testUser());
     SecretProvider mockSecretProvider = Mockito.mock(SecretProvider.class);
@@ -102,6 +217,7 @@ public class SlackNotificationSinkTest {
     ChatPostMessageRequest userMsgRequest = ChatPostMessageRequest.builder()
         .channel("test-id")
         .text("*Test Message Title*\n\nTest Message Body")
+        .iconUrl(String.format("http://localhost:9002%s", ACRYL_LOGO_FILE_PATH))
         .build();
     ChatPostMessageResponse usrMsgResponse = new ChatPostMessageResponse();
     usrMsgResponse.setOk(true);
@@ -110,6 +226,7 @@ public class SlackNotificationSinkTest {
     ChatPostMessageRequest channelMsgRequest = ChatPostMessageRequest.builder()
         .channel("#test-channel")
         .text("*Test Message Title*\n\nTest Message Body")
+        .iconUrl(String.format("http://localhost:9002%s", ACRYL_LOGO_FILE_PATH))
         .build();
     ChatPostMessageResponse channelMsgResponse = new ChatPostMessageResponse();
     channelMsgResponse.setOk(true);
@@ -118,6 +235,7 @@ public class SlackNotificationSinkTest {
     ChatPostMessageRequest defaultChannelMsgRequest = ChatPostMessageRequest.builder()
         .channel("#test")
         .text("*Test Message Title*\n\nTest Message Body")
+        .iconUrl(String.format("http://localhost:9002%s", ACRYL_LOGO_FILE_PATH))
         .build();
     ChatPostMessageResponse defaultChannelMsgResponse = new ChatPostMessageResponse();
     defaultChannelMsgResponse.setOk(true);
@@ -135,6 +253,7 @@ public class SlackNotificationSinkTest {
         mockSettingsProvider,
         mockIdentityProvider,
         mockSecretProvider,
+        mockConnectionService,
         TEST_BASE_URL
     ));
 
@@ -202,6 +321,7 @@ public class SlackNotificationSinkTest {
     IdentityProvider mockIdentityProvider = Mockito.mock(IdentityProvider.class);
     SecretProvider mockSecretProvider = Mockito.mock(SecretProvider.class);
     MethodsClient mockSlackClient = Mockito.mock(MethodsClient.class);
+    ConnectionService mockConnectionService = Mockito.mock(ConnectionService.class);
 
     // Init with a mock slack client.
     SlackNotificationSink sink = new SlackNotificationSink(mockSlackClient);
@@ -215,6 +335,7 @@ public class SlackNotificationSinkTest {
         mockSettingsProvider,
         mockIdentityProvider,
         mockSecretProvider,
+        mockConnectionService,
         "http://localhost:9002"
     ));
 
@@ -284,7 +405,19 @@ public class SlackNotificationSinkTest {
     GlobalIntegrationSettings globalIntegrationSettings = new GlobalIntegrationSettings();
     globalIntegrationSettings.setSlackSettings(new SlackIntegrationSettings()
         .setEnabled(true)
+        .setDefaultChannelName("#test")
     );
+    globalSettingsInfo.setIntegrations(globalIntegrationSettings);
+    return globalSettingsInfo;
+  }
+
+  private GlobalSettingsInfo emptySettings() {
+    GlobalSettingsInfo globalSettingsInfo = new GlobalSettingsInfo();
+    globalSettingsInfo.setNotifications(new GlobalNotificationSettings());
+
+    // Enabled slack settings..
+    GlobalIntegrationSettings globalIntegrationSettings = new GlobalIntegrationSettings();
+    globalIntegrationSettings.setSlackSettings(new SlackIntegrationSettings()); // Empty
     globalSettingsInfo.setIntegrations(globalIntegrationSettings);
     return globalSettingsInfo;
   }

@@ -32,6 +32,9 @@ public class AcrylConstants {
   public static final String TESTS_CREATED_TIME_INDEX_FIELD_NAME = "createdTime";
   public static final String TESTS_LAST_UPDATED_TIME_INDEX_FIELD_NAME = "lastUpdatedTime";
 
+  public static final String ACRYL_LOGO_FILE_PATH = "/integrations/static/acryl-slack-icon.png";
+
+
   private AcrylConstants() {
   }
 }

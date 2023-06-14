@@ -12,6 +12,7 @@ import com.linkedin.datahub.graphql.GmsGraphQLEngineArgs;
 import com.linkedin.datahub.graphql.GraphQLEngine;
 import com.linkedin.datahub.graphql.analytics.service.AnalyticsService;
 import com.linkedin.gms.factory.assertions.AssertionServiceFactory;
+import com.linkedin.gms.factory.integration.IntegrationsServiceFactory;
 import com.linkedin.metadata.client.JavaEntityClient;
 import com.linkedin.gms.factory.auth.DataHubTokenServiceFactory;
 import com.linkedin.gms.factory.common.GitVersionFactory;
@@ -24,10 +25,12 @@ import com.linkedin.gms.factory.entity.RestliEntityClientFactory;
 import com.linkedin.gms.factory.recommendation.RecommendationServiceFactory;
 import com.linkedin.gms.factory.search.EntitySearchServiceFactory;
 import com.linkedin.gms.factory.test.TestEngineFactory;
+import com.linkedin.metadata.connection.ConnectionService;
 import com.linkedin.metadata.entity.EntityService;
 import com.linkedin.metadata.graph.GraphClient;
 import com.linkedin.metadata.graph.GraphService;
 import com.linkedin.metadata.graph.SiblingGraphService;
+import com.linkedin.metadata.integration.IntegrationsService;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.recommendation.RecommendationsService;
 import com.linkedin.metadata.search.EntitySearchService;
@@ -60,7 +63,7 @@ import org.springframework.context.annotation.Import;
 @Import({RestHighLevelClientFactory.class, IndexConventionFactory.class, RestliEntityClientFactory.class,
     RecommendationServiceFactory.class, EntityRegistryFactory.class, DataHubTokenServiceFactory.class,
     GitVersionFactory.class, SiblingGraphServiceFactory.class, TestEngineFactory.class,
-    EntitySearchServiceFactory.class, AssertionServiceFactory.class})
+    EntitySearchServiceFactory.class, AssertionServiceFactory.class, IntegrationsServiceFactory.class})
 public class GraphQLEngineFactory {
   @Autowired
   @Qualifier("elasticSearchRestHighLevelClient")
@@ -192,6 +195,14 @@ public class GraphQLEngineFactory {
   @Qualifier("monitorService")
   private MonitorService _monitorService;
 
+  @Autowired
+  @Qualifier("integrationsService")
+  private IntegrationsService _integrationsService;
+
+  @Autowired
+  @Qualifier("connectionService")
+  private ConnectionService _connectionService;
+
   @Value("${platformAnalytics.enabled}") // TODO: Migrate to DATAHUB_ANALYTICS_ENABLED
   private Boolean isAnalyticsEnabled;
 
@@ -243,6 +254,8 @@ public class GraphQLEngineFactory {
     args.setProposalService(_proposalService);
     args.setAssertionService(_assertionsService);
     args.setMonitorService(_monitorService);
+    args.setIntegrationsService(_integrationsService);
+    args.setConnectionService(_connectionService);
 
     return new GmsGraphQLEngine(
         args

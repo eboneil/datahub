@@ -2,7 +2,6 @@ query getGlobalSettings {
     globalSettings {
         integrationSettings {
             slackSettings {
-                enabled
                 defaultChannelName
                 botToken
             }
@@ -24,7 +23,6 @@ query getIntegrationSettings {
     globalSettings {
         integrationSettings {
             slackSettings {
-                enabled
                 defaultChannelName
                 botToken
             }

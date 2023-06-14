@@ -3,6 +3,7 @@ package com.datahub.notification;
 import com.datahub.notification.provider.IdentityProvider;
 import com.datahub.notification.provider.SecretProvider;
 import com.datahub.notification.provider.SettingsProvider;
+import com.linkedin.metadata.connection.ConnectionService;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +34,11 @@ public class NotificationSinkConfig {
    * Secret provider, which is responsible for resolving secret values from their urn.
    */
   private final SecretProvider secretProvider;
+
+  /**
+   * A provider of connection information.
+   */
+  private final ConnectionService connectionService;
 
   /**
    * The base URL where DataHub is deployed. Used to construct URL strings.

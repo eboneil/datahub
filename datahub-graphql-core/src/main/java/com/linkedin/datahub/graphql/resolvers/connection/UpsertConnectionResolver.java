@@ -10,7 +10,7 @@ import com.linkedin.datahub.graphql.exception.AuthorizationException;
 import com.linkedin.datahub.graphql.generated.DataHubConnection;
 import com.linkedin.datahub.graphql.generated.UpsertDataHubConnectionInput;
 import com.linkedin.entity.EntityResponse;
-import com.linkedin.entity.client.EntityClient;
+import com.linkedin.metadata.connection.ConnectionService;
 import com.linkedin.metadata.secret.SecretService;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -28,8 +28,10 @@ public class UpsertConnectionResolver implements DataFetcher<CompletableFuture<D
   private final ConnectionService _connectionService;
   private final SecretService _secretService;
 
-  public UpsertConnectionResolver(@Nonnull final EntityClient entityClient, @Nonnull final SecretService secretService) {
-    _connectionService = new ConnectionService(Objects.requireNonNull(entityClient, "entityClient cannot be null"));
+  public UpsertConnectionResolver(
+      @Nonnull final ConnectionService connectionService,
+      @Nonnull final SecretService secretService) {
+    _connectionService = Objects.requireNonNull(connectionService, "connectionService cannot be null");
     _secretService = Objects.requireNonNull(secretService, "secretService cannot be null");
   }
 

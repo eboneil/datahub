@@ -544,5 +544,25 @@
       "type": "FILE_SYSTEM",
       "logoUrl": "/assets/platforms/gcslogo.svg"
     }
+  },
+  {
+    "urn": "urn:li:dataPlatform:slack",
+    "aspect": {
+      "datasetNameDelimiter": ".",
+      "name": "Slack",
+      "displayName": "Slack",
+      "type": "OTHERS",
+      "logoUrl": "/assets/platforms/slacklogo.png"
+    }
+  },
+  {
+    "urn": "urn:li:dataPlatform:microsoft-teams",
+    "aspect": {
+      "datasetNameDelimiter": ".",
+      "name": "Microsoft Teams",
+      "displayName": "Microsoft Teams",
+      "type": "OTHERS",
+      "logoUrl": "/assets/platforms/teamslogo.png"
+    }
   }
 ]
