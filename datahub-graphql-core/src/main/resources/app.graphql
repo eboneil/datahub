@@ -429,19 +429,15 @@ Slack integration settings.
 """
 type SlackIntegrationSettings {
   """
-  Whether the slack integration is enabled or not.
-  """
-  enabled: Boolean!
-
-  """
-  A bot token used for sending notifications
-  """
-  botToken: String
-
-  """
   A default slack channel to route to.
   """
   defaultChannelName: String
+
+  """
+  A bot token used for sending notifications
+  Deprecated! Use connection entity instead.
+  """
+  botToken: String
 }
 
 """
@@ -676,17 +672,13 @@ Input required to update Slack settings.
 """
 input UpdateSlackIntegrationSettingsInput {
   """
-  Whether the slack integration is enabled or not.
-  """
-  enabled: Boolean!
-
-  """
   A default slack channel to route to.
   """
   defaultChannelName: String
 
   """
   Optional - a bot token to use. This will be encrypted on DataHub backend.
+  Deprecated! Use upsertConnection to create slack connections instead.
   """
   botToken: String
 }

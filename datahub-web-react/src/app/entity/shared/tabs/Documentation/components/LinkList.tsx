@@ -9,6 +9,8 @@ import { useEntityRegistry } from '../../../../../useEntityRegistry';
 import { ANTD_GRAY } from '../../../constants';
 import { formatDateString } from '../../../containers/profile/utils';
 import { useRemoveLinkMutation } from '../../../../../../graphql/mutations.generated';
+import { shouldTryLinkPreview } from '../../../../../integration/linkPreviews';
+import LinkPreview from '../../../../../integration/LinkPreview';
 
 const LinkListItem = styled(List.Item)`
     border-radius: 5px;
@@ -80,6 +82,7 @@ export const LinkList = ({ refetch }: LinkListProps) => {
                                 }
                                 description={
                                     <>
+                                        {shouldTryLinkPreview(link.url) && <LinkPreview link={link} />}
                                         Added {formatDateString(link.created.time)} by{' '}
                                         <Link
                                             to={`${entityRegistry.getEntityUrl(EntityType.CorpUser, link.author.urn)}`}

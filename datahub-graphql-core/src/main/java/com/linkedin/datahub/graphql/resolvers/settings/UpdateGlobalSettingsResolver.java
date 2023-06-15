@@ -105,7 +105,7 @@ public class UpdateGlobalSettingsResolver implements DataFetcher<CompletableFutu
       final SlackIntegrationSettings existingSettings,
       final UpdateSlackIntegrationSettingsInput update
   ) {
-    existingSettings.setEnabled(update.getEnabled());
+    existingSettings.setEnabled(true);
     if (update.getDefaultChannelName() != null) {
       existingSettings.setDefaultChannelName(update.getDefaultChannelName());
     }

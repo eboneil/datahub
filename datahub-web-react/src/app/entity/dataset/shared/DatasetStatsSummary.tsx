@@ -8,6 +8,8 @@ import { toLocalDateTimeString, toRelativeTimeString } from '../../../shared/tim
 import { StatsSummary } from '../../shared/components/styled/StatsSummary';
 import { FormattedBytesStat } from './FormattedBytesStat';
 import { PercentileLabel } from '../../shared/stats/PercentileLabel';
+import { countFormatter, needsFormatting } from '../../../../utils/formatter';
+import ExpandingStat from './ExpandingStat';
 
 const StatText = styled.span<{ color: string }>`
     color: ${(props) => props.color};
@@ -28,6 +30,7 @@ type Props = {
     uniqueUserPercentileLast30Days?: number | null;
     lastUpdatedMs?: number | null;
     color?: string;
+    mode?: 'normal' | 'tooltip-content';
 };
 
 export const DatasetStatsSummary = ({
@@ -41,20 +44,33 @@ export const DatasetStatsSummary = ({
     uniqueUserPercentileLast30Days,
     lastUpdatedMs,
     color,
+    mode = 'normal',
 }: Props) => {
-    const displayedColor = color !== undefined ? color : ANTD_GRAY[7];
+    const isTooltipMode = mode === 'tooltip-content';
+    const displayedColor = isTooltipMode ? '' : color ?? ANTD_GRAY[7];
 
     const statsViews = [
         !!rowCount && (
-            <StatText color={displayedColor}>
-                <TableOutlined style={{ marginRight: 8, color: displayedColor }} />
-                <b>{formatNumberWithoutAbbreviation(rowCount)}</b> rows
-                {!!columnCount && (
-                    <>
-                        , <b>{formatNumberWithoutAbbreviation(columnCount)}</b> columns
-                    </>
+            <ExpandingStat
+                disabled={isTooltipMode || !needsFormatting(rowCount)}
+                render={(isExpanded) => (
+                    <StatText color={displayedColor}>
+                        <TableOutlined style={{ marginRight: 8, color: displayedColor }} />
+                        <b>{isExpanded ? formatNumberWithoutAbbreviation(rowCount) : countFormatter(rowCount)}</b> rows
+                        {!!columnCount && (
+                            <>
+                                ,{' '}
+                                <b>
+                                    {isExpanded
+                                        ? formatNumberWithoutAbbreviation(columnCount)
+                                        : countFormatter(columnCount)}
+                                </b>{' '}
+                                columns
+                            </>
+                        )}
+                    </StatText>
                 )}
-            </StatText>
+            />
         ),
         !!sizeInBytes && (
             <StatText color={displayedColor}>

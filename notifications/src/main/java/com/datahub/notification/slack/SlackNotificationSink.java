@@ -7,15 +7,20 @@ import com.datahub.notification.NotificationTemplateType;
 import com.datahub.notification.provider.SecretProvider;
 import com.datahub.notification.provider.SettingsProvider;
 import com.datahub.notification.provider.IdentityProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
+import com.linkedin.connection.DataHubConnectionDetails;
+import com.linkedin.connection.DataHubConnectionDetailsType;
 import com.linkedin.data.template.GetMode;
 import com.linkedin.event.notification.NotificationRecipient;
 import com.linkedin.event.notification.NotificationRecipientType;
 import com.linkedin.event.notification.NotificationRequest;
 import com.linkedin.event.notification.NotificationSinkType;
+import com.linkedin.metadata.connection.ConnectionService;
 import com.linkedin.settings.global.GlobalSettingsInfo;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
@@ -40,6 +45,7 @@ import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.datahub.notification.NotificationUtils.*;
+import static com.linkedin.metadata.AcrylConstants.*;
 
 
 /**
@@ -53,6 +59,8 @@ import static com.datahub.notification.NotificationUtils.*;
  */
 @Slf4j
 public class SlackNotificationSink implements NotificationSink {
+
+  static final Urn SLACK_CONNECTION_URN = UrnUtils.getUrn("urn:li:dataHubConnection:__system_slack-0");
 
   /**
    * A list of notification templates supported by this sink.
@@ -70,11 +78,12 @@ public class SlackNotificationSink implements NotificationSink {
   private static final String BOT_TOKEN_CONFIG_NAME = "botToken";
   private static final String DEFAULT_CHANNEL_CONFIG_NAME = "defaultChannel";
 
-  private final Slack slack = Slack.getInstance();
   private final Map<String, User> emailToSlackUser = new HashMap<>();
+  private Slack slack = Slack.getInstance();
   private SettingsProvider settingsProvider;
   private IdentityProvider identityProvider;
   private SecretProvider secretProvider;
+  private ConnectionService connectionService;
   private String baseUrl;
   private String defaultChannel;
   private String botToken;
@@ -85,6 +94,11 @@ public class SlackNotificationSink implements NotificationSink {
   @VisibleForTesting
   SlackNotificationSink(MethodsClient slackClient) {
     this.slackClient = slackClient;
+  }
+
+  @VisibleForTesting
+  SlackNotificationSink(Slack slack) {
+    this.slack = slack;
   }
 
   public SlackNotificationSink() { }
@@ -105,6 +119,7 @@ public class SlackNotificationSink implements NotificationSink {
     this.identityProvider = cfg.getIdentityProvider();
     this.secretProvider = cfg.getSecretProvider();
     this.baseUrl = cfg.getBaseUrl();
+    this.connectionService = cfg.getConnectionService();
     // Optional -- Provide the bot token directly in config. Used until this is available inside UI.
     if (cfg.getStaticConfig().containsKey(BOT_TOKEN_CONFIG_NAME)) {
       botToken = (String) cfg.getStaticConfig().get(BOT_TOKEN_CONFIG_NAME);
@@ -135,9 +150,9 @@ public class SlackNotificationSink implements NotificationSink {
    * Instantiation of the slack client simply depends on a "bot token" config being resolvable from global
    * settings or from static configuration.
    */
-  private boolean isEnabled() {
+  @VisibleForTesting
+  boolean isEnabled() {
 
-    // Fetch application settings, used to determine whether Slack notifications is enabled.
     final GlobalSettingsInfo globalSettings = this.settingsProvider.getGlobalSettings();
 
     if (globalSettings == null) {
@@ -147,9 +162,18 @@ public class SlackNotificationSink implements NotificationSink {
     }
 
     // Next check global settings to determine whether slack is supposed to be enabled.
-    if (globalSettings.getIntegrations().hasSlackSettings() && globalSettings.getIntegrations().getSlackSettings().isEnabled()) {
-      // Slack is enabled. Let's try to create a slack client (if one doesn't already exist)
-      initSlackClient(globalSettings);
+    if (globalSettings.getIntegrations().hasSlackSettings()) {
+
+      // Slack should be enabled. Let's try to create a slack client (if one doesn't already exist)
+      ObjectNode slackConnectionDetails = getSlackConnection();
+      if (slackConnectionDetails != null) {
+        // First, let's try using the New Connection Entity.
+        initSlackClientFromConnection(slackConnectionDetails);
+      } else {
+        // If no connection was found, let's fallback to using Global Settings
+        initSlackClientFromGlobalSettings(globalSettings);
+      }
+
       if (this.slackClient != null) {
         return true;
       } else {
@@ -556,6 +580,7 @@ public class SlackNotificationSink implements NotificationSink {
     final ChatPostMessageRequest msgRequest = ChatPostMessageRequest.builder()
         .channel(channel)
         .text(text)
+        .iconUrl(String.format("%s%s", this.baseUrl, ACRYL_LOGO_FILE_PATH))
         .build();
     final ChatPostMessageResponse response = sendMessage(msgRequest);
     if (response.isOk()) {
@@ -669,7 +694,9 @@ public class SlackNotificationSink implements NotificationSink {
         : Optional.ofNullable(this.defaultChannel);
   }
 
-  private void initSlackClient(final GlobalSettingsInfo globalSettings) {
+
+
+  private void initSlackClientFromGlobalSettings(@Nonnull final GlobalSettingsInfo globalSettings) {
     // Attempt to init the slack client from static config or local configuration.
     if (slackClient == null) {
       // Next, attempt to instantiate a slack client using a bot token from static config or settings. Bot token provided in dynamic settings
@@ -689,5 +716,37 @@ public class SlackNotificationSink implements NotificationSink {
         log.warn("Failed to create Slack client - could not resolve a bot token from static config or global settings!");
       }
     }
+  }
+
+  private void initSlackClientFromConnection(@Nonnull final ObjectNode jsonConnection) {
+    // Attempt to init the slack client from the connection object
+    if (slackClient == null) {
+      // Next, attempt to instantiate a slack client using a bot token from static config or settings. Bot token provided in dynamic settings
+      // takes precedence over that provided in static sink config.
+      if (jsonConnection.has("bot_token")) {
+        try {
+          this.slackClient = slack.methods(jsonConnection.get("bot_token").asText());
+        } catch (Exception e) {
+          log.error("Caught exception while attempting to resolve bot token secret. Failed to create slack client.", e);
+        }
+      } else {
+        log.warn("Failed to create Slack client using Connection JSON! Falling back to legacy settings.");
+      }
+    }
+  }
+
+  @Nullable
+  private ObjectNode getSlackConnection() {
+    final DataHubConnectionDetails details = this.connectionService.getConnectionDetails(SLACK_CONNECTION_URN);
+    if (details != null && DataHubConnectionDetailsType.JSON.equals(details.getType()) && details.hasJson()) {
+      try {
+        final String jsonStr = this.secretProvider.decryptSecret(details.getJson().getEncryptedBlob());
+        return new ObjectMapper().readValue(jsonStr, ObjectNode.class);
+      } catch (Exception e) {
+        log.error(String.format("Failed to decode Slack Connection details from connection %s. Falling back to global settings.",
+            details));
+      }
+    }
+    return null;
   }
 }

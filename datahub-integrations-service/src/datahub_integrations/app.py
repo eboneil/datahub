@@ -1,8 +1,11 @@
 import os
+import pathlib
 
 from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from fastapi import FastAPI, Response
 from fastapi.responses import RedirectResponse
+
+STATIC_ASSETS_DIR = pathlib.Path(__file__).parent / "../../static"
 
 app = FastAPI()
 

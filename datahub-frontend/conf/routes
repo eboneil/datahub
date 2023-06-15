@@ -34,6 +34,12 @@ POST          /openapi/*path                                                   c
 DELETE        /openapi/*path                                                   controllers.Application.proxy(path: String, request: Request)
 PUT           /openapi/*path                                                   controllers.Application.proxy(path: String, request: Request)
 
+# Acryl Only! Proxies 3rd party integrations to integrations service.
+GET           /integrations/*path                                             controllers.IntegrationsController.proxyToIntegrationsService(path: String, request: Request)
+POST          /integrations/*path                                             controllers.IntegrationsController.proxyToIntegrationsService(path: String, request: Request)
+DELETE        /integrations/*path                                             controllers.IntegrationsController.proxyToIntegrationsService(path: String, request: Request)
+PUT           /integrations/*path                                             controllers.IntegrationsController.proxyToIntegrationsService(path: String, request: Request)
+
 # Proxies Dashboard requests to the metadata service
 GET           /admin/dashboard/*path                                         controllers.Application.proxy(path: String, request: Request)
 POST          /admin/dashboard/*path                                         controllers.Application.proxy(path: String, request: Request)

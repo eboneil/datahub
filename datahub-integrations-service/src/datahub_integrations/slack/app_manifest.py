@@ -39,6 +39,9 @@ slack_bot_scopes = [
     "mpim:history",
     "mpim:read",
     "metadata.message:read",
+    # TODO: Should we add channels:join?
+    # If we add that, then we can set the app to automatically join all public channels.
+    # However, that would send a message to the channel when the app joins, which is not ideal.
     # Required to unfurl links.
     "links:read",
     "links:write",
@@ -59,9 +62,11 @@ def get_slack_app_manifest() -> str:
         },
         "display_information": {
             "name": "Acryl Data",
-            "description": "TODO short desc",
             "background_color": "#142f39",
-            "long_description": "TODO long desc\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit. In at interdum eros. Praesent a cursus diam, et mattis libero. Suspendisse quis mauris in nibh lobortis posuere. Integer elit dolor, ultricies id tempus et, consequat quis tellus. Quisque blandit libero eget mauris aliquet ullamcorper. Etiam euismod orci nulla, eget fermentum dolor posuere sit amet. Donec gravida quam eu libero euismod, non scelerisque risus iaculis.",
+            # The short tagline shows up in the app hover cards.
+            "description": "A modern approach to data discovery and metadata management",
+            # The long description appears on the app install page and the about app details page in Slack.
+            "long_description": "The Acryl Data integration for Slack allows you to receive real-time notifications about changes to your data, unfurl links in both Slack and Acryl, and to search across your data from within Slack.",
         },
         "features": {
             "bot_user": {"display_name": "Acryl", "always_online": True},
@@ -76,7 +81,7 @@ def get_slack_app_manifest() -> str:
             "slash_commands": [
                 {
                     "command": "/acryl",
-                    "url": f"{DATAHUB_FRONTEND_URL}/integrations/slack/events",
+                    "url": f"{DATAHUB_FRONTEND_URL}/integrations/slack/commands",
                     "description": "Search across your Acryl instance",
                     "usage_hint": "keywords",
                     "should_escape": False,
@@ -115,7 +120,7 @@ def get_slack_app_manifest() -> str:
             },
             "interactivity": {
                 "is_enabled": True,
-                "request_url": f"{DATAHUB_FRONTEND_URL}/integrations/slack/events",
+                "request_url": f"{DATAHUB_FRONTEND_URL}/integrations/slack/actions",
             },
             "org_deploy_enabled": False,
             "socket_mode_enabled": USE_SOCKET_MODE,

@@ -10,9 +10,11 @@ import com.datahub.notification.NotificationSinkManager;
 import com.linkedin.entity.client.EntityClient;
 import com.linkedin.gms.factory.auth.SystemAuthenticationFactory;
 import com.linkedin.gms.factory.config.ConfigurationProvider;
+import com.linkedin.gms.factory.connection.ConnectionServiceFactory;
 import com.linkedin.gms.factory.entity.RestliEntityClientFactory;
 import com.linkedin.gms.factory.spring.YamlPropertySourceFactory;
 import com.linkedin.metadata.config.notification.NotificationSinkConfiguration;
+import com.linkedin.metadata.connection.ConnectionService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +33,7 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @PropertySource(value = "classpath:/application.yml", factory = YamlPropertySourceFactory.class)
 @Import({RestliEntityClientFactory.class, SettingsProviderFactory.class, IdentityProviderFactory.class,
-    SecretProviderFactory.class, SystemAuthenticationFactory.class})
+    SecretProviderFactory.class, SystemAuthenticationFactory.class, ConnectionServiceFactory.class})
 public class NotificationSinkManagerFactory {
 
   @Autowired
@@ -53,6 +55,10 @@ public class NotificationSinkManagerFactory {
   @Autowired
   @Qualifier("secretProvider")
   private SecretProvider secretProvider;
+
+  @Autowired
+  @Qualifier("connectionService")
+  private ConnectionService connectionService;
 
   @Autowired
   private ConfigurationProvider configurationProvider;
@@ -94,6 +100,7 @@ public class NotificationSinkManagerFactory {
                 this.settingsProvider,
                 this.identityProvider,
                 this.secretProvider,
+                this.connectionService,
                 baseUrl
             ));
             configuredSinks.add(notificationSink);

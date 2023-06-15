@@ -102,7 +102,7 @@ const SLACK_CHANNEL_PARAM_NAME = `${SLACK_SINK.id}.channel`;
 const isSinkEnabled = (sinkId, settings?: GlobalSettings | null) => {
     switch (sinkId) {
         case SLACK_SINK.id: {
-            return settings?.integrationSettings?.slackSettings?.enabled || false;
+            return settings?.integrationSettings?.slackSettings?.defaultChannelName || false;
         }
         default:
             return false;

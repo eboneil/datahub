@@ -8,12 +8,16 @@ import com.linkedin.common.Urn
 record SlackIntegrationSettings {
   /**
    * Whether the slack integration is enabled or not.
+   * Deprecated! This is no longer used in favor of using the connections abstraction.
    */
-  enabled: boolean
+  @deprecated
+  enabled: boolean = true
 
   /**
    * An encrypted bot token.
+   * Deprecated! This is no longer used in favor of using the connections abstraction.
    */
+  @deprecated
   encryptedBotToken: optional string
 
   /**

@@ -527,5 +527,10 @@ entities:
     keyAspect: monitorKey
     aspects:
       - monitorInfo
+  - name: linkPreview
+    category: internal
+    keyAspect: linkPreviewKey
+    aspects:
+      - linkPreviewInfo
 events:
   - name: notificationRequest

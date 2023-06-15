@@ -22,6 +22,8 @@ dependencies {
     annotationProcessor externalDependency.lombok
 
     testCompile externalDependency.mockito
+
+
 }
 
 graphqlCodegen {
@@ -52,6 +54,8 @@ graphqlCodegen {
         "$projectDir/src/main/resources/incident.graphql".toString(),
         // Anomalies not in OSS
         "$projectDir/src/main/resources/anomaly.graphql".toString(),
+        // Integrations not in OSS
+        "$projectDir/src/main/resources/integration.graphql".toString(),
     ]
     outputDir = new File("$projectDir/src/mainGeneratedGraphQL/java")
     packageName = "com.linkedin.datahub.graphql.generated"

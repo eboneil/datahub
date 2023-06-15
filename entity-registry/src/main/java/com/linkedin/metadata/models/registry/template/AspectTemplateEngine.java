@@ -21,7 +21,11 @@ import static com.linkedin.metadata.Constants.*;
  */
 public class AspectTemplateEngine {
 
-  public static final Set<String> SUPPORTED_TEMPLATES = Stream.of(
+  public static final Stream<String> SUPPORTED_TEMPLATES_SAAS = Stream.of(
+          MONITOR_INFO_ASPECT_NAME
+  );
+
+  public static final Set<String> SUPPORTED_TEMPLATES = Stream.concat(SUPPORTED_TEMPLATES_SAAS, Stream.of(
       DATASET_PROPERTIES_ASPECT_NAME,
       EDITABLE_SCHEMA_METADATA_ASPECT_NAME,
       GLOBAL_TAGS_ASPECT_NAME,
@@ -31,8 +35,7 @@ public class AspectTemplateEngine {
       DATA_FLOW_INFO_ASPECT_NAME,
       DATA_JOB_INFO_ASPECT_NAME,
       DATA_PRODUCT_PROPERTIES_ASPECT_NAME,
-      MONITOR_INFO_ASPECT_NAME // SaaS only
-      ).collect(Collectors.toSet());
+      DATA_JOB_INPUT_OUTPUT_ASPECT_NAME)).collect(Collectors.toSet());
 
   private final Map<String, Template<? extends RecordTemplate>> _aspectTemplateMap;
 

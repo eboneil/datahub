@@ -73,9 +73,6 @@ public class GlobalSettingsResolverTest {
 
     // Verify integration settings.
     assertEquals(
-        (boolean) actual.getIntegrationSettings().getSlackSettings().getEnabled(),
-        (boolean) expected.getIntegrations().getSlackSettings().isEnabled());
-    assertEquals(
         actual.getIntegrationSettings().getSlackSettings().getDefaultChannelName(),
         expected.getIntegrations().getSlackSettings().getDefaultChannelName());
 

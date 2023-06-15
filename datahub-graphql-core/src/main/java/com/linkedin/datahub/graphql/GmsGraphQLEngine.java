@@ -181,6 +181,7 @@ import com.linkedin.datahub.graphql.resolvers.ingest.source.DeleteIngestionSourc
 import com.linkedin.datahub.graphql.resolvers.ingest.source.GetIngestionSourceResolver;
 import com.linkedin.datahub.graphql.resolvers.ingest.source.ListIngestionSourcesResolver;
 import com.linkedin.datahub.graphql.resolvers.ingest.source.UpsertIngestionSourceResolver;
+import com.linkedin.datahub.graphql.resolvers.integration.GetLinkPreviewResolver;
 import com.linkedin.datahub.graphql.resolvers.jobs.DataJobRunsResolver;
 import com.linkedin.datahub.graphql.resolvers.jobs.EntityRunsResolver;
 import com.linkedin.datahub.graphql.resolvers.lineage.UpdateLineageResolver;
@@ -348,9 +349,11 @@ import com.linkedin.metadata.config.IngestionConfiguration;
 import com.linkedin.metadata.config.TestsConfiguration;
 import com.linkedin.metadata.config.ViewsConfiguration;
 import com.linkedin.metadata.config.VisualConfiguration;
+import com.linkedin.metadata.connection.ConnectionService;
 import com.linkedin.metadata.entity.EntityService;
 import com.linkedin.metadata.graph.GraphClient;
 import com.linkedin.metadata.graph.SiblingGraphService;
+import com.linkedin.metadata.integration.IntegrationsService;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.query.filter.SortCriterion;
 import com.linkedin.metadata.query.filter.SortOrder;
@@ -436,6 +439,8 @@ public class GmsGraphQLEngine {
     private final DataProductService dataProductService;
     private final AssertionService assertionService;
     private final MonitorService monitorService; // Acryl-only
+    private final IntegrationsService integrationsService;
+    private final ConnectionService connectionService;
 
     private final FeatureFlags featureFlags;
 
@@ -544,6 +549,8 @@ public class GmsGraphQLEngine {
         this.dataProductService = args.dataProductService;
         this.assertionService = args.assertionService;
         this.monitorService = args.monitorService;
+        this.integrationsService = args.integrationsService;
+        this.connectionService = args.connectionService;
 
         this.ingestionConfiguration = Objects.requireNonNull(args.ingestionConfiguration);
         this.authenticationConfiguration = Objects.requireNonNull(args.authenticationConfiguration);
@@ -706,6 +713,7 @@ public class GmsGraphQLEngine {
         configureConnectionResolvers(builder); // Not in OSS
         configureMonitorResolvers(builder); // Not in OSS
         configureIncidentResolvers(builder); // Not in OSS
+        configureIntegrationResolvers(builder); // Not in OSS
     }
 
     public GraphQLEngine.Builder builder() {
@@ -735,6 +743,8 @@ public class GmsGraphQLEngine {
             .addSchema(fileBasedSchema(MONITORS_SCHEMA_FILE))
             // Anomalies not in OSS
             .addSchema(fileBasedSchema(ANOMALY_SCHEMA_FILE))
+            // Integrations not in OSS
+            .addSchema(fileBasedSchema(INTEGRATIONS_SCHEMA_FILE))
             .addDataLoaders(loaderSuppliers(loadableTypes))
             .addDataLoader("Aspect", context -> createDataLoader(aspectType, context))
             .configureRuntimeWiring(this::configureRuntimeWiring);
@@ -2017,7 +2027,8 @@ public class GmsGraphQLEngine {
     }
 
     private void configureConnectionResolvers(final RuntimeWiring.Builder builder) {
-        builder.type("Mutation", typeWiring -> typeWiring.dataFetcher("upsertConnection", new UpsertConnectionResolver(entityClient, secretService)));
+        builder.type("Mutation", typeWiring -> typeWiring.dataFetcher("upsertConnection",
+            new UpsertConnectionResolver(connectionService, secretService)));
         builder.type("Query", typeWiring -> typeWiring.dataFetcher("connection", getResolver(connectionType)));
         builder.type("DataHubConnection",
             typeWiring -> typeWiring.dataFetcher("platform", new LoadableTypeResolver<>(dataPlatformType, (env) -> {
@@ -2027,17 +2038,17 @@ public class GmsGraphQLEngine {
     }
 
     private void configureIncidentResolvers(final RuntimeWiring.Builder builder) {
-        builder.type("Incident", typeWiring -> typeWiring
-            .dataFetcher("relationships", new EntityRelationshipsResultResolver(graphClient))
-        );
-        builder.type("IncidentSource", typeWiring -> typeWiring
-            .dataFetcher("source",
-                new LoadableTypeResolver<>(assertionType,
-                    (env) -> {
-                        final IncidentSource incidentSource = env.getSource();
-                        return incidentSource.getSource() != null ? incidentSource.getSource().getUrn() : null;
-                    }))
-        );
+        builder.type("Incident", typeWiring -> typeWiring.dataFetcher("relationships", new EntityRelationshipsResultResolver(graphClient)));
+        builder.type("IncidentSource",
+            typeWiring -> typeWiring.dataFetcher("source", new LoadableTypeResolver<>(assertionType, (env) -> {
+                final IncidentSource incidentSource = env.getSource();
+                return incidentSource.getSource() != null ? incidentSource.getSource().getUrn() : null;
+            })));
+    }
+
+
+    private void configureIntegrationResolvers(final RuntimeWiring.Builder builder) {
+        builder.type("Query", typeWiring -> typeWiring.dataFetcher("getLinkPreview", new GetLinkPreviewResolver(this.integrationsService)));
     }
 
 
