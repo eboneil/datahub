@@ -7,12 +7,9 @@ import { ANTD_GRAY } from '../../shared/constants';
 import { toLocalDateTimeString, toRelativeTimeString } from '../../../shared/time/timeUtils';
 import { StatsSummary } from '../../shared/components/styled/StatsSummary';
 import { FormattedBytesStat } from './FormattedBytesStat';
-<<<<<<< HEAD
 import { PercentileLabel } from '../../shared/stats/PercentileLabel';
-=======
 import { countFormatter, needsFormatting } from '../../../../utils/formatter';
 import ExpandingStat from './ExpandingStat';
->>>>>>> oss_master
 
 const StatText = styled.span<{ color: string }>`
     color: ${(props) => props.color};

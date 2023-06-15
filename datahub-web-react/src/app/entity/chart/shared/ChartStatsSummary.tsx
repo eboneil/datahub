@@ -6,12 +6,9 @@ import { formatNumberWithoutAbbreviation } from '../../../shared/formatNumber';
 import { ANTD_GRAY } from '../../shared/constants';
 import { toLocalDateTimeString, toRelativeTimeString } from '../../../shared/time/timeUtils';
 import { StatsSummary } from '../../shared/components/styled/StatsSummary';
-<<<<<<< HEAD
 import { PercentileLabel } from '../../shared/stats/PercentileLabel';
-=======
 import { countFormatter, needsFormatting } from '../../../../utils/formatter';
 import ExpandingStat from '../../dataset/shared/ExpandingStat';
->>>>>>> oss_master
 
 const StatText = styled.span`
     color: ${ANTD_GRAY[8]};
