@@ -118,7 +118,8 @@ public class OwnerUtils {
       }
 
       // Fall back to mapping deprecated type to the new ownership entity, if it matches remove
-      return mapOwnershipTypeToEntity(OwnershipType.valueOf(owner.getType().toString())).equals(ownershipUrn.toString());
+      return mapOwnershipTypeToEntity(OwnershipType.valueOf(owner.getType().toString()).name())
+          .equals(ownershipUrn.toString());
     });
 
     Owner newOwner = new Owner();
@@ -160,7 +161,7 @@ public class OwnerUtils {
           }
 
           // Fall back to mapping deprecated type to the new ownership entity, if it matches remove
-          return mapOwnershipTypeToEntity(OwnershipType.valueOf(owner.getType().toString()))
+          return mapOwnershipTypeToEntity(OwnershipType.valueOf(owner.getType().toString()).name())
               .equals(maybeOwnershipTypeUrn.get().toString());
         });
       } else {
@@ -285,7 +286,7 @@ public class OwnerUtils {
     EntityService entityService) {
     try {
       Urn actorUrn = CorpuserUrn.createFromString(context.getActorUrn());
-      String ownershipTypeUrn = mapOwnershipTypeToEntity(ownershipType);
+      String ownershipTypeUrn = mapOwnershipTypeToEntity(ownershipType.name());
 
       if (!entityService.exists(UrnUtils.getUrn(ownershipTypeUrn))) {
         throw new RuntimeException(String.format("Unknown ownership type urn %s", ownershipTypeUrn));
@@ -302,8 +303,8 @@ public class OwnerUtils {
     }
   }
 
-  public static String mapOwnershipTypeToEntity(OwnershipType type) {
-    final String typeName = SYSTEM_ID + type.name().toLowerCase();
+  public static String mapOwnershipTypeToEntity(String type) {
+    final String typeName = SYSTEM_ID + type.toLowerCase();
     return Urn.createFromTuple(Constants.OWNERSHIP_TYPE_ENTITY_NAME, typeName).toString();
   }
 }

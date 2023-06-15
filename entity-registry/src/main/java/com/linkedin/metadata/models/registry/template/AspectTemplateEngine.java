@@ -31,8 +31,12 @@ public class AspectTemplateEngine {
       DATA_FLOW_INFO_ASPECT_NAME,
       DATA_JOB_INFO_ASPECT_NAME,
       DATA_PRODUCT_PROPERTIES_ASPECT_NAME,
+<<<<<<< HEAD
       MONITOR_INFO_ASPECT_NAME // SaaS only
       ).collect(Collectors.toSet());
+=======
+      DATA_JOB_INPUT_OUTPUT_ASPECT_NAME).collect(Collectors.toSet());
+>>>>>>> oss_master
 
   private final Map<String, Template<? extends RecordTemplate>> _aspectTemplateMap;
 
