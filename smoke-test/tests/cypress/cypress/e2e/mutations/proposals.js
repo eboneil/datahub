@@ -75,7 +75,7 @@ describe("proposals", () => {
   it.only("can propose description to glossary term and then reject description proposal from the my requests tab", () => {
     proposeGlossaryDescription();
 
-    // accepting the proposal
+    // rejecting the proposal
     cy.contains("Inbox").click({ force: true });
 
     cy.get(".action-request-test-id").should("have.length", 1);
