@@ -53,6 +53,7 @@ import com.linkedin.schema.SchemaProposal;
 import com.linkedin.schema.SchemaProposalArray;
 import com.linkedin.schema.SchemaProposals;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -199,10 +200,10 @@ public class ProposalUtils {
     boolean isGlossaryEntity = targetUrn.getEntityType().equals(GLOSSARY_TERM_ENTITY_NAME) || targetUrn.getEntityType().equals(GLOSSARY_NODE_ENTITY_NAME);
     // Decide whether the current principal should be allowed to update the Dataset.
     // If you either have all entity privileges, or have the specific privileges required, you are authorized.
-    final DisjunctivePrivilegeGroup orPrivilegeGroups = new DisjunctivePrivilegeGroup(ImmutableList.of(
+    final DisjunctivePrivilegeGroup orPrivilegeGroups = new DisjunctivePrivilegeGroup(new ArrayList<>(Arrays.asList(
         ALL_PRIVILEGES_GROUP,
-        new ConjunctivePrivilegeGroup(ImmutableList.of(PoliciesConfig.MANAGE_ENTITY_DOCS_PROPOSALS_PRIVILEGE.getType()))
-    ));
+        new ConjunctivePrivilegeGroup(List.of(PoliciesConfig.MANAGE_ENTITY_DOCS_PROPOSALS_PRIVILEGE.getType()))
+    )));
 
     if (isGlossaryEntity) {
       orPrivilegeGroups.getAuthorizedPrivilegeGroups().add(
