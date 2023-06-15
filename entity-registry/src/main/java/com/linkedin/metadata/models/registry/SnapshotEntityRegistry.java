@@ -67,7 +67,7 @@ public class SnapshotEntityRegistry implements EntityRegistry {
     // TODO: This should be more dynamic ideally, "hardcoding" for now, passing in aspect spec map preemptively
 
     Map<String, Template<? extends RecordTemplate>> aspectSpecTemplateMap = new HashMap<>();
-    populateTemplateEngineSaaS();
+    populateTemplateEngineSaaS(aspectSpecTemplateMap);
     aspectSpecTemplateMap.put(OWNERSHIP_ASPECT_NAME, new OwnershipTemplate());
     aspectSpecTemplateMap.put(DATASET_PROPERTIES_ASPECT_NAME, new DatasetPropertiesTemplate());
     aspectSpecTemplateMap.put(UPSTREAM_LINEAGE_ASPECT_NAME, new UpstreamLineageTemplate());
