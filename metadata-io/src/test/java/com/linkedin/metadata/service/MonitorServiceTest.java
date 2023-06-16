@@ -174,6 +174,65 @@ public class MonitorServiceTest {
         () -> service.createAssertionMonitor(entityUrn, assertionUrn, schedule, parameters, Mockito.mock(Authentication.class)));
   }
 
+  @Test
+  private void testUpsertMonitorMode() throws Exception {
+    final EntityClient mockClient = createMockEntityClient();
+    final MonitorService service = new MonitorService(
+        mockClient,
+        Mockito.mock(Authentication.class));
+
+    // Case 1: Info exists
+    Mockito.doAnswer(invocation -> {
+      List<MetadataChangeProposal> aspects = invocation.getArgument(0);
+      Assert.assertEquals(aspects.size(), 1);
+      MetadataChangeProposal proposal = aspects.get(0);
+      Assert.assertEquals(proposal.getAspectName(), MONITOR_INFO_ASPECT_NAME);
+      // Verify that the correct aspect was ingested.
+      MonitorInfo newMonitorInfo = GenericRecordUtils.deserializeAspect(proposal.getAspect().getValue(),
+          proposal.getAspect().getContentType(), MonitorInfo.class);
+      Assert.assertEquals(newMonitorInfo.getType(), MonitorType.ASSERTION);
+      Assert.assertEquals(newMonitorInfo.getStatus().getMode(), MonitorMode.ACTIVE);
+      Assert.assertEquals(newMonitorInfo.getAssertionMonitor().getAssertions().size(), 1);
+
+      return null;
+    }).when(mockClient).batchIngestProposals(
+        Mockito.anyList(),
+        Mockito.any(Authentication.class),
+        Mockito.eq(false));
+    Urn urn = service.upsertMonitorMode(
+        TEST_MONITOR_URN,
+        MonitorMode.ACTIVE,
+        Mockito.mock(Authentication.class)
+    );
+    Assert.assertEquals(urn, TEST_MONITOR_URN);
+
+
+    // Case 2: Info does not exist
+    Mockito.doAnswer(invocation -> {
+      List<MetadataChangeProposal> aspects = invocation.getArgument(0);
+      Assert.assertEquals(aspects.size(), 1);
+      MetadataChangeProposal proposal = aspects.get(0);
+      Assert.assertEquals(proposal.getAspectName(), MONITOR_INFO_ASPECT_NAME);
+      // Verify that the correct aspect was ingested.
+      MonitorInfo newMonitorInfo = GenericRecordUtils.deserializeAspect(proposal.getAspect().getValue(),
+          proposal.getAspect().getContentType(), MonitorInfo.class);
+      Assert.assertEquals(newMonitorInfo.getType(), MonitorType.ASSERTION);
+      Assert.assertEquals(newMonitorInfo.getStatus().getMode(), MonitorMode.INACTIVE); // Should be in inactive mode.
+      Assert.assertEquals(newMonitorInfo.getAssertionMonitor(), new AssertionMonitor()
+          .setAssertions(new AssertionEvaluationSpecArray(Collections.emptyList())));
+      return null;
+    }).when(mockClient).batchIngestProposals(
+        Mockito.anyList(),
+        Mockito.any(Authentication.class),
+        Mockito.eq(false));
+    urn = service.upsertMonitorMode(
+        TEST_NON_EXISTENT_MONITOR_URN,
+        MonitorMode.INACTIVE,
+        Mockito.mock(Authentication.class)
+    );
+    Assert.assertEquals(urn, TEST_NON_EXISTENT_MONITOR_URN);
+  }
+
   private static EntityClient createMockEntityClient() throws Exception {
     EntityClient mockClient = Mockito.mock(EntityClient.class);
 

@@ -101,6 +101,7 @@ import com.linkedin.datahub.graphql.generated.SchemaFieldEntity;
 import com.linkedin.datahub.graphql.generated.SearchAcrossLineageResult;
 import com.linkedin.datahub.graphql.generated.SearchResult;
 import com.linkedin.datahub.graphql.generated.SiblingProperties;
+import com.linkedin.datahub.graphql.generated.SystemMonitor;
 import com.linkedin.datahub.graphql.generated.TagProposalParams;
 import com.linkedin.datahub.graphql.generated.Test;
 import com.linkedin.datahub.graphql.generated.TestResult;
@@ -198,6 +199,8 @@ import com.linkedin.datahub.graphql.resolvers.load.ProposalsResolver;
 import com.linkedin.datahub.graphql.resolvers.load.TimeSeriesAspectResolver;
 import com.linkedin.datahub.graphql.resolvers.monitor.CreateAssertionMonitorResolver;
 import com.linkedin.datahub.graphql.resolvers.monitor.DeleteMonitorResolver;
+import com.linkedin.datahub.graphql.resolvers.monitor.SystemMonitorsResolver;
+import com.linkedin.datahub.graphql.resolvers.monitor.UpdateSystemMonitorsResolver;
 import com.linkedin.datahub.graphql.resolvers.proposal.AcceptProposalResolver;
 import com.linkedin.datahub.graphql.resolvers.mutate.AddLinkResolver;
 import com.linkedin.datahub.graphql.resolvers.mutate.AddOwnerResolver;
@@ -2092,6 +2095,10 @@ public class GmsGraphQLEngine {
         builder.type("Mutation", typeWiring -> typeWiring
             .dataFetcher("deleteMonitor", new DeleteMonitorResolver(entityClient, entityService))
             .dataFetcher("createAssertionMonitor", new CreateAssertionMonitorResolver(monitorService))
+            .dataFetcher("updateSystemMonitors", new UpdateSystemMonitorsResolver(
+                this.monitorService,
+                this.entityClient
+            ))
         );
         builder.type("AssertionEvaluationSpec", typeWiring -> typeWiring
             .dataFetcher("assertion", new LoadableTypeResolver<>(assertionType,
@@ -2104,6 +2111,21 @@ public class GmsGraphQLEngine {
             .dataFetcher("entity", new EntityTypeResolver(
                 entityTypes,
                 (env) -> ((Monitor) env.getSource()).getEntity()))
+        );
+        builder.type("Query", typeWiring -> typeWiring
+            .dataFetcher("systemMonitors", new SystemMonitorsResolver(
+                this.monitorService,
+                this.entityClient
+            ))
+        );
+        builder.type("SystemMonitor", typeWiring -> typeWiring
+            .dataFetcher("monitor", new LoadableTypeResolver<>(
+                monitorType,
+                (env) -> {
+                    final SystemMonitor monitor = env.getSource();
+                    return monitor.getMonitor() != null ? monitor.getMonitor().getUrn() : null;
+                })
+            )
         );
     }
 }

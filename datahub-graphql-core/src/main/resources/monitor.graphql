@@ -1,3 +1,10 @@
+extend type Query {
+  """
+  Fetches the settings for "system" monitors for an entity with a given URN.
+  """
+  systemMonitors(urn: String!): SystemMonitorsResult!
+}
+
 extend type Mutation {
   """
   Create a monitor that evaluates assertions
@@ -8,8 +15,87 @@ extend type Mutation {
   Removes a monitor
   """
   deleteMonitor(urn: String!): Boolean
+
+  """
+  Updates the state of a "system" (e.g. anomaly) monitor.
+  """
+  updateSystemMonitors(input: UpdateSystemMonitorsInput!): Boolean!
 }
 
+"""
+Information describing the system monitors enabled for a particular entity.
+"""
+type SystemMonitorsResult {
+  """
+  The monitors that have settings.
+  """
+  monitors: [SystemMonitor!]!
+}
+
+"""
+A type of built-in system monitor, e.g. those that generate anomalies.
+"""
+enum SystemMonitorType {
+  """
+  An SLA or Freshness monitor.
+  """
+  SLA
+}
+
+"""
+Information about a specific system monitor.
+"""
+type SystemMonitor {
+  """
+  The type or category of system monitor
+  """
+  type: SystemMonitorType!
+
+  """
+  The actual underlying Monitor object used to evaluate the monitor
+  """
+  monitor: Monitor!
+}
+
+"""
+Input required to update the settings for a set of system monitors
+"""
+input UpdateSystemMonitorsInput {
+  """
+  The urn of the entity for which to update system monitors.
+  Note that Datasets are the only entity currently supported.
+
+  The entity MUST exist, and the user must have the "Manage Monitors" privilege
+  for the entity in order to change these settings.
+  """
+  entityUrn: String!
+
+  """
+  Settings for each system monitor type for the entity.
+
+  It is expected that this is a unique set, where each entry
+  in the set has a different SystemMonitorType.
+  """
+  monitors: [UpdateSystemMonitorInput!]!
+}
+
+"""
+Input required to update the settings for a single system monitor
+In the future, this object may be extended to have type-specific parameters or configuration.
+"""
+input UpdateSystemMonitorInput {
+  """
+  The type of the system monitor
+  """
+  type: SystemMonitorType!
+
+  """
+  The mode of operation for the system monitor.
+  This determines whether the monitor is ACTIVE and running
+  for the entity.
+  """
+  mode: MonitorMode!
+}
 
 """
 A monitor represents a process that monitors a Data Asset
@@ -41,7 +127,6 @@ type Monitor implements Entity {
     relationships(input: RelationshipsInput!): EntityRelationshipsResult
 }
 
-
 """
 Information about the monitor.
 """
@@ -71,7 +156,6 @@ enum MonitorType {
   """
   ASSERTION
 }
-
 
 """
 Information about an assertion evaluator monitor.

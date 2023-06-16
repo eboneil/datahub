@@ -1,15 +1,11 @@
 package com.linkedin.datahub.graphql.resolvers.monitor;
 
-import com.datahub.authorization.ConjunctivePrivilegeGroup;
-import com.datahub.authorization.DisjunctivePrivilegeGroup;
-import com.google.common.collect.ImmutableList;
 import com.linkedin.common.CronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.data.template.SetMode;
 import com.linkedin.data.template.StringArray;
 import com.linkedin.datahub.graphql.QueryContext;
-import com.linkedin.datahub.graphql.authorization.AuthorizationUtils;
 import com.linkedin.datahub.graphql.exception.AuthorizationException;
 import com.linkedin.datahub.graphql.exception.DataHubGraphQLErrorCode;
 import com.linkedin.datahub.graphql.exception.DataHubGraphQLException;
@@ -22,7 +18,6 @@ import com.linkedin.datahub.graphql.generated.Monitor;
 import com.linkedin.datahub.graphql.generated.SchemaFieldSpecInput;
 import com.linkedin.datahub.graphql.resolvers.ResolverUtils;
 import com.linkedin.datahub.graphql.types.monitor.MonitorMapper;
-import com.linkedin.metadata.authorization.PoliciesConfig;
 import com.linkedin.metadata.service.MonitorService;
 import com.linkedin.monitor.AssertionEvaluationParameters;
 import com.linkedin.monitor.AssertionEvaluationParametersType;
@@ -33,13 +28,12 @@ import com.linkedin.schema.SchemaFieldSpec;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Objects;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.linkedin.datahub.graphql.resolvers.AuthUtils.*;
+import static com.linkedin.datahub.graphql.resolvers.monitor.MonitorUtils.*;
 
 
 @Slf4j
@@ -61,7 +55,7 @@ public class CreateAssertionMonitorResolver implements DataFetcher<CompletableFu
 
     return CompletableFuture.supplyAsync(() -> {
 
-      if (isAuthorizedToCreateAssertionMonitor(entityUrn, context)) {
+      if (isAuthorizedToUpdateEntityMonitors(entityUrn, context)) {
 
         try {
           // First create the new monitor
@@ -147,24 +141,5 @@ public class CreateAssertionMonitorResolver implements DataFetcher<CompletableFu
     result.setNativeType(input.getNativeType(), SetMode.IGNORE_NULL);
     result.setPath(input.getPath(), SetMode.IGNORE_NULL);
     return result;
-  }
-
-  /**
-   * Determine whether the current user is allowed to create a monitor.
-   *
-   * This is determined by either having the MANAGE_MONITORS platform privilege, to edit
-   * monitors for all assets, or the EDIT_MONITORs entity privilege for the target entity.
-   */
-  private boolean isAuthorizedToCreateAssertionMonitor(final Urn entityUrn, final QueryContext context) {
-    final DisjunctivePrivilegeGroup orPrivilegeGroups = new DisjunctivePrivilegeGroup(
-        ImmutableList.of(ALL_PRIVILEGES_GROUP,
-            new ConjunctivePrivilegeGroup(ImmutableList.of(PoliciesConfig.EDIT_MONITORS_PRIVILEGE.getType()))));
-    return AuthorizationUtils.isAuthorized(context, Optional.empty(), PoliciesConfig.MANAGE_MONITORS)
-        || AuthorizationUtils.isAuthorized(
-            context.getAuthorizer(),
-            context.getActorUrn(),
-            entityUrn.getEntityType(),
-            entityUrn.toString(),
-            orPrivilegeGroups);
   }
 }

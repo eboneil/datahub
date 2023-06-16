@@ -21,6 +21,7 @@ import com.linkedin.metadata.key.MonitorKey;
 import com.linkedin.metadata.utils.EntityKeyUtils;
 import com.linkedin.mxe.MetadataChangeProposal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MonitorService extends BaseService {
+
+  private static final MonitorType DEFAULT_MONITOR_TYPE = MonitorType.ASSERTION;
 
   public MonitorService(@Nonnull final EntityClient entityClient, @Nonnull final Authentication systemAuthentication) {
     super(entityClient, systemAuthentication);
@@ -137,6 +140,49 @@ public class MonitorService extends BaseService {
       return monitorUrn;
     } catch (Exception e) {
       throw new RuntimeException(String.format("Failed to create new Monitor for Assertion with urn %s", assertionUrn), e);
+    }
+  }
+
+  /**
+   * Upserts the mode of a particular monitor, to enable or disable it's operation.
+   *
+   * If the monitor does not yet have an info aspect, a default will be minted for the provided urn.
+   */
+  @Nonnull
+  public Urn upsertMonitorMode(
+      @Nonnull final Urn monitorUrn,
+      @Nonnull final MonitorMode monitorMode,
+      @Nonnull final Authentication authentication) throws Exception {
+    Objects.requireNonNull(monitorUrn, "monitorUrn must not be null");
+    Objects.requireNonNull(monitorMode, "monitorMode must not be null");
+    Objects.requireNonNull(authentication, "authentication must not be null");
+
+    MonitorInfo info = getMonitorInfo(monitorUrn);
+
+    // If monitor info does not yet exist, then mint a default info aspect
+    if (info == null) {
+      info = new MonitorInfo()
+          .setType(DEFAULT_MONITOR_TYPE)
+          .setAssertionMonitor(
+              new AssertionMonitor().setAssertions(new AssertionEvaluationSpecArray(Collections.emptyList())));
+    }
+
+    // Update the status to have the new Monitor Mode
+    info.setStatus(new MonitorStatus().setMode(monitorMode));
+
+    // Write the info back!
+    final List<MetadataChangeProposal> aspects = new ArrayList<>();
+    aspects.add(AspectUtils.buildMetadataChangeProposal(monitorUrn, Constants.MONITOR_INFO_ASPECT_NAME, info));
+
+    try {
+      this.entityClient.batchIngestProposals(
+          aspects,
+          authentication,
+          false
+      );
+      return monitorUrn;
+    } catch (Exception e) {
+      throw new RuntimeException(String.format("Failed to upsert Monitor Mode for monitor with urn %s", monitorUrn), e);
     }
   }
 
