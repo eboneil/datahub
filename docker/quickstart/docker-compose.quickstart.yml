@@ -108,6 +108,7 @@ services:
     - UI_INGESTION_ENABLED=true
     - METADATA_SERVICE_AUTH_ENABLED=false
     - DATAHUB_INTEGRATIONS_HOST=datahub-integrations-service
+    - DATAHUB_MONITORS_HOST=datahub-monitors-service
     healthcheck:
       interval: 1s
       retries: 3

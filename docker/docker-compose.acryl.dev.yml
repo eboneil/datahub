@@ -12,3 +12,14 @@ services:
       - ./datahub-integrations-service/start.sh:/start_datahub_integrations_service.sh
       - ../metadata-ingestion:/datahub-src/metadata-ingestion
       - ../datahub-integrations-service:/datahub-src/datahub-integrations-service
+  datahub-monitors-service:
+    build:
+      context: ../
+      dockerfile: docker/datahub-monitors-service/Dockerfile
+      args:
+        APP_ENV: dev
+    image: 795586375822.dkr.ecr.us-west-2.amazonaws.com/datahub-monitors-service:debug
+    volumes:
+      - ./datahub-monitors-service/start.sh:/start_datahub_monitors_service.sh
+      - ../metadata-ingestion:/datahub-src/metadata-ingestion
+      - ../datahub-monitors-service:/datahub-src/datahub-monitors-service

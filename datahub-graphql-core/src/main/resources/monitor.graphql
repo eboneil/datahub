@@ -184,7 +184,7 @@ type AssertionEvaluationSpec {
     """
     Parameters required to evaluate the assertion
     """
-    parameters: AssertionEvaluationParameters!
+    parameters: AssertionEvaluationParameters
 }
 
 """
@@ -436,5 +436,5 @@ input CreateAssertionMonitorInput {
     """
     Parameters required to evaluate the assertion
     """
-    parameters: AssertionEvaluationParametersInput!
+    parameters: AssertionEvaluationParametersInput
 }

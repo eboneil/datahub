@@ -1,0 +1,142 @@
+fragment AssertionDataset on Dataset {
+  urn
+  properties {
+    name
+    qualifiedName
+  }
+  platform {
+    urn
+    properties {
+        displayName
+    }
+  }
+  subTypes {
+    typeNames
+  }
+}
+
+fragment AssertionDetails on Assertion {
+  urn
+  type
+  platform {
+      urn
+      properties {
+          displayName
+          logoUrl
+      }
+      info {
+          displayName
+          logoUrl
+      }
+  }
+  info {
+      type
+      datasetAssertion {
+          scope
+          aggregation
+          operator
+          parameters {
+              value {
+                  value
+                  type
+              }
+              minValue {
+                  value
+                  type
+              }
+              maxValue {
+                  value
+                  type
+              }
+          }
+          fields {
+              urn
+              path
+          }
+          nativeType
+          nativeParameters {
+              key
+              value
+          }
+          logic
+      }
+      slaAssertion {
+          type
+          schedule {
+              type
+              cron {
+                  cron
+                  timezone
+                  windowStartOffsetMs
+              }
+              fixedInterval {
+                  unit
+                  multiple
+              }
+          }
+      }
+      source {
+          type
+      }
+  }
+  relationships(input: { types: "Asserts", direction: OUTGOING, start: 0, count: 1 }) {
+    start
+    count
+    total
+    relationships {
+      entity {
+        ... on Dataset {
+          ...AssertionDataset
+        }
+      }
+    }
+  }
+}
+
+fragment MonitorSearchResults on SearchResults {
+  start
+  count
+  total
+  searchResults {
+    entity {
+      ... on Monitor {
+        urn
+        info {
+          type
+          assertionMonitor {
+            assertions {
+              assertion {
+                ...AssertionDetails
+              }
+              schedule {
+                cron
+                timezone
+              }
+              parameters {
+                type
+                datasetSlaParameters {
+                  sourceType
+                  field {
+                    type
+                    nativeType
+                    path
+                  }
+                  auditLog {
+                    operationTypes
+                    userName
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query searchAcrossEntities($input: SearchAcrossEntitiesInput!) {
+    searchAcrossEntities(input: $input) {
+    ...MonitorSearchResults
+    }
+}
