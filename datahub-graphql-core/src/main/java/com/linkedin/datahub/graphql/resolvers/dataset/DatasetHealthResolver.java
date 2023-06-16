@@ -132,12 +132,14 @@ public class DatasetHealthResolver implements DataFetcher<CompletableFuture<List
     }
 
     // Tests are saas-only.
-    if  (_config.getTestsEnabled()) {
-      final Health testsHealth = computeTestsHealthForDataset(datasetUrn, context);
-      if (testsHealth != null) {
-        healthStatuses.add(testsHealth);
-      }
-    }
+    // We are hiding this for now because passing/failing all tests no longer has meaning
+    // with the new set of default tests where passing may just mean you are not in the top 10% of size
+    // if  (_config.getTestsEnabled()) {
+    //   final Health testsHealth = computeTestsHealthForDataset(datasetUrn, context);
+    //   if (testsHealth != null) {
+    //     healthStatuses.add(testsHealth);
+    //   }
+    // }
 
     // Incidents are saas-only.
     if (_config.getIncidentsEnabled()) {
