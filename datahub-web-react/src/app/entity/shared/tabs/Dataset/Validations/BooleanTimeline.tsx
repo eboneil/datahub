@@ -4,12 +4,15 @@ import { Bar } from '@vx/shape';
 import { Group } from '@vx/group';
 import { AxisBottom } from '@vx/axis';
 import { scaleUtc } from '@vx/scale';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import { ANTD_GRAY } from '../../../constants';
+import { LinkWrapper } from '../../../../../shared/LinkWrapper';
 
 export type BooleanResult = {
     result: boolean;
     title: React.ReactNode;
     content: React.ReactNode;
+    resultUrl?: Maybe<string>;
 };
 
 export type BooleanDataPoint = {
@@ -54,6 +57,7 @@ export const BooleanTimeline = ({ data, timeRange, width }: Props) => {
             content: result.result.content,
             result: result.result.result,
             time: result.time,
+            url: result.result.resultUrl,
         };
     });
 
@@ -68,25 +72,27 @@ export const BooleanTimeline = ({ data, timeRange, width }: Props) => {
                         const barY = yMax - barHeight;
                         const fillColor = d.result ? SUCCESS_COLOR_HEX : FAILURE_COLOR_HEX;
                         return (
-                            <Popover
-                                key={d.time}
-                                title={d.title}
-                                overlayStyle={{
-                                    maxWidth: 440,
-                                    wordWrap: 'break-word',
-                                }}
-                                content={d.content}
-                            >
-                                <Bar
-                                    key={`bar-${d.time}`}
-                                    x={barX}
-                                    y={barY}
-                                    stroke="white"
-                                    width={barWidth}
-                                    height={barHeight}
-                                    fill={fillColor}
-                                />
-                            </Popover>
+                            <LinkWrapper to={d.url} target="_blank">
+                                <Popover
+                                    key={d.time}
+                                    title={d.title}
+                                    overlayStyle={{
+                                        maxWidth: 440,
+                                        wordWrap: 'break-word',
+                                    }}
+                                    content={d.content}
+                                >
+                                    <Bar
+                                        key={`bar-${d.time}`}
+                                        x={barX}
+                                        y={barY}
+                                        stroke="white"
+                                        width={barWidth}
+                                        height={barHeight}
+                                        fill={fillColor}
+                                    />
+                                </Popover>
+                            </LinkWrapper>
                         );
                     })}
                 </Group>
