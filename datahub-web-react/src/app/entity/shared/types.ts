@@ -34,7 +34,12 @@ import {
     FineGrainedLineage,
     EntityPrivileges,
     Embed,
+<<<<<<< HEAD
     ActionRequest,
+=======
+    FabricType,
+    BrowsePathV2,
+>>>>>>> oss_master
 } from '../../../types.generated';
 import { FetchedEntity } from '../../lineage/types';
 
@@ -106,8 +111,13 @@ export type GenericEntityProperties = {
     privileges?: Maybe<EntityPrivileges>;
     embed?: Maybe<Embed>;
     exists?: boolean;
+<<<<<<< HEAD
     tagProposals?: Maybe<ActionRequest[]>;
     termProposals?: Maybe<ActionRequest[]>;
+=======
+    origin?: Maybe<FabricType>;
+    browsePathV2?: Maybe<BrowsePathV2>;
+>>>>>>> oss_master
 };
 
 export type GenericEntityUpdate = {

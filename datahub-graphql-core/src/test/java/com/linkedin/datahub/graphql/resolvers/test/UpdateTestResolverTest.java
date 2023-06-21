@@ -69,7 +69,10 @@ public class UpdateTestResolverTest {
 
     resolver.get(mockEnv).get();
 
+<<<<<<< HEAD
     // Not ideal to match against "any", but we don't know the auto-generated execution request id
+=======
+>>>>>>> oss_master
     ArgumentCaptor<MetadataChangeProposal> proposalCaptor = ArgumentCaptor.forClass(MetadataChangeProposal.class);
     Mockito.verify(mockClient, Mockito.times(1))
         .ingestProposal(proposalCaptor.capture(), Mockito.any(Authentication.class), Mockito.eq(false));
@@ -85,6 +88,7 @@ public class UpdateTestResolverTest {
     assertEquals(resultInfo.getDescription(), "test-description");
     assertEquals(resultInfo.getDefinition().getType(), TestDefinitionType.JSON);
     assertEquals(resultInfo.getDefinition().getJson(), "{}");
+<<<<<<< HEAD
   }
 
   @Test
@@ -97,6 +101,8 @@ public class UpdateTestResolverTest {
 
     assertThrows(CompletionException.class, () -> resolver.get(mockEnv).join());
     Mockito.verify(mockClient, Mockito.times(0)).ingestProposal(Mockito.any(), Mockito.any(Authentication.class));
+=======
+>>>>>>> oss_master
   }
 
   @Test

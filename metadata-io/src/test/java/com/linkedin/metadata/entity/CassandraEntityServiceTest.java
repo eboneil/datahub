@@ -69,7 +69,11 @@ public class CassandraEntityServiceTest extends EntityServiceTest<CassandraAspec
     _mockUpdateIndicesService = mock(UpdateIndicesService.class);
     PreProcessHooks preProcessHooks = new PreProcessHooks();
     preProcessHooks.setUiEnabled(true);
+<<<<<<< HEAD
     _entityService = new EntityService(_aspectDao, _mockProducer, _testEntityRegistry, false,
+=======
+    _entityService = new EntityService(_aspectDao, _mockProducer, _testEntityRegistry, true,
+>>>>>>> oss_master
         _mockUpdateIndicesService, preProcessHooks);
     _retentionService = new CassandraRetentionService(_entityService, session, 1000);
     _entityService.setRetentionService(_retentionService);

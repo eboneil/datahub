@@ -19,6 +19,7 @@ import org.springframework.context.annotation.FilterType;
         "com.linkedin.metadata.boot.kafka",
         "com.linkedin.metadata.kafka",
         "com.linkedin.metadata.dao.producer",
+<<<<<<< HEAD
         "com.datahub.event",
         "com.linkedin.gms.factory.notifications",
         "com.linkedin.gms.factory.incident",
@@ -28,6 +29,14 @@ import org.springframework.context.annotation.FilterType;
 }, excludeFilters = {
     @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ScheduledAnalyticsFactory.class),
     @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SiblingGraphServiceFactory.class)})
+=======
+        "com.linkedin.gms.factory.config",
+        "com.linkedin.gms.factory.entity.update.indices"
+},
+    excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ScheduledAnalyticsFactory.class),
+  @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SiblingGraphServiceFactory.class)}
+    )
+>>>>>>> oss_master
 public class MaeConsumerApplication {
   public static void main(String[] args) {
     Class<?>[] primarySources = {MaeConsumerApplication.class, MclConsumerConfig.class};

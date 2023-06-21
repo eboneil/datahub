@@ -1,9 +1,13 @@
 package com.linkedin.datahub.graphql.resolvers.test;
 
+<<<<<<< HEAD
 import com.datahub.authentication.Actor;
 import com.datahub.authentication.Authentication;
 import com.linkedin.common.AuditStamp;
 import com.linkedin.common.urn.UrnUtils;
+=======
+import com.datahub.authentication.Authentication;
+>>>>>>> oss_master
 import com.linkedin.data.template.SetMode;
 import com.linkedin.datahub.graphql.QueryContext;
 import com.linkedin.datahub.graphql.exception.AuthorizationException;
@@ -40,7 +44,10 @@ public class CreateTestResolver implements DataFetcher<CompletableFuture<String>
   public CompletableFuture<String> get(final DataFetchingEnvironment environment) throws Exception {
     final QueryContext context = environment.getContext();
     final Authentication authentication = context.getAuthentication();
+<<<<<<< HEAD
     final Actor actor = authentication.getActor();
+=======
+>>>>>>> oss_master
     final CreateTestInput input = bindArgument(environment.getArgument("input"), CreateTestInput.class);
 
     return CompletableFuture.supplyAsync(() -> {
@@ -64,6 +71,7 @@ public class CreateTestResolver implements DataFetcher<CompletableFuture<String>
           }
 
           // Create the Test info.
+<<<<<<< HEAD
           final TestInfo info = mapCreateTestInput(input, actor);
 
           // Validate test info
@@ -86,6 +94,14 @@ public class CreateTestResolver implements DataFetcher<CompletableFuture<String>
 
         } catch (Exception e) {
           throw new RuntimeException(String.format("Failed to create test with urn %s", input), e);
+=======
+          final TestInfo info = mapCreateTestInput(input);
+
+          final MetadataChangeProposal proposal = buildMetadataChangeProposalWithKey(key, TEST_ENTITY_NAME, TEST_INFO_ASPECT_NAME, info);
+          return _entityClient.ingestProposal(proposal, context.getAuthentication(), false);
+        } catch (Exception e) {
+          throw new RuntimeException(String.format("Failed to perform update against Test with urn %s", input), e);
+>>>>>>> oss_master
         }
       }
       throw new AuthorizationException(
