@@ -25,11 +25,9 @@ export const DESCRIPTION_FILTER_NAME = 'description';
 export const REMOVED_FILTER_NAME = 'removed';
 export const ORIGIN_FILTER_NAME = 'origin';
 export const DEGREE_FILTER_NAME = 'degree';
-<<<<<<< HEAD
+export const BROWSE_PATH_V2_FILTER_NAME = 'browsePathV2';
 export const HAS_ACTIVE_INCIDENTS_FILTER_NAME = 'hasActiveIncidents';
 export const HAS_FAILING_ASSERTIONS_FILTER_NAME = 'hasFailingAssertions';
-=======
-export const BROWSE_PATH_V2_FILTER_NAME = 'browsePathV2';
 
 export const LEGACY_ENTITY_FILTER_FIELDS = [ENTITY_FILTER_NAME, LEGACY_ENTITY_FILTER_NAME];
 
@@ -41,7 +39,6 @@ export const ENTITY_SUB_TYPE_FILTER_FIELDS = [
     LEGACY_ENTITY_FILTER_NAME,
     TYPE_NAMES_FILTER_NAME,
 ];
->>>>>>> oss_master
 
 export const FILTERS_TO_TRUNCATE = [
     TAGS_FILTER_NAME,

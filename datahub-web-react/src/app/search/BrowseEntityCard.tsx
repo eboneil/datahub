@@ -14,7 +14,6 @@ import { useIsBrowseV2 } from './useSearchAndBrowseVersion';
 
 const BrowseEntityCardWrapper = styled.div``;
 
-<<<<<<< HEAD
 export const BrowseEntityCard = ({
     entityType,
     count,
@@ -24,10 +23,7 @@ export const BrowseEntityCard = ({
     count: number;
     showGlossary?: boolean;
 }) => {
-=======
-export const BrowseEntityCard = ({ entityType, count }: { entityType: EntityType; count: number }) => {
     const history = useHistory();
->>>>>>> oss_master
     const entityRegistry = useEntityRegistry();
     const showBrowseV2 = useIsBrowseV2();
     const isGlossaryEntityCard = entityType === EntityType.GlossaryTerm;
@@ -40,23 +36,6 @@ export const BrowseEntityCard = ({ entityType, count }: { entityType: EntityType
         });
     };
 
-<<<<<<< HEAD
-    const showElement = isGlossaryEntityCard ? showGlossary : true;
-
-    return (
-        <>
-            {showElement && (
-                <Link to={url} data-testid={`entity-type-browse-card-${entityType}`}>
-                    <LogoCountCard
-                        logoComponent={entityRegistry.getIcon(entityType, 18, IconStyleType.HIGHLIGHT)}
-                        name={entityRegistry.getCollectionName(entityType)}
-                        count={count}
-                        onClick={onBrowseEntityCardClick}
-                    />
-                </Link>
-            )}
-        </>
-=======
     function browse() {
         if (showBrowseV2 && !isGlossaryEntityCard) {
             navigateToSearchUrl({
@@ -69,6 +48,10 @@ export const BrowseEntityCard = ({ entityType, count }: { entityType: EntityType
         }
     }
 
+    if (isGlossaryEntityCard && !showGlossary) {
+        return null;
+    }
+
     return (
         <BrowseEntityCardWrapper onClick={browse} data-testid={`entity-type-browse-card-${entityType}`}>
             <LogoCountCard
@@ -78,6 +61,5 @@ export const BrowseEntityCard = ({ entityType, count }: { entityType: EntityType
                 onClick={onBrowseEntityCardClick}
             />
         </BrowseEntityCardWrapper>
->>>>>>> oss_master
     );
 };

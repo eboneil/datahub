@@ -56,16 +56,13 @@ query appConfig {
         }
         featureFlags {
             readOnlyModeEnabled
-<<<<<<< HEAD
+            showSearchFiltersV2
+            showBrowseV2
             assertionMonitorsEnabled
         }
         chromeExtensionConfig {
             enabled
             lineageEnabled
-=======
-            showSearchFiltersV2
-            showBrowseV2
->>>>>>> oss_master
         }
     }
 }

@@ -42,16 +42,13 @@ export const DEFAULT_APP_CONFIG = {
     },
     featureFlags: {
         readOnlyModeEnabled: false,
-<<<<<<< HEAD
+        showSearchFiltersV2: true,
+        showBrowseV2: true,
         assertionMonitorsEnabled: false,
     },
     chromeExtensionConfig: {
         enabled: false,
         lineageEnabled: false,
-=======
-        showSearchFiltersV2: true,
-        showBrowseV2: true,
->>>>>>> oss_master
     },
 };
 

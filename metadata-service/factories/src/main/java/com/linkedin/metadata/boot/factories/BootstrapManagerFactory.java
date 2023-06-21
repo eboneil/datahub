@@ -10,11 +10,8 @@ import com.linkedin.gms.factory.search.SearchDocumentTransformerFactory;
 import com.linkedin.metadata.boot.BootstrapManager;
 import com.linkedin.metadata.boot.BootstrapStep;
 import com.linkedin.metadata.boot.dependencies.BootstrapDependency;
-<<<<<<< HEAD
 import com.linkedin.metadata.boot.steps.MigrateAssertionsSummaryStep;
-=======
 import com.linkedin.metadata.boot.steps.BackfillBrowsePathsV2Step;
->>>>>>> oss_master
 import com.linkedin.metadata.boot.steps.IndexDataPlatformsStep;
 import com.linkedin.metadata.boot.steps.IngestDataPlatformInstancesStep;
 import com.linkedin.metadata.boot.steps.IngestDataPlatformsStep;
@@ -112,15 +109,13 @@ public class BootstrapManagerFactory {
   @Value("${bootstrap.upgradeDefaultBrowsePaths.enabled}")
   private Boolean _upgradeDefaultBrowsePathsEnabled;
 
-<<<<<<< HEAD
+  @Value("${bootstrap.backfillBrowsePathsV2.enabled}")
+  private Boolean _backfillBrowsePathsV2Enabled;
+
   // Saas-only
   @Autowired
   @Qualifier("ingestMetadataTestsStep")
   private IngestMetadataTestsStep _ingestMetadataTestsStep;
-=======
-  @Value("${bootstrap.backfillBrowsePathsV2.enabled}")
-  private Boolean _backfillBrowsePathsV2Enabled;
->>>>>>> oss_master
 
   @Bean(name = "bootstrapManager")
   @Scope("singleton")

@@ -1007,7 +1007,6 @@ fragment inputFieldsFields on InputFields {
     }
 }
 
-<<<<<<< HEAD
 fragment proposalsFragment on ActionRequest {
     urn
     type
@@ -1065,7 +1064,11 @@ fragment proposalsFragment on ActionRequest {
             }
             editableInfo {
                 pictureLink
-=======
+            }
+        }
+    }
+}
+
 fragment browsePathV2Fields on BrowsePathV2 {
     path {
         name
@@ -1091,13 +1094,10 @@ fragment browsePathV2Fields on BrowsePathV2 {
                     }
                 }
                 instanceId
->>>>>>> oss_master
             }
         }
     }
 }
-<<<<<<< HEAD
-=======
 
 fragment entityDisplayNameFields on Entity {
     urn
@@ -1211,4 +1211,3 @@ fragment entityDisplayNameFields on Entity {
         }
     }
 }
->>>>>>> oss_master

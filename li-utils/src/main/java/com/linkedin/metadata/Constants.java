@@ -33,10 +33,7 @@ public class Constants {
 
   // App sources
   public static final String UI_SOURCE = "ui";
-<<<<<<< HEAD
   public static final String METADATA_TESTS_SOURCE = "metadataTests";
-=======
->>>>>>> oss_master
 
   /**
    * Entities
