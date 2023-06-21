@@ -60,10 +60,7 @@ import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.models.registry.template.AspectTemplateEngine;
 import com.linkedin.metadata.query.ListUrnsResult;
 import com.linkedin.metadata.run.AspectRowSummary;
-<<<<<<< HEAD
-=======
 import com.linkedin.metadata.search.utils.BrowsePathV2Utils;
->>>>>>> oss_master
 import com.linkedin.metadata.service.UpdateIndicesService;
 import com.linkedin.metadata.snapshot.Snapshot;
 import com.linkedin.metadata.utils.DataPlatformInstanceUtils;

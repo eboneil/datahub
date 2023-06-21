@@ -1,23 +1,16 @@
 package com.linkedin.datahub.graphql.resolvers.test;
 
-<<<<<<< HEAD
 import com.datahub.authentication.Actor;
 import com.datahub.authentication.Authentication;
 import com.linkedin.common.AuditStamp;
-=======
-import com.datahub.authentication.Authentication;
->>>>>>> oss_master
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.data.template.SetMode;
 import com.linkedin.datahub.graphql.QueryContext;
 import com.linkedin.datahub.graphql.exception.AuthorizationException;
 import com.linkedin.datahub.graphql.generated.UpdateTestInput;
 import com.linkedin.entity.client.EntityClient;
-<<<<<<< HEAD
 import com.linkedin.metadata.test.TestEngine;
 import com.linkedin.metadata.test.definition.ValidationResult;
-=======
->>>>>>> oss_master
 import com.linkedin.mxe.MetadataChangeProposal;
 import com.linkedin.test.TestInfo;
 import graphql.schema.DataFetcher;
@@ -44,10 +37,7 @@ public class UpdateTestResolver implements DataFetcher<CompletableFuture<String>
   public CompletableFuture<String> get(final DataFetchingEnvironment environment) throws Exception {
     final QueryContext context = environment.getContext();
     final Authentication authentication = context.getAuthentication();
-<<<<<<< HEAD
     final Actor actor = authentication.getActor();
-=======
->>>>>>> oss_master
 
     return CompletableFuture.supplyAsync(() -> {
 
@@ -57,23 +47,12 @@ public class UpdateTestResolver implements DataFetcher<CompletableFuture<String>
         final UpdateTestInput input = bindArgument(environment.getArgument("input"), UpdateTestInput.class);
 
         // Update the Test info - currently this simply creates a new test with same urn.
-<<<<<<< HEAD
         final TestInfo info = mapUpdateTestInput(input, actor);
 
         // Validate test info
         ValidationResult validationResult = _testEngine.validateJson(info.getDefinition().getJson());
         if (!validationResult.isValid()) {
           throw new RuntimeException(String.join("\n", validationResult.getMessages()));
-=======
-        final TestInfo info = mapUpdateTestInput(input);
-
-        final MetadataChangeProposal proposal = buildMetadataChangeProposalWithUrn(UrnUtils.getUrn(urn), TEST_INFO_ASPECT_NAME, info);
-        try {
-          return _entityClient.ingestProposal(proposal, authentication, false);
-        } catch (Exception e) {
-          throw new RuntimeException(
-              String.format("Failed to perform update against Test with urn %s", input), e);
->>>>>>> oss_master
         }
 
         final MetadataChangeProposal proposal = buildMetadataChangeProposalWithUrn(UrnUtils.getUrn(urn), TEST_INFO_ASPECT_NAME, info);

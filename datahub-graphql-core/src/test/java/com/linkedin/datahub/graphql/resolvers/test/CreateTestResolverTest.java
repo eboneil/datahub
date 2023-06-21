@@ -65,10 +65,7 @@ public class CreateTestResolverTest {
     final TestKey key = new TestKey();
     key.setId("test-id");
 
-<<<<<<< HEAD
     // Not ideal to match against "any", but we don't know the auto-generated execution request id
-=======
->>>>>>> oss_master
     ArgumentCaptor<MetadataChangeProposal> proposalCaptor = ArgumentCaptor.forClass(MetadataChangeProposal.class);
     Mockito.verify(mockClient, Mockito.times(1))
         .ingestProposal(proposalCaptor.capture(), Mockito.any(Authentication.class), Mockito.eq(false));
@@ -84,7 +81,6 @@ public class CreateTestResolverTest {
     assertEquals(resultInfo.getDescription(), "test-description");
     assertEquals(resultInfo.getDefinition().getType(), TestDefinitionType.JSON);
     assertEquals(resultInfo.getDefinition().getJson(), "{}");
-<<<<<<< HEAD
   }
 
   @Test
@@ -96,9 +92,8 @@ public class CreateTestResolverTest {
     Mockito.when(mockEngine.validateJson(anyString())).thenReturn(new ValidationResult(false, Collections.emptyList()));
 
     assertThrows(CompletionException.class, () -> resolver.get(mockEnv).join());
-    Mockito.verify(mockClient, Mockito.times(0)).ingestProposal(Mockito.any(), Mockito.any(Authentication.class));
-=======
->>>>>>> oss_master
+    Mockito.verify(mockClient, Mockito.times(0))
+        .ingestProposal(Mockito.any(), Mockito.any(Authentication.class), Mockito.eq(false));
   }
 
   @Test
@@ -109,26 +104,16 @@ public class CreateTestResolverTest {
     Mockito.when(mockEnv.getContext()).thenReturn(mockContext);
 
     assertThrows(CompletionException.class, () -> resolver.get(mockEnv).join());
-    Mockito.verify(mockClient, Mockito.times(0)).ingestProposal(Mockito.any(), Mockito.any(Authentication.class));
+    Mockito.verify(mockClient, Mockito.times(0))
+        .ingestProposal(Mockito.any(), Mockito.any(Authentication.class), Mockito.eq(false));
   }
 
   @Test
   public void testGetEntityClientException() throws Exception {
-<<<<<<< HEAD
-=======
-    // Create resolver
-    EntityClient mockClient = Mockito.mock(EntityClient.class);
-    Mockito.doThrow(RemoteInvocationException.class).when(mockClient).ingestProposal(
-        Mockito.any(),
-        Mockito.any(Authentication.class),
-        Mockito.eq(false));
-    CreateTestResolver resolver = new CreateTestResolver(mockClient);
-
->>>>>>> oss_master
     // Execute resolver
     Mockito.doThrow(RemoteInvocationException.class)
         .when(mockClient)
-        .ingestProposal(Mockito.any(), Mockito.any(Authentication.class));
+        .ingestProposal(Mockito.any(), Mockito.any(Authentication.class), Mockito.eq(false));
     QueryContext mockContext = getMockAllowContext();
     Mockito.when(mockEnv.getArgument(Mockito.eq("input"))).thenReturn(TEST_INPUT);
     Mockito.when(mockEnv.getContext()).thenReturn(mockContext);

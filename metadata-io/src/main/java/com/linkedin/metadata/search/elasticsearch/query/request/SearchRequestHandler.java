@@ -82,12 +82,7 @@ public class SearchRequestHandler {
           .setSkipAggregates(false)
           .setSkipHighlighting(false);
   private static final Map<List<EntitySpec>, SearchRequestHandler> REQUEST_HANDLER_BY_ENTITY_NAME = new ConcurrentHashMap<>();
-  private static final String REMOVED = "removed";
   private static final String URN_FILTER = "urn";
-  private static final String[] FIELDS_TO_FETCH = new String[]{"urn", "usageCountLast30Days"};
-  private static final String[] URN_FIELD = new String[]{"urn"};
-
-
   private static final String[] FIELDS_TO_FETCH = new String[]{"urn", "usageCountLast30Days"};
   private static final String[] URN_FIELD = new String[]{"urn"};
 
@@ -742,8 +737,6 @@ public class SearchRequestHandler {
         .setAggregations(aggValues)
         .setFilterValues(filterValues);
   }
-<<<<<<< HEAD
-=======
 
   private List<Pair<String, String>> getFacetFieldDisplayNameFromAnnotation(
       @Nonnull final SearchableAnnotation annotation
@@ -761,5 +754,4 @@ public class SearchRequestHandler {
     }
     return facetsFromAnnotation;
   }
->>>>>>> oss_master
 }
