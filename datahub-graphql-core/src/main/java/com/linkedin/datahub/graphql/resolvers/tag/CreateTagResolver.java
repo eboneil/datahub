@@ -65,17 +65,10 @@ public class CreateTagResolver implements DataFetcher<CompletableFuture<String>>
           throw new IllegalArgumentException("This Tag already exists!");
         }
 
-<<<<<<< HEAD
-        final MetadataChangeProposal proposal = buildMetadataChangeProposalWithKey(key, TAG_ENTITY_NAME,
-            TAG_PROPERTIES_ASPECT_NAME, mapTagProperties(input));
-        String tagUrn = _entityClient.ingestProposal(proposal, context.getAuthentication(), false);
-
-=======
         // Create the MCP
         final MetadataChangeProposal proposal = buildMetadataChangeProposalWithKey(key, TAG_ENTITY_NAME,
             TAG_PROPERTIES_ASPECT_NAME, mapTagProperties(input));
         String tagUrn = _entityClient.ingestProposal(proposal, context.getAuthentication(), false);
->>>>>>> oss_master
         OwnershipType ownershipType = OwnershipType.TECHNICAL_OWNER;
         if (!_entityService.exists(UrnUtils.getUrn(mapOwnershipTypeToEntity(ownershipType.name())))) {
           log.warn("Technical owner does not exist, defaulting to None ownership.");
