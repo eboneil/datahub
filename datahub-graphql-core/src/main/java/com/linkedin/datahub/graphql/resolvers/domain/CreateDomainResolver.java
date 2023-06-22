@@ -29,8 +29,6 @@ import static com.linkedin.datahub.graphql.resolvers.mutate.MutationUtils.*;
 import static com.linkedin.metadata.Constants.*;
 
 import static com.linkedin.datahub.graphql.resolvers.mutate.util.OwnerUtils.*;
-import static com.linkedin.datahub.graphql.resolvers.mutate.MutationUtils.*;
-import static com.linkedin.metadata.Constants.*;
 
 
 /**
