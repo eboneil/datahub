@@ -3,7 +3,6 @@ package com.linkedin.metadata;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.linkedin.entity.client.EntityClient;
 import com.linkedin.metadata.client.JavaEntityClient;
-import com.linkedin.metadata.config.PreProcessHooks;
 import com.linkedin.metadata.config.search.CustomConfiguration;
 import com.linkedin.metadata.config.PreProcessHooks;
 import com.linkedin.metadata.config.search.ElasticSearchConfiguration;
