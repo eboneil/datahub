@@ -10,12 +10,8 @@
         "actions": [
           {
             "rollover": {
-<<<<<<< HEAD
-              "min_index_age": "7d"
-=======
               "min_size": "5gb",
               "min_index_age": "1d"
->>>>>>> oss_master
             }
           }
         ],
