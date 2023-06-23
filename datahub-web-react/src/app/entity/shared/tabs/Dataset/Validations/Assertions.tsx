@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import { useGetDatasetAssertionsQuery } from '../../../../../../graphql/dataset.generated';
 import { Assertion, AssertionResultType } from '../../../../../../types.generated';
 import { useEntityData } from '../../../EntityContext';
@@ -6,6 +8,10 @@ import { DatasetAssertionsList } from './DatasetAssertionsList';
 import { DatasetAssertionsSummary } from './DatasetAssertionsSummary';
 import { sortAssertions } from './assertionUtils';
 import { combineEntityDataWithSiblings, useIsSeparateSiblingsMode } from '../../../siblingUtils';
+import { useAppConfig } from '../../../../../useAppConfig';
+import { AssertionMonitorBuilderModal } from './assertion/builder/AssertionMonitorBuilderModal';
+import TabToolbar from '../../../components/styled/TabToolbar';
+import { isEntityEligibleForAssertionMonitoring } from './assertion/builder/utils';
 
 /**
  * Returns a status summary for the assertions associated with a Dataset.
@@ -41,8 +47,17 @@ export const Assertions = () => {
     const { data, refetch } = useGetDatasetAssertionsQuery({ variables: { urn }, fetchPolicy: 'cache-first' });
     const isHideSiblingMode = useIsSeparateSiblingsMode();
 
+    // Start SaaS only
+    const { entityType } = useEntityData();
+    const { config } = useAppConfig();
+    const assertionMonitorsEnabled = config?.featureFlags?.assertionMonitorsEnabled || false;
+    // End SaaS only
+
     const combinedData = isHideSiblingMode ? data : combineEntityDataWithSiblings(data);
     const [removedUrns, setRemovedUrns] = useState<string[]>([]);
+    // Start saas only
+    const [showAssertionBuilder, setShowAssertionBuilder] = useState(false);
+    // End saas only
 
     const assertions =
         (combinedData && combinedData.dataset?.assertions?.assertions?.map((assertion) => assertion as Assertion)) ||
@@ -54,6 +69,13 @@ export const Assertions = () => {
 
     return (
         <>
+            {assertionMonitorsEnabled && isEntityEligibleForAssertionMonitoring(entityData?.platform?.urn) && (
+                <TabToolbar>
+                    <Button type="text" onClick={() => setShowAssertionBuilder(true)}>
+                        <PlusOutlined /> Create Assertion
+                    </Button>
+                </TabToolbar>
+            )}
             <DatasetAssertionsSummary summary={getAssertionsStatusSummary(filteredAssertions)} />
             {entityData && (
                 <DatasetAssertionsList
@@ -63,6 +85,19 @@ export const Assertions = () => {
                         setRemovedUrns([...removedUrns, assertionUrn]);
                         setTimeout(() => refetch(), 3000);
                     }}
+                />
+            )}
+            {showAssertionBuilder && (
+                <AssertionMonitorBuilderModal
+                    entityUrn={urn}
+                    entityType={entityType}
+                    platformUrn={entityData?.platform?.urn as string}
+                    onSubmit={() => {
+                        setShowAssertionBuilder(false);
+                        // TODO: Use the Apollo Cache.
+                        setTimeout(() => refetch(), 3000);
+                    }}
+                    onCancel={() => setShowAssertionBuilder(false)}
                 />
             )}
         </>
