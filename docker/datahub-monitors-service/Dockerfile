@@ -32,6 +32,8 @@ FROM base as prod-install
 
 ARG RELEASE_VERSION
 
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 COPY --from=prod-codegen /datahub-src/metadata-ingestion /datahub-src/metadata-ingestion
 COPY --from=prod-codegen /datahub-src/datahub-monitors-service /datahub-src/datahub-monitors-service
 COPY --from=prod-codegen /root/.cache/pip /root/.cache/pip
@@ -50,7 +52,8 @@ FROM base as dev-install
 
 # Dummy stage for development. Assumes most of the code is built on your machine and mounted to this image.
 # See this excellent thread https://github.com/docker/cli/issues/1134
-
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 COPY ./datahub-monitors-service/pyproject.toml ./datahub-monitors-service/poetry.lock /datahub-src/datahub-monitors-service/
 # We only add these so that we can run `poetry install` without errors.
 COPY ./datahub-monitors-service/src/datahub_monitors/__init__.py /datahub-src/datahub-monitors-service/src/datahub_monitors/__init__.py

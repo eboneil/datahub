@@ -123,6 +123,7 @@ function list_markdown_files(): string[] {
     /^metadata-ingestion\/tests\//,
     /^metadata-ingestion-examples\//,
     /^datahub-integrations-service\/README.md/,
+    /^datahub-monitors-service\/README.md/,
     /^docker\/(?!README|datahub-upgrade|airflow\/local_airflow)/, // Drop all but a few docker docs.
     /^docs\/docker\/README\.md/, // This one is just a pointer to another file.
     /^docs\/README\.md/, // This one is just a pointer to the hosted docs site.
