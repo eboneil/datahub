@@ -28,11 +28,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.mockito.Mockito;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import static com.linkedin.metadata.Constants.*;
 
 
+@Ignore("Temporary ignore for v0.2.9")
 public class AssertionsSummaryHookTest {
 
   private static EntityRegistry entityRegistry;

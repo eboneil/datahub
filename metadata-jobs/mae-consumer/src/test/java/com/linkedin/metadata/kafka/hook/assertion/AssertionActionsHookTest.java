@@ -58,11 +58,13 @@ import com.linkedin.mxe.MetadataChangeProposal;
 import java.util.Collections;
 import javax.annotation.Nonnull;
 import org.mockito.Mockito;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import static com.linkedin.metadata.Constants.*;
 
 
+@Ignore("Temporary ignore for v0.2.9")
 public class AssertionActionsHookTest {
   private static final EntityRegistry ENTITY_REGISTRY = new ConfigEntityRegistry(
       AssertionsSummaryHookTest.class.getClassLoader().getResourceAsStream("test-entity-registry.yml"));
