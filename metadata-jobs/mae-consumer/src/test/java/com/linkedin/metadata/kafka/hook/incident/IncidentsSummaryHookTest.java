@@ -17,8 +17,6 @@ import com.linkedin.incident.IncidentSourceType;
 import com.linkedin.incident.IncidentState;
 import com.linkedin.incident.IncidentStatus;
 import com.linkedin.incident.IncidentType;
-import com.linkedin.metadata.models.registry.ConfigEntityRegistry;
-import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.service.IncidentService;
 import com.linkedin.metadata.utils.GenericRecordUtils;
 import com.linkedin.mxe.MetadataChangeLog;
@@ -29,11 +27,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.linkedin.metadata.Constants.*;
+import static com.linkedin.metadata.kafka.hook.EntityRegistryTestUtil.ENTITY_REGISTRY;
 
 
 public class IncidentsSummaryHookTest {
-  private static final EntityRegistry ENTITY_REGISTRY = new ConfigEntityRegistry(
-      IncidentsSummaryHookTest.class.getClassLoader().getResourceAsStream("test-entity-registry.yml"));
   private static final Urn TEST_EXISTING_INCIDENT_URN = UrnUtils.getUrn("urn:li:incident:existing");
   private static final Urn TEST_INCIDENT_URN = UrnUtils.getUrn("urn:li:incident:test");
   private static final Urn TEST_DATASET_URN = UrnUtils.getUrn("urn:li:dataset:(urn:li:dataPlatform:hive,name,PROD)");
