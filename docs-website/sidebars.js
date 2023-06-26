@@ -622,9 +622,7 @@ module.exports = {
     // - "perf-test/README",
     // "metadata-jobs/README",
     // "docs/how/add-user-data",
-    // "docs/_feature-guide-template",
-    // "datahub-monitors-service/README.md",
-    // "datahub-integrations-service/README.md"
+    // "docs/_feature-guide-template"
     // ],
   ],
 };
