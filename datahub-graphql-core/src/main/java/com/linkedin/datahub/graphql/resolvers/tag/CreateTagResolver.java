@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.linkedin.datahub.graphql.resolvers.ResolverUtils.*;
 import static com.linkedin.datahub.graphql.resolvers.mutate.util.OwnerUtils.*;
-
 import static com.linkedin.datahub.graphql.resolvers.mutate.MutationUtils.*;
 import static com.linkedin.metadata.Constants.*;
 
@@ -63,10 +62,10 @@ public class CreateTagResolver implements DataFetcher<CompletableFuture<String>>
           throw new IllegalArgumentException("This Tag already exists!");
         }
 
+        // Create the MCP
         final MetadataChangeProposal proposal = buildMetadataChangeProposalWithKey(key, TAG_ENTITY_NAME,
             TAG_PROPERTIES_ASPECT_NAME, mapTagProperties(input));
         String tagUrn = _entityClient.ingestProposal(proposal, context.getAuthentication(), false);
-
         OwnershipType ownershipType = OwnershipType.TECHNICAL_OWNER;
         if (!_entityService.exists(UrnUtils.getUrn(mapOwnershipTypeToEntity(ownershipType.name())))) {
           log.warn("Technical owner does not exist, defaulting to None ownership.");

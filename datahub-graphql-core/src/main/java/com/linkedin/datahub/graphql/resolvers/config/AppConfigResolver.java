@@ -163,9 +163,13 @@ public class AppConfigResolver implements DataFetcher<CompletableFuture<AppConfi
     viewsConfig.setEnabled(_viewsConfiguration.isEnabled());
     appConfig.setViewsConfig(viewsConfig);
 
-    final FeatureFlagsConfig featureFlagsConfig = new FeatureFlagsConfig();
-    featureFlagsConfig.setReadOnlyModeEnabled(_featureFlags.isReadOnlyModeEnabled());
-    featureFlagsConfig.setAssertionMonitorsEnabled(_featureFlags.isAssertionMonitorsEnabled());
+    final FeatureFlagsConfig featureFlagsConfig = FeatureFlagsConfig.builder()
+      .setAssertionMonitorsEnabled(_featureFlags.isAssertionMonitorsEnabled())
+      .setShowSearchFiltersV2(_featureFlags.isShowSearchFiltersV2())
+      .setReadOnlyModeEnabled(_featureFlags.isReadOnlyModeEnabled())
+      .setShowBrowseV2(_featureFlags.isShowBrowseV2())
+      .build();
+
     appConfig.setFeatureFlags(featureFlagsConfig);
 
     final ChromeExtensionConfig chromeExtensionConfig = new ChromeExtensionConfig();

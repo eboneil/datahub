@@ -1,12 +1,10 @@
 import logging
 from typing import Any, Dict, List, Optional, Union
 
-from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from pydantic import BaseModel, validator
 
-from datahub.secret.datahub_secrets_client import (
-    DataHubSecretsClient,
-)
+from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
+from datahub.secret.datahub_secrets_client import DataHubSecretsClient
 from datahub.secret.secret_store import SecretStore
 
 logger = logging.getLogger(__name__)

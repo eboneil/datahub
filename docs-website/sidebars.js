@@ -385,6 +385,7 @@ module.exports = {
         "docs/how/search",
         "docs/schema-history",
         // "docs/how/ui-tabs-guide",
+        // "datahub-monitors-service/README.md",
         "docs/domains",
         "docs/dataproducts",
         "docs/glossary/business-glossary",
@@ -437,6 +438,7 @@ module.exports = {
             "docs/developers",
             "docs/docker/development",
             "metadata-ingestion/developing",
+            "docs/api/graphql/graphql-endpoint-development",
             {
               Modules: [
                 "datahub-web-react/README",

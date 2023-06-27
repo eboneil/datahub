@@ -2,8 +2,9 @@ import { Tooltip, Typography } from 'antd';
 import { SelectValue } from 'antd/lib/select';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { ArrowRightOutlined } from '@ant-design/icons';
 import { useGetAssertionRunsLazyQuery } from '../../../../../../graphql/assertion.generated';
-import { AssertionResultType, AssertionRunStatus } from '../../../../../../types.generated';
+import { AssertionResultType, AssertionRunStatus, EntityType } from '../../../../../../types.generated';
 import { formatNumber } from '../../../../../shared/formatNumber';
 import { getFixedLookbackWindow, getLocaleTimezone } from '../../../../../shared/time/timeUtils';
 import { ANTD_GRAY } from '../../../constants';
@@ -12,6 +13,8 @@ import { LOOKBACK_WINDOWS } from '../Stats/lookbackWindows';
 import { getResultColor, getResultIcon, getResultText } from './assertionUtils';
 import { BooleanTimeline } from './BooleanTimeline';
 import { DatasetAssertionResultDetails } from './DatasetAssertionResultDetails';
+import { LinkWrapper } from '../../../../../shared/LinkWrapper';
+import { useEntityRegistry } from '../../../../../useEntityRegistry';
 
 const RESULT_CHART_WIDTH_PX = 800;
 
@@ -72,6 +75,7 @@ type Props = {
 
 export const DatasetAssertionDetails = ({ urn, lastEvaluatedAtMillis }: Props) => {
     const [getAssertionRuns, { data }] = useGetAssertionRunsLazyQuery({ fetchPolicy: 'cache-first' });
+    const entityRegistry = useEntityRegistry();
 
     /**
      * Set default window for fetching assertion history.
@@ -140,6 +144,10 @@ export const DatasetAssertionDetails = ({ urn, lastEvaluatedAtMillis }: Props) =
             const resultTime = new Date(runEvent.timestampMillis);
             const localTime = resultTime.toLocaleString();
             const gmtTime = resultTime.toUTCString();
+            const resultUrl = result?.externalUrl;
+            const platformName = data?.assertion?.platform
+                ? entityRegistry.getDisplayName(EntityType.DataPlatform, data?.assertion?.platform)
+                : undefined;
 
             /**
              * Create a "result" to render in the timeline chart.
@@ -148,6 +156,7 @@ export const DatasetAssertionDetails = ({ urn, lastEvaluatedAtMillis }: Props) =
                 time: runEvent.timestampMillis,
                 result: {
                     result: result?.type !== AssertionResultType.Failure,
+                    resultUrl,
                     title: (
                         <>
                             {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
@@ -168,6 +177,11 @@ export const DatasetAssertionDetails = ({ urn, lastEvaluatedAtMillis }: Props) =
                                     <Typography.Text type="secondary">{localTime}</Typography.Text>
                                 </Tooltip>
                             </div>
+                            {resultUrl && (
+                                <LinkWrapper to={resultUrl} target="_blank">
+                                    {platformName ? `View in ${platformName}` : 'View results'} <ArrowRightOutlined />
+                                </LinkWrapper>
+                            )}
                         </>
                     ),
                 },

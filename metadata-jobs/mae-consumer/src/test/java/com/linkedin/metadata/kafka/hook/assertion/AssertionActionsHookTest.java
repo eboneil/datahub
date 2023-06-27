@@ -44,8 +44,6 @@ import com.linkedin.incident.IncidentState;
 import com.linkedin.incident.IncidentStatus;
 import com.linkedin.incident.IncidentType;
 import com.linkedin.metadata.entity.AspectUtils;
-import com.linkedin.metadata.models.registry.ConfigEntityRegistry;
-import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.query.SearchFlags;
 import com.linkedin.metadata.query.filter.Filter;
 import com.linkedin.metadata.query.filter.SortCriterion;
@@ -61,11 +59,10 @@ import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 import static com.linkedin.metadata.Constants.*;
+import static com.linkedin.metadata.kafka.hook.EntityRegistryTestUtil.ENTITY_REGISTRY;
 
 
 public class AssertionActionsHookTest {
-  private static final EntityRegistry ENTITY_REGISTRY = new ConfigEntityRegistry(
-      AssertionsSummaryHookTest.class.getClassLoader().getResourceAsStream("test-entity-registry.yml"));
   private static final Urn TEST_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test");
   private static final Urn TEST_INCIDENT_URN = UrnUtils.getUrn("urn:li:incident:test-1");
   private static final Urn TEST_ANOMALY_URN = UrnUtils.getUrn("urn:li:anomaly:test-2");

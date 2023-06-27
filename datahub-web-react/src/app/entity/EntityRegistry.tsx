@@ -38,6 +38,10 @@ export default class EntityRegistry {
         return validatedGet(type, this.entityTypeToEntity);
     }
 
+    hasEntity(type: EntityType): boolean {
+        return this.entityTypeToEntity.has(type);
+    }
+
     getEntities(): Array<Entity<any>> {
         return this.entities;
     }

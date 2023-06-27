@@ -33,7 +33,7 @@ def resolve_secrets(secret_names: List[str], secret_stores: List[SecretStore]) -
 
 def resolve_recipe(recipe: str, secret_stores: List[SecretStore]) -> dict:
     # Now attempt to find and replace all secrets inside the recipe.
-    secret_pattern = re.compile(".*?\${(\w+)}.*?")
+    secret_pattern = re.compile(".*?\\${(\\w+)}.*?")
 
     resolved_recipe = recipe
     secret_matches = secret_pattern.findall(resolved_recipe)

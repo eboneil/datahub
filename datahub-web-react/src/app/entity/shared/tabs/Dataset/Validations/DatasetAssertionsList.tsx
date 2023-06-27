@@ -10,6 +10,7 @@ import { getResultColor, getResultIcon, getResultText } from './assertionUtils';
 import { useDeleteAssertionMutation } from '../../../../../../graphql/assertion.generated';
 import { capitalizeFirstLetterOnly } from '../../../../../shared/textUtil';
 import { SlaAssertionDescription } from './SlaAssertionDescription';
+import { LinkWrapper } from '../../../../../shared/LinkWrapper';
 
 const ResultContainer = styled.div`
     display: flex;
@@ -87,6 +88,10 @@ export const DatasetAssertionsList = ({ assertions, onDelete }: Props) => {
             assertion.runEvents?.runEvents?.length &&
             assertion.runEvents.runEvents[0].status === AssertionRunStatus.Complete &&
             assertion.runEvents.runEvents[0].result?.type,
+        lastExecUrl:
+            assertion.runEvents?.runEvents.length &&
+            assertion.runEvents.runEvents[0].status === AssertionRunStatus.Complete &&
+            assertion.runEvents.runEvents[0].result?.externalUrl,
     }));
 
     const assertionsTableCols = [
@@ -133,12 +138,18 @@ export const DatasetAssertionsList = ({ assertions, onDelete }: Props) => {
                         >
                             <PlatformContainer>
                                 {(record.platform.properties?.logoUrl && (
-                                    <Image
-                                        preview={false}
-                                        height={20}
-                                        width={20}
-                                        src={record.platform.properties?.logoUrl}
-                                    />
+                                    <LinkWrapper
+                                        to={record.lastExecUrl}
+                                        target="_blank"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Image
+                                            preview={false}
+                                            height={20}
+                                            width={20}
+                                            src={record.platform.properties?.logoUrl}
+                                        />
+                                    </LinkWrapper>
                                 )) || (
                                     <Typography.Text>
                                         {record.platform.properties?.displayName ||
