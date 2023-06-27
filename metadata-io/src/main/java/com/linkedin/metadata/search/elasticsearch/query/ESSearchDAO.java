@@ -160,13 +160,14 @@ public class ESSearchDAO {
   @WithSpan
   private ScrollResult executeSearchScrollRequestAndExtract(@Nonnull List<EntitySpec> entitySpecs,
       @Nullable Filter filters,
-      @Nonnull SearchRequest searchRequest, int size) {
+      @Nonnull SearchRequest searchRequest, @Nonnull String keepAlive, int size) {
     try (Timer.Context ignored = MetricUtils.timer(this.getClass(), "esSearch").time()) {
       final SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
       // extract results, validated against document model as well
-      SearchResult searchResult = SearchRequestHandler.getBuilder(entitySpecs, searchConfiguration, customSearchConfiguration)
-              .extractResult(searchResponse, filters, 0, size);
-      return buildScrollResult(searchResult, searchResponse.getScrollId());
+      return SearchRequestHandler
+          .getBuilder(entitySpecs, searchConfiguration, customSearchConfiguration)
+          .extractScrollResult(searchResponse,
+              filters, searchResponse.getScrollId(), keepAlive, size, supportsPointInTime());
     } catch (Exception e) {
       if (e instanceof ElasticsearchStatusException) {
         final ElasticsearchStatusException statusException = (ElasticsearchStatusException) e;
@@ -185,13 +186,13 @@ public class ESSearchDAO {
   @WithSpan
   private ScrollResult executeScrollRequestAndExtract(@Nonnull EntitySpec entitySpec,
       @Nullable Filter filters,
-      @Nonnull SearchScrollRequest searchScrollRequest, int size) {
+      @Nonnull SearchScrollRequest searchScrollRequest, int size, @Nonnull String keepAlive) {
     try (Timer.Context ignored = MetricUtils.timer(this.getClass(), "esSearch").time()) {
       final SearchResponse searchResponse = client.scroll(searchScrollRequest, RequestOptions.DEFAULT);
       // extract results, validated against document model as well
-      SearchResult searchResult = SearchRequestHandler.getBuilder(entitySpec, searchConfiguration, customSearchConfiguration)
-              .extractResult(searchResponse, filters, 0, size);
-      return buildScrollResult(searchResult, searchResponse.getScrollId());
+      return SearchRequestHandler.getBuilder(entitySpec, searchConfiguration, customSearchConfiguration)
+          .extractScrollResult(searchResponse,
+                        filters, searchResponse.getScrollId(), keepAlive, size, supportsPointInTime());
     } catch (Exception e) {
       if (e instanceof ElasticsearchStatusException) {
         final ElasticsearchStatusException statusException = (ElasticsearchStatusException) e;
@@ -332,7 +333,7 @@ public class ESSearchDAO {
       searchRequest.indices(indexArray);
     }
     scrollRequestTimer.stop();
-    return executeSearchScrollRequestAndExtract(entitySpecs, filters, searchRequest, size);
+    return executeSearchScrollRequestAndExtract(entitySpecs, filters, searchRequest, keepAliveDuration, size);
   }
 
   /**
