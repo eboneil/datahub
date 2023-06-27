@@ -153,8 +153,9 @@
     }, {
       "name" : "category",
       "type" : "string",
-      "doc" : "Category of the test",
+      "doc" : "Category of the test - Operational, Governance, etc.",
       "Searchable" : {
+        "addToFilters" : true,
         "fieldType" : "KEYWORD"
       }
     }, {

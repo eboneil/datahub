@@ -96,7 +96,8 @@ public class UpdateTestResolverTest {
     Mockito.when(mockEngine.validateJson(anyString())).thenReturn(new ValidationResult(false, Collections.emptyList()));
 
     assertThrows(CompletionException.class, () -> resolver.get(mockEnv).join());
-    Mockito.verify(mockClient, Mockito.times(0)).ingestProposal(Mockito.any(), Mockito.any(Authentication.class));
+    Mockito.verify(mockClient, Mockito.times(0))
+        .ingestProposal(Mockito.any(), Mockito.any(Authentication.class), Mockito.eq(false));
   }
 
   @Test
@@ -110,7 +111,8 @@ public class UpdateTestResolverTest {
     assertThrows(CompletionException.class, () -> resolver.get(mockEnv).join());
     Mockito.verify(mockClient, Mockito.times(0)).ingestProposal(
         Mockito.any(),
-        Mockito.any(Authentication.class));
+        Mockito.any(Authentication.class),
+        Mockito.eq(false));
   }
 
   @Test
@@ -118,7 +120,8 @@ public class UpdateTestResolverTest {
     // Execute resolver
     Mockito.doThrow(RemoteInvocationException.class).when(mockClient).ingestProposal(
         Mockito.any(),
-        Mockito.any(Authentication.class));
+        Mockito.any(Authentication.class),
+        Mockito.eq(false));
     QueryContext mockContext = getMockAllowContext();
     Mockito.when(mockEnv.getArgument(Mockito.eq("input"))).thenReturn(TEST_INPUT);
     Mockito.when(mockEnv.getContext()).thenReturn(mockContext);

@@ -9,8 +9,6 @@ import com.linkedin.events.metadata.ChangeType;
 import com.linkedin.ingestion.DataHubIngestionSourceConfig;
 import com.linkedin.ingestion.DataHubIngestionSourceInfo;
 import com.linkedin.ingestion.DataHubIngestionSourceSchedule;
-import com.linkedin.metadata.models.registry.ConfigEntityRegistry;
-import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.utils.GenericRecordUtils;
 import com.linkedin.mxe.MetadataChangeLog;
 import com.linkedin.mxe.SystemMetadata;
@@ -23,6 +21,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static com.linkedin.metadata.Constants.*;
+import static com.linkedin.metadata.kafka.hook.EntityRegistryTestUtil.ENTITY_REGISTRY;
 
 
 public class MetadataTestHookTest {
@@ -31,11 +30,9 @@ public class MetadataTestHookTest {
 
   @BeforeMethod
   public void setupTest() throws Exception {
-    EntityRegistry registry = new ConfigEntityRegistry(
-        MetadataTestHookTest.class.getClassLoader().getResourceAsStream("test-entity-registry.yml"));
     Authentication mockAuthentication = Mockito.mock(Authentication.class);
     _mockTestClient = initTestClientMock();
-    _metadataTestHook = new MetadataTestHook(registry, _mockTestClient, mockAuthentication, true, 1, TimeUnit.MILLISECONDS);
+    _metadataTestHook = new MetadataTestHook(ENTITY_REGISTRY, _mockTestClient, mockAuthentication, true, 1, TimeUnit.MILLISECONDS);
   }
 
   @Test
