@@ -1454,7 +1454,9 @@ type Dataset implements EntityWithRelationships & Entity & BrowsableEntity {
     siblings: SiblingProperties
 
     """
-    fine grained lineage
+    Lineage information for the column-level. Includes a list of objects
+    detailing which columns are upstream and which are downstream of each other.
+    The upstream and downstream columns are from datasets.
     """
     fineGrainedLineages: [FineGrainedLineage!]
 
@@ -5782,11 +5784,9 @@ type DataJob implements EntityWithRelationships & Entity & BrowsableEntity {
     info: DataJobInfo @deprecated
 
     """
-    Deprecated, use relationship Produces, Consumes, DownstreamOf instead
-    Information about the inputs and outputs of a Data processing job
+    Information about the inputs and outputs of a Data processing job including column-level lineage.
     """
-    inputOutput: DataJobInputOutput @deprecated
-
+    inputOutput: DataJobInputOutput
 
     """
     Deprecated, use the tags field instead
@@ -6011,6 +6011,13 @@ type DataJobInputOutput {
     Input datajobs that this data job depends on
     """
     inputDatajobs: [DataJob!] @deprecated
+
+    """
+    Lineage information for the column-level. Includes a list of objects
+    detailing which columns are upstream and which are downstream of each other.
+    The upstream and downstream columns are from datasets.
+    """
+    fineGrainedLineages: [FineGrainedLineage!]
 }
 
 """

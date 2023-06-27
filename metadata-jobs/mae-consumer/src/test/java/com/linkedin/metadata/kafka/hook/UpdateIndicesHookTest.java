@@ -88,7 +88,6 @@ public class UpdateIndicesHookTest {
   @BeforeMethod
   public void setupTest() {
     _actorUrn = UrnUtils.getUrn(TEST_ACTOR_URN);
-    EntityRegistry registry = ENTITY_REGISTRY;
     _mockGraphService = Mockito.mock(ElasticSearchGraphService.class);
     _mockEntitySearchService = Mockito.mock(EntitySearchService.class);
     _mockTimeseriesAspectService = Mockito.mock(TimeseriesAspectService.class);
@@ -105,7 +104,7 @@ public class UpdateIndicesHookTest {
         _mockEntitySearchService,
         _mockTimeseriesAspectService,
         _mockSystemMetadataService,
-        registry,
+        ENTITY_REGISTRY,
         _searchDocumentTransformer
     );
     _updateIndicesHook = new UpdateIndicesHook(
