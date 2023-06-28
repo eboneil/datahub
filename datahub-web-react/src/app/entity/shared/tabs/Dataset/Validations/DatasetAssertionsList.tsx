@@ -89,7 +89,7 @@ export const DatasetAssertionsList = ({ assertions, onDelete }: Props) => {
             assertion.runEvents.runEvents[0].status === AssertionRunStatus.Complete &&
             assertion.runEvents.runEvents[0].result?.type,
         lastExecUrl:
-            assertion.runEvents?.runEvents.length &&
+            assertion.runEvents?.runEvents?.length &&
             assertion.runEvents.runEvents[0].status === AssertionRunStatus.Complete &&
             assertion.runEvents.runEvents[0].result?.externalUrl,
     }));
