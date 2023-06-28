@@ -24,7 +24,7 @@ import com.linkedin.monitor.AssertionEvaluationParametersType;
 import com.linkedin.monitor.AuditLogSpec;
 import com.linkedin.monitor.DatasetSlaAssertionParameters;
 import com.linkedin.monitor.DatasetSlaSourceType;
-import com.linkedin.schema.SchemaFieldSpec;
+import com.linkedin.assertion.FreshnessFieldSpec;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Objects;
@@ -135,8 +135,8 @@ public class CreateAssertionMonitorResolver implements DataFetcher<CompletableFu
     return result;
   }
 
-  private SchemaFieldSpec createFieldSpec(@Nonnull final SchemaFieldSpecInput input) {
-    final SchemaFieldSpec result = new SchemaFieldSpec();
+  private FreshnessFieldSpec createFieldSpec(@Nonnull final SchemaFieldSpecInput input) {
+    final FreshnessFieldSpec result = new FreshnessFieldSpec();
     result.setType(input.getType());
     result.setNativeType(input.getNativeType(), SetMode.IGNORE_NULL);
     result.setPath(input.getPath(), SetMode.IGNORE_NULL);

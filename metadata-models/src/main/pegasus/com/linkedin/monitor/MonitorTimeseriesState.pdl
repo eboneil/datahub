@@ -1,0 +1,14 @@
+namespace com.linkedin.monitor
+
+import com.linkedin.timeseries.TimeseriesAspectBase
+import com.linkedin.common.CustomProperties
+
+/**
+ * Stats required to evaluate continuous monitors.
+ */
+@Aspect = {
+  "name": "monitorTimeseriesState",
+  "type": "timeseries",
+}
+record MonitorTimeseriesState includes TimeseriesAspectBase, CustomProperties {
+}

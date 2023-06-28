@@ -1,6 +1,6 @@
 namespace com.linkedin.monitor
 
-import com.linkedin.schema.SchemaFieldSpec
+import com.linkedin.assertion.FreshnessFieldSpec
 
 /**
  * Information about the parameters required to evaluate an assertion
@@ -11,7 +11,7 @@ record DatasetSlaAssertionParameters {
   */
   sourceType: enum DatasetSlaSourceType {
     /**
-    * Determine that a change has occurred by inspecting a particular field, e.g. a timestamp column.
+    * Determine that a change has occurred by inspecting a particular field's value.
     */
     FIELD_VALUE
 
@@ -29,7 +29,7 @@ record DatasetSlaAssertionParameters {
   /**
   * Information about the field to use. Present when sourceType is FIELD_VALUE
   */
-  field: optional SchemaFieldSpec
+  field: optional FreshnessFieldSpec
 
   /**
   * Information about the audit log operation to use. Present when sourceType is AUDIT_LOG

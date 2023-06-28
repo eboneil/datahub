@@ -1,6 +1,7 @@
 namespace com.linkedin.assertion
 
 import com.linkedin.common.Urn
+import com.linkedin.common.Filter
 
 /**
 * Attributes defining an SLA Assertion.
@@ -43,4 +44,10 @@ record SlaAssertionInfo {
       }
     }
     schedule: SlaAssertionSchedule
+
+    /**
+     * A definition of the specific filters that should be applied, when performing monitoring.
+     * If not provided, there is no filter, and the full table is under consideration.
+     */
+    filter: optional Filter
 }

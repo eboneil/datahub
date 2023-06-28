@@ -527,6 +527,7 @@ entities:
     keyAspect: monitorKey
     aspects:
       - monitorInfo
+      - monitorTimeseriesState
   - name: linkPreview
     category: internal
     keyAspect: linkPreviewKey

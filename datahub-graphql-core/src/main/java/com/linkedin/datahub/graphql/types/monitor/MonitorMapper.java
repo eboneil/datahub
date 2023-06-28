@@ -119,7 +119,7 @@ public class MonitorMapper {
     return datasetSlaAssertionParameters;
   }
 
-  private static SchemaFieldSpec mapSchemaFieldSpec(com.linkedin.schema.SchemaFieldSpec backendSchemaFieldSpec) {
+  private static SchemaFieldSpec mapSchemaFieldSpec(com.linkedin.assertion.FreshnessFieldSpec backendSchemaFieldSpec) {
     SchemaFieldSpec schemaFieldSpec = new SchemaFieldSpec();
     schemaFieldSpec.setPath(backendSchemaFieldSpec.getPath());
     schemaFieldSpec.setType(backendSchemaFieldSpec.getType());

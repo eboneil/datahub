@@ -23,7 +23,7 @@ import com.linkedin.entity.EntityResponse;
 import com.linkedin.entity.EnvelopedAspect;
 import com.linkedin.entity.EnvelopedAspectMap;
 import com.linkedin.metadata.Constants;
-import com.linkedin.schema.SchemaFieldSpec;
+import com.linkedin.assertion.FreshnessFieldSpec;
 import java.util.HashMap;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -79,7 +79,7 @@ public class MonitorMapperTest {
       Assert.assertEquals(outputParams.getSourceType().toString(), inputParams.getSourceType().toString());
 
       if (inputParams.hasField()) {
-        SchemaFieldSpec inputFieldSpec = inputParams.getField();
+        FreshnessFieldSpec inputFieldSpec = inputParams.getField();
         com.linkedin.datahub.graphql.generated.SchemaFieldSpec outputFieldSpec = outputParams.getField();
         Assert.assertEquals(outputFieldSpec.getNativeType(), inputFieldSpec.getNativeType());
         Assert.assertEquals(outputFieldSpec.getType(), inputFieldSpec.getType());
@@ -148,7 +148,7 @@ public class MonitorMapperTest {
                     .setType(com.linkedin.monitor.AssertionEvaluationParametersType.DATASET_SLA)
                     .setDatasetSlaParameters(new DatasetSlaAssertionParameters()
                         .setSourceType(DatasetSlaSourceType.FIELD_VALUE)
-                        .setField(new SchemaFieldSpec().setNativeType("varchar").setType("STRING").setPath("name"))
+                        .setField(new FreshnessFieldSpec().setNativeType("varchar").setType("STRING").setPath("name"))
                     )
                 )
           )
