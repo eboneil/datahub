@@ -32,6 +32,8 @@ FROM base as prod-install
 
 ARG RELEASE_VERSION
 
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 COPY --from=prod-codegen /datahub-src/metadata-ingestion /datahub-src/metadata-ingestion
 COPY --from=prod-codegen /datahub-src/datahub-integrations-service /datahub-src/datahub-integrations-service
 COPY --from=prod-codegen /root/.cache/pip /root/.cache/pip
@@ -39,7 +41,6 @@ RUN cd /datahub-src/datahub-integrations-service && \
     sed -i.bak "s/__version__ = \"0.0.0.dev0\"/__version__ = \"$RELEASE_VERSION\"/" src/datahub_integrations/__init__.py && \
     cat src/datahub_integrations/__init__.py && \
     sed -i.bak "s/version = \"0.0.0.dev0\"/version = \"$RELEASE_VERSION\"/" pyproject.toml && \
-    poetry config virtualenvs.create false && \
     poetry install && \
     poetry export --without-hashes
 
@@ -51,6 +52,8 @@ FROM base as dev-install
 # Dummy stage for development. Assumes most of the code is built on your machine and mounted to this image.
 # See this excellent thread https://github.com/docker/cli/issues/1134
 
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 COPY ./datahub-integrations-service/pyproject.toml ./datahub-integrations-service/poetry.lock /datahub-src/datahub-integrations-service/
 # We only add these so that we can run `poetry install` without errors.
 COPY ./datahub-integrations-service/src/datahub_integrations/__init__.py /datahub-src/datahub-integrations-service/src/datahub_integrations/__init__.py
@@ -58,7 +61,6 @@ COPY ./metadata-ingestion/setup.py /datahub-src/metadata-ingestion/
 COPY ./metadata-ingestion/README.md /datahub-src/metadata-ingestion/
 COPY ./metadata-ingestion/src/datahub/__init__.py /datahub-src/metadata-ingestion/src/datahub/__init__.py
 RUN cd /datahub-src/datahub-integrations-service && \
-    poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi && \
     pip freeze
 
