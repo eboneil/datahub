@@ -12,8 +12,10 @@ import com.linkedin.datahub.graphql.resolvers.ResolverUtils;
 import com.linkedin.datahub.graphql.types.SearchableEntityType;
 import com.linkedin.metadata.graph.LineageDirection;
 import com.linkedin.metadata.query.SearchFlags;
+import com.linkedin.metadata.search.EntitySearchService;
 import com.linkedin.metadata.search.LineageSearchResult;
 import com.linkedin.metadata.search.LineageSearchService;
+import com.linkedin.metadata.search.ScrollResult;
 import com.linkedin.metadata.search.SearchResult;
 import com.linkedin.metadata.search.SearchService;
 import java.time.Duration;
@@ -76,6 +78,15 @@ public class ESTestUtils {
             100, new SearchFlags().setFulltext(true).setSkipCache(true), facets);
     }
 
+    public static ScrollResult scroll(SearchService searchService, String query, int batchSize, @Nullable String scrollId) {
+        return searchService.scrollAcrossEntities(SEARCHABLE_ENTITIES, query, null, null,
+            scrollId, "3m", batchSize, new SearchFlags().setFulltext(true).setSkipCache(true));
+    }
+
+    public static ScrollResult scroll(EntitySearchService entitySearchService, int batchSize, @Nullable String scrollId) {
+        return entitySearchService.scroll(
+            SEARCHABLE_ENTITIES, null, null, batchSize, scrollId, "3m");
+    }
     public static SearchResult searchStructured(SearchService searchService, String query) {
         return searchService.searchAcrossEntities(SEARCHABLE_ENTITIES, query, null, null, 0,
                 100, new SearchFlags().setFulltext(false).setSkipCache(true));

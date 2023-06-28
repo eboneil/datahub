@@ -24,6 +24,8 @@ import com.linkedin.metadata.query.filter.Criterion;
 import com.linkedin.metadata.query.filter.CriterionArray;
 import com.linkedin.metadata.query.filter.Filter;
 import com.linkedin.metadata.search.AggregationMetadata;
+import com.linkedin.metadata.search.EntitySearchService;
+import com.linkedin.metadata.search.ScrollResult;
 import com.linkedin.metadata.search.SearchEntity;
 import com.linkedin.metadata.search.SearchResult;
 import com.linkedin.metadata.search.SearchService;
@@ -53,9 +55,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.linkedin.metadata.ESTestUtils.autocomplete;
-import static com.linkedin.metadata.ESTestUtils.search;
-import static com.linkedin.metadata.ESTestUtils.searchStructured;
+import static com.linkedin.metadata.ESTestUtils.*;
 import static com.linkedin.metadata.search.elasticsearch.query.request.SearchQueryBuilder.STRUCTURED_QUERY_PREFIX;
 import static com.linkedin.metadata.utils.SearchUtil.*;
 import static org.testng.Assert.assertEquals;
@@ -83,6 +83,11 @@ public class SampleDataFixtureTests extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private EntityRegistry entityRegistry;
+
+    @Autowired
+    @Qualifier("sampleDataEntitySearchService")
+    private EntitySearchService _entitySearchService;
+
 
     @Test
     public void testSearchFieldConfig() throws IOException {
@@ -793,6 +798,42 @@ public class SampleDataFixtureTests extends AbstractTestNGSpringContextTests {
         List<String> searchIndexTokens = getTokens(request).map(AnalyzeResponse.AnalyzeToken::getTerm).collect(Collectors.toList());
         expectedIndexTokens.forEach(expected -> assertTrue(searchIndexTokens.contains(expected),
                 String.format("Expected token `%s` in %s", expected, searchIndexTokens)));
+    }
+
+    @Test
+    public void testScrollAcrossEntities() throws IOException {
+        String query = "logging_events";
+        final int batchSize = 1;
+        int totalResults = 0;
+        String scrollId = null;
+        do {
+            ScrollResult result = scroll(searchService, query, batchSize, scrollId);
+            int numResults = result.hasEntities() ? result.getEntities().size() : 0;
+            assertTrue(numResults <= batchSize);
+            totalResults += numResults;
+            scrollId = result.getScrollId();
+        } while (scrollId != null);
+        // expect 8 total matching results
+        assertEquals(totalResults, 8);
+    }
+
+    @Test
+    public void testEntityServiceScroll() throws IOException {
+        // Find expected number of entities by doing a * search
+        SearchResult totalResult = search(searchService, "*");
+        int expectedTotal = totalResult.getNumEntities();
+        final int batchSize = 1;
+        int totalResults = 0;
+        String scrollId = null;
+        do {
+            ScrollResult result = scroll(_entitySearchService, batchSize, scrollId);
+            int numResults = result.hasEntities() ? result.getEntities().size() : 0;
+            assertTrue(numResults <= batchSize);
+            totalResults += numResults;
+            scrollId = result.getScrollId();
+        } while (scrollId != null);
+        // expect total number of results scrolling through to be the number that we saw
+        assertEquals(totalResults, expectedTotal);
     }
 
     @Test
