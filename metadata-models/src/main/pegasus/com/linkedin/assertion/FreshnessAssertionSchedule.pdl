@@ -3,17 +3,17 @@ namespace com.linkedin.assertion
 import com.linkedin.common.Urn
 
 /**
-* Attributes defining a single SLA schedule.
+* Attributes defining a single Freshness schedule.
 */
-record SlaAssertionSchedule {
+record FreshnessAssertionSchedule {
 
   /**
-   * The type of an SLA Assertion Schedule.
+   * The type of a Freshness Assertion Schedule.
    *
    * Once we support data-time-relative schedules (e.g. schedules relative to time partitions),
    * we will add those schedule types here.
    */
-  type: enum SlaAssertionScheduleType {
+  type: enum FreshnessAssertionScheduleType {
     /**
      * An highly configurable recurring schedule which describes the times of events described
      * by a CRON schedule, with the evaluation schedule assuming to be matching the cron schedule.
@@ -23,7 +23,7 @@ record SlaAssertionSchedule {
      * the schedule defined inside the cron schedule.
      *
      * For example, a CRON schedule defined as "0 8 * * *" would represent a schedule of "every day by 8am". Assuming
-     * that the assertion evaluation schedule is defined to match this, the SLA assertion would be evaluated in the following way:
+     * that the assertion evaluation schedule is defined to match this, the freshness assertion would be evaluated in the following way:
      *
      *     1. Compute the "last scheduled occurrence" of the event using the CRON schedule. For example, yesterday at 8am.
      *     2. Compute the bounds of a time window between the "last scheduled occurrence" (yesterday at 8am) until the "current occurrence" (today at 8am)
@@ -56,7 +56,7 @@ record SlaAssertionSchedule {
   /**
    * A cron schedule. This field is required when type is CRON.
    */
-  cron: optional SlaCronSchedule
+  cron: optional FreshnessCronSchedule
 
   /**
    * A fixed interval schedule. This field is required when type is FIXED_INTERVAL.

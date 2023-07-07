@@ -4,13 +4,13 @@ import cronstrue from 'cronstrue';
 import {
     CronSchedule,
     FixedIntervalSchedule,
-    SlaAssertionInfo,
-    SlaAssertionScheduleType,
-    SlaAssertionType,
+    FreshnessAssertionInfo,
+    FreshnessAssertionScheduleType,
+    FreshnessAssertionType,
 } from '../../../../../../types.generated';
 
 type Props = {
-    assertionInfo: SlaAssertionInfo;
+    assertionInfo: FreshnessAssertionInfo;
 };
 
 const createCronText = (cronSchedule: CronSchedule) => {
@@ -24,18 +24,20 @@ const createFixedIntervalText = (fixedIntervalSchedule: FixedIntervalSchedule) =
 };
 
 /**
- * A human-readable description of an SLA Assertion.
+ * A human-readable description of an Freshness Assertion.
  */
-export const SlaAssertionDescription = ({ assertionInfo }: Props) => {
+export const FreshnessAssertionDescription = ({ assertionInfo }: Props) => {
     const scheduleType = assertionInfo.schedule?.type;
-    const slaType = assertionInfo.type;
+    const freshnessType = assertionInfo.type;
 
     return (
         <div>
             <Typography.Text>
-                <b>SLA</b>:{' '}
-                {slaType === SlaAssertionType.DatasetChange ? 'Dataset is updated ' : 'Data Task is run successfully '}
-                {scheduleType === SlaAssertionScheduleType.Cron
+                <b>Freshness</b>:{' '}
+                {freshnessType === FreshnessAssertionType.DatasetChange
+                    ? 'Dataset is updated '
+                    : 'Data Task is run successfully '}
+                {scheduleType === FreshnessAssertionScheduleType.Cron
                     ? createCronText(assertionInfo.schedule?.cron as any)
                     : createFixedIntervalText(assertionInfo.schedule?.fixedInterval as any)}
             </Typography.Text>

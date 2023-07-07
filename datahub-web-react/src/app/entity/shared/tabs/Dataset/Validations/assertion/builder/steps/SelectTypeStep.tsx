@@ -5,7 +5,10 @@ import { AssertionTypeOption } from './AssertionTypeOption';
 import { AssertionBuilderStep, StepProps } from '../types';
 import { getAssertionTypesForEntityType } from '../utils';
 import { AssertionType, EntityType } from '../../../../../../../../../types.generated';
-import { DEFAULT_DATASET_SLA_ASSERTION_STATE, DEFAULT_DATASET_SLA_ASSERTION_PARAMETERS_STATE } from '../constants';
+import {
+    DEFAULT_DATASET_FRESHNESS_ASSERTION_STATE,
+    DEFAULT_DATASET_FRESHNESS_ASSERTION_PARAMETERS_STATE,
+} from '../constants';
 
 const Step = styled.div`
     height: 100%;
@@ -44,14 +47,14 @@ export const SelectTypeStep = ({ state, updateState, goTo, cancel }: StepProps) 
         let newState = { ...state };
 
         // Init the default fields per assertion type.
-        if (type === AssertionType.Sla) {
+        if (type === AssertionType.Freshness) {
             newState = {
                 ...newState,
                 assertion: {
                     type,
-                    slaAssertion: DEFAULT_DATASET_SLA_ASSERTION_STATE,
+                    freshnessAssertion: DEFAULT_DATASET_FRESHNESS_ASSERTION_STATE,
                 },
-                parameters: DEFAULT_DATASET_SLA_ASSERTION_PARAMETERS_STATE,
+                parameters: DEFAULT_DATASET_FRESHNESS_ASSERTION_PARAMETERS_STATE,
             };
         }
 
@@ -60,8 +63,8 @@ export const SelectTypeStep = ({ state, updateState, goTo, cancel }: StepProps) 
         });
 
         switch (type) {
-            case AssertionType.Sla:
-                goTo(AssertionBuilderStep.CONFIGURE_DATASET_SLA_ASSERTION);
+            case AssertionType.Freshness:
+                goTo(AssertionBuilderStep.CONFIGURE_DATASET_FRESHNESS_ASSERTION);
                 return;
             default:
                 // Do nothing.

@@ -1,21 +1,21 @@
 import {
-    DatasetSlaSourceType,
+    DatasetFreshnessSourceType,
     EntityType,
-    SlaAssertionScheduleType,
-    SlaAssertionType,
+    FreshnessAssertionScheduleType,
+    FreshnessAssertionType,
 } from '../../../../../../../../types.generated';
 import { BIGQUERY_URN, REDSHIFT_URN, SNOWFLAKE_URN } from '../../../../../../../ingest/source/builder/constants';
 import { AssertionMonitorBuilderState } from './types';
 import { ASSERTION_TYPES } from './constants';
 
-export const builderStateToUpdateSlaAssertionVariables = (builderState: AssertionMonitorBuilderState) => {
+export const builderStateToUpdateFreshnessAssertionVariables = (builderState: AssertionMonitorBuilderState) => {
     return {
         input: {
-            type: builderState.assertion?.slaAssertion?.type as SlaAssertionType,
+            type: builderState.assertion?.freshnessAssertion?.type as FreshnessAssertionType,
             schedule: {
-                type: builderState.assertion?.slaAssertion?.schedule?.type as SlaAssertionScheduleType,
-                cron: builderState.assertion?.slaAssertion?.schedule?.cron,
-                fixedInterval: builderState.assertion?.slaAssertion?.schedule?.fixedInterval,
+                type: builderState.assertion?.freshnessAssertion?.schedule?.type as FreshnessAssertionScheduleType,
+                cron: builderState.assertion?.freshnessAssertion?.schedule?.cron,
+                fixedInterval: builderState.assertion?.freshnessAssertion?.schedule?.fixedInterval,
             },
             actions: builderState.assertion?.actions
                 ? {
@@ -41,11 +41,11 @@ export const builderStateToCreateAssertionMonitorVariables = (
     };
 };
 
-export const builderStateToCreateSlaAssertionVariables = (builderState: AssertionMonitorBuilderState) => {
+export const builderStateToCreateFreshnessAssertionVariables = (builderState: AssertionMonitorBuilderState) => {
     return {
         input: {
             entityUrn: builderState.entityUrn as string,
-            ...builderStateToUpdateSlaAssertionVariables(builderState).input,
+            ...builderStateToUpdateFreshnessAssertionVariables(builderState).input,
         },
     };
 };
@@ -56,18 +56,18 @@ export const getAssertionTypesForEntityType = (entityType: EntityType) => {
 
 export const SOURCE_TYPES = [
     {
-        type: DatasetSlaSourceType.AuditLog,
+        type: DatasetFreshnessSourceType.AuditLog,
         name: 'Audit Log',
         description: 'Use operations logged in the platform audit log to determine whether the dataset has changed',
     },
     {
-        type: DatasetSlaSourceType.InformationSchema,
+        type: DatasetFreshnessSourceType.InformationSchema,
         name: 'Information Schema',
         description:
             'Use the information schema or system metadata tables to determine whether the dataset has changed',
     },
     {
-        type: DatasetSlaSourceType.FieldValue,
+        type: DatasetFreshnessSourceType.FieldValue,
         name: 'Date Column',
         description:
             'Check the maximum value of a timestamp or date column to determine whether the dataset has changed',
@@ -83,18 +83,18 @@ export const getSourceTypesForPlatform = (platformUrn: string) => {
     switch (platformUrn) {
         case SNOWFLAKE_URN:
             return [
-                DatasetSlaSourceType.AuditLog,
-                DatasetSlaSourceType.InformationSchema,
-                DatasetSlaSourceType.FieldValue,
+                DatasetFreshnessSourceType.AuditLog,
+                DatasetFreshnessSourceType.InformationSchema,
+                DatasetFreshnessSourceType.FieldValue,
             ];
         case BIGQUERY_URN:
             return [
-                DatasetSlaSourceType.AuditLog,
-                DatasetSlaSourceType.InformationSchema,
-                DatasetSlaSourceType.FieldValue,
+                DatasetFreshnessSourceType.AuditLog,
+                DatasetFreshnessSourceType.InformationSchema,
+                DatasetFreshnessSourceType.FieldValue,
             ];
         case REDSHIFT_URN:
-            return [DatasetSlaSourceType.AuditLog, DatasetSlaSourceType.FieldValue];
+            return [DatasetFreshnessSourceType.AuditLog, DatasetFreshnessSourceType.FieldValue];
         default:
             return []; // No types supported.
     }

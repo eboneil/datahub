@@ -14,7 +14,7 @@ fragment monitorDetails on Monitor {
                 }
                 parameters {
                     type
-                    datasetSlaParameters {
+                    datasetFreshnessParameters {
                         sourceType
                         auditLog {
                             operationTypes

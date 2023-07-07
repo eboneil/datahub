@@ -60,7 +60,7 @@ fragment AssertionDetails on Assertion {
           }
           logic
       }
-      slaAssertion {
+      freshnessAssertion {
           type
           schedule {
               type
@@ -114,7 +114,7 @@ fragment MonitorSearchResults on SearchResults {
               }
               parameters {
                 type
-                datasetSlaParameters {
+                datasetFreshnessParameters {
                   sourceType
                   field {
                     type

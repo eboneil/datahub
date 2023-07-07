@@ -11,9 +11,9 @@ import com.linkedin.assertion.AssertionStdParameters;
 import com.linkedin.assertion.AssertionType;
 import com.linkedin.assertion.DatasetAssertionInfo;
 import com.linkedin.assertion.DatasetAssertionScope;
-import com.linkedin.assertion.SlaAssertionInfo;
-import com.linkedin.assertion.SlaAssertionSchedule;
-import com.linkedin.assertion.SlaAssertionType;
+import com.linkedin.assertion.FreshnessAssertionInfo;
+import com.linkedin.assertion.FreshnessAssertionSchedule;
+import com.linkedin.assertion.FreshnessAssertionType;
 import com.linkedin.common.AssertionsSummary;
 import com.linkedin.common.UrnArray;
 import com.linkedin.common.urn.Urn;
@@ -164,14 +164,14 @@ public class AssertionService extends BaseService {
   }
 
   /**
-   * Creates a new Dataset or DataJob SLA Assertion for native execution by DataHub.
+   * Creates a new Dataset or DataJob Freshness Assertion for native execution by DataHub.
    * Assumes that the caller has already performed the required authorization.
    */
   @Nonnull
-  public Urn createSlaAssertion(
+  public Urn createFreshnessAssertion(
       @Nonnull final Urn entityUrn,
-      @Nonnull final SlaAssertionType type,
-      @Nonnull final SlaAssertionSchedule schedule,
+      @Nonnull final FreshnessAssertionType type,
+      @Nonnull final FreshnessAssertionSchedule schedule,
       @Nullable final AssertionActions actions,
       @Nonnull final Authentication authentication) {
     Objects.requireNonNull(entityUrn, "entityUrn must not be null");
@@ -181,14 +181,14 @@ public class AssertionService extends BaseService {
 
     final Urn assertionUrn = generateAssertionUrn();
 
-    final SlaAssertionInfo slaInfo = new SlaAssertionInfo()
+    final FreshnessAssertionInfo freshnessInfo = new FreshnessAssertionInfo()
       .setEntity(entityUrn)
       .setType(type)
       .setSchedule(schedule, SetMode.IGNORE_NULL);
 
     final AssertionInfo assertion = new AssertionInfo();
-    assertion.setSlaAssertion(slaInfo);
-    assertion.setType(AssertionType.SLA);
+    assertion.setFreshnessAssertion(freshnessInfo);
+    assertion.setType(AssertionType.FRESHNESS);
     assertion.setSource(getNativeAssertionSource());
 
     final List<MetadataChangeProposal> aspects = new ArrayList<>();
@@ -205,7 +205,7 @@ public class AssertionService extends BaseService {
       );
       return assertionUrn;
     } catch (Exception e) {
-      throw new RuntimeException(String.format("Failed to create new SLA Assertion for entity with urn %s", entityUrn), e);
+      throw new RuntimeException(String.format("Failed to create new Freshness Assertion for entity with urn %s", entityUrn), e);
     }
   }
 
@@ -262,13 +262,13 @@ public class AssertionService extends BaseService {
   }
 
   /**
-   * Updates an existing Dataset or DataJob SLA Assertion for native execution by DataHub.
+   * Updates an existing Dataset or DataJob Freshness Assertion for native execution by DataHub.
    * Assumes that the caller has already performed the required authorization.
    */
   @Nonnull
-  public Urn updateSlaAssertion(
+  public Urn updateFreshnessAssertion(
       @Nonnull final Urn assertionUrn,
-      @Nonnull final SlaAssertionSchedule schedule,
+      @Nonnull final FreshnessAssertionSchedule schedule,
       @Nullable final AssertionActions actions,
       @Nonnull final Authentication authentication) {
     Objects.requireNonNull(assertionUrn, "assertionUrn must not be null");
@@ -282,18 +282,18 @@ public class AssertionService extends BaseService {
       throw new IllegalArgumentException(String.format("Failed to update Assertion. Assertion with urn %s does not exist.", assertionUrn));
     }
 
-    if (!AssertionType.SLA.equals(existingInfo.getType())) {
-      throw new IllegalArgumentException(String.format("Failed to update Assertion. Assertion with urn %s is not an SLA assertion.", assertionUrn));
+    if (!AssertionType.FRESHNESS.equals(existingInfo.getType())) {
+      throw new IllegalArgumentException(String.format("Failed to update Assertion. Assertion with urn %s is not an Freshness assertion.", assertionUrn));
     }
 
-    if (!existingInfo.hasSlaAssertion()) {
-      throw new IllegalArgumentException(String.format("Failed to update Assertion. SLA Assertion with urn %s is malformed!", assertionUrn));
+    if (!existingInfo.hasFreshnessAssertion()) {
+      throw new IllegalArgumentException(String.format("Failed to update Assertion. Freshness Assertion with urn %s is malformed!", assertionUrn));
     }
 
-    SlaAssertionInfo existingSlaAssertion = existingInfo.getSlaAssertion();
+    FreshnessAssertionInfo existingFreshnessAssertion = existingInfo.getFreshnessAssertion();
 
     // 2. Apply changes to existing Assertion Info
-    existingSlaAssertion.setSchedule(schedule, SetMode.IGNORE_NULL);
+    existingFreshnessAssertion.setSchedule(schedule, SetMode.IGNORE_NULL);
 
     final List<MetadataChangeProposal> aspects = new ArrayList<>();
     aspects.add(AspectUtils.buildMetadataChangeProposal(assertionUrn, Constants.ASSERTION_INFO_ASPECT_NAME, existingInfo));
@@ -310,7 +310,7 @@ public class AssertionService extends BaseService {
       );
       return assertionUrn;
     } catch (Exception e) {
-      throw new RuntimeException(String.format("Failed to update SLA Assertion with urn %s", assertionUrn), e);
+      throw new RuntimeException(String.format("Failed to update Freshness Assertion with urn %s", assertionUrn), e);
     }
   }
 

@@ -22,7 +22,7 @@ type Props = {
 };
 
 /**
- * Builder used to construct an SLA based on a field / column value.
+ * Builder used to construct an Freshness based on a field / column value.
  */
 export const FieldValueSourceBuilder = ({ fields, value, onChange }: Props) => {
     const updateSchemaFieldSpec = (newPath: any) => {

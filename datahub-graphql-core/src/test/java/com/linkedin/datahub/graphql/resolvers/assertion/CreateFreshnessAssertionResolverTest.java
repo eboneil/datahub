@@ -8,9 +8,9 @@ import com.linkedin.assertion.AssertionActionArray;
 import com.linkedin.assertion.AssertionActions;
 import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.assertion.AssertionType;
-import com.linkedin.assertion.SlaAssertionInfo;
-import com.linkedin.assertion.SlaAssertionSchedule;
-import com.linkedin.assertion.SlaCronSchedule;
+import com.linkedin.assertion.FreshnessAssertionInfo;
+import com.linkedin.assertion.FreshnessAssertionSchedule;
+import com.linkedin.assertion.FreshnessCronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.datahub.graphql.QueryContext;
@@ -18,11 +18,11 @@ import com.linkedin.datahub.graphql.generated.Assertion;
 import com.linkedin.datahub.graphql.generated.AssertionActionInput;
 import com.linkedin.datahub.graphql.generated.AssertionActionType;
 import com.linkedin.datahub.graphql.generated.AssertionActionsInput;
-import com.linkedin.datahub.graphql.generated.CreateSlaAssertionInput;
-import com.linkedin.datahub.graphql.generated.SlaAssertionScheduleInput;
-import com.linkedin.datahub.graphql.generated.SlaAssertionScheduleType;
-import com.linkedin.datahub.graphql.generated.SlaAssertionType;
-import com.linkedin.datahub.graphql.generated.SlaCronScheduleInput;
+import com.linkedin.datahub.graphql.generated.CreateFreshnessAssertionInput;
+import com.linkedin.datahub.graphql.generated.FreshnessAssertionScheduleInput;
+import com.linkedin.datahub.graphql.generated.FreshnessAssertionScheduleType;
+import com.linkedin.datahub.graphql.generated.FreshnessAssertionType;
+import com.linkedin.datahub.graphql.generated.FreshnessCronScheduleInput;
 import com.linkedin.entity.Aspect;
 import com.linkedin.entity.EntityResponse;
 import com.linkedin.entity.EnvelopedAspect;
@@ -39,17 +39,17 @@ import static com.linkedin.datahub.graphql.TestUtils.*;
 import static org.testng.Assert.*;
 
 
-public class CreateSlaAssertionResolverTest {
+public class CreateFreshnessAssertionResolverTest {
 
   private static final Urn TEST_DATASET_URN = UrnUtils.getUrn("urn:li:dataset:(urn:li:dataPlatform:hive,name,PROD)");
   private static final Urn TEST_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test");
 
-  private static final CreateSlaAssertionInput TEST_INPUT = new CreateSlaAssertionInput(
-      SlaAssertionType.DATASET_CHANGE,
+  private static final CreateFreshnessAssertionInput TEST_INPUT = new CreateFreshnessAssertionInput(
+      FreshnessAssertionType.DATASET_CHANGE,
       TEST_DATASET_URN.toString(),
-      new SlaAssertionScheduleInput(
-          SlaAssertionScheduleType.CRON,
-          new SlaCronScheduleInput("* * * * *", "America / Los_Angeles", null),
+      new FreshnessAssertionScheduleInput(
+          FreshnessAssertionScheduleType.CRON,
+          new FreshnessCronScheduleInput("* * * * *", "America / Los_Angeles", null),
           null
       ),
       new AssertionActionsInput(
@@ -59,14 +59,14 @@ public class CreateSlaAssertionResolverTest {
   );
 
   private static final AssertionInfo TEST_ASSERTION_INFO = new AssertionInfo()
-      .setType(AssertionType.SLA)
-      .setSlaAssertion(
-          new SlaAssertionInfo()
+      .setType(AssertionType.FRESHNESS)
+      .setFreshnessAssertion(
+          new FreshnessAssertionInfo()
               .setEntity(TEST_DATASET_URN)
-              .setType(com.linkedin.assertion.SlaAssertionType.DATASET_CHANGE)
-              .setSchedule(new SlaAssertionSchedule()
-                  .setType(com.linkedin.assertion.SlaAssertionScheduleType.CRON)
-                  .setCron(new SlaCronSchedule()
+              .setType(com.linkedin.assertion.FreshnessAssertionType.DATASET_CHANGE)
+              .setSchedule(new FreshnessAssertionSchedule()
+                  .setType(com.linkedin.assertion.FreshnessAssertionScheduleType.CRON)
+                  .setCron(new FreshnessCronSchedule()
                     .setCron("* * * * *")
                     .setTimezone("America / Los_Angeles")
                   )
@@ -83,7 +83,7 @@ public class CreateSlaAssertionResolverTest {
   public void testGetSuccess() throws Exception {
     // Create resolver
     AssertionService mockService = initMockService();
-    CreateSlaAssertionResolver resolver = new CreateSlaAssertionResolver(mockService);
+    CreateFreshnessAssertionResolver resolver = new CreateFreshnessAssertionResolver(mockService);
 
     // Execute resolver
     QueryContext mockContext = getMockAllowContext();
@@ -98,10 +98,10 @@ public class CreateSlaAssertionResolverTest {
     assertEquals(assertion.getUrn(), TEST_ASSERTION_URN.toString());
 
     // Validate that we created the assertion
-    Mockito.verify(mockService, Mockito.times(1)).createSlaAssertion(
-        Mockito.eq(TEST_ASSERTION_INFO.getSlaAssertion().getEntity()),
-        Mockito.eq(TEST_ASSERTION_INFO.getSlaAssertion().getType()),
-        Mockito.eq(TEST_ASSERTION_INFO.getSlaAssertion().getSchedule()),
+    Mockito.verify(mockService, Mockito.times(1)).createFreshnessAssertion(
+        Mockito.eq(TEST_ASSERTION_INFO.getFreshnessAssertion().getEntity()),
+        Mockito.eq(TEST_ASSERTION_INFO.getFreshnessAssertion().getType()),
+        Mockito.eq(TEST_ASSERTION_INFO.getFreshnessAssertion().getSchedule()),
         Mockito.eq(TEST_ASSERTION_ACTIONS),
         Mockito.any(Authentication.class));
   }
@@ -111,7 +111,7 @@ public class CreateSlaAssertionResolverTest {
     // Create resolver
     EntityClient mockClient = Mockito.mock(EntityClient.class);
     AssertionService mockService = Mockito.mock(AssertionService.class);
-    CreateSlaAssertionResolver resolver = new CreateSlaAssertionResolver(mockService);
+    CreateFreshnessAssertionResolver resolver = new CreateFreshnessAssertionResolver(mockService);
 
     // Execute resolver
     DataFetchingEnvironment mockEnv = Mockito.mock(DataFetchingEnvironment.class);
@@ -129,14 +129,14 @@ public class CreateSlaAssertionResolverTest {
   public void testGetAssertionServiceException() throws Exception {
     // Create resolver
     AssertionService mockService = Mockito.mock(AssertionService.class);
-    Mockito.doThrow(RuntimeException.class).when(mockService).createSlaAssertion(
+    Mockito.doThrow(RuntimeException.class).when(mockService).createFreshnessAssertion(
         Mockito.any(),
         Mockito.any(),
         Mockito.any(),
         Mockito.any(),
         Mockito.any(Authentication.class));
 
-    CreateSlaAssertionResolver resolver = new CreateSlaAssertionResolver(mockService);
+    CreateFreshnessAssertionResolver resolver = new CreateFreshnessAssertionResolver(mockService);
 
     // Execute resolver
     DataFetchingEnvironment mockEnv = Mockito.mock(DataFetchingEnvironment.class);
@@ -149,7 +149,7 @@ public class CreateSlaAssertionResolverTest {
 
   private AssertionService initMockService() {
     AssertionService service = Mockito.mock(AssertionService.class);
-    Mockito.when(service.createSlaAssertion(
+    Mockito.when(service.createFreshnessAssertion(
         Mockito.any(),
         Mockito.any(),
         Mockito.any(),

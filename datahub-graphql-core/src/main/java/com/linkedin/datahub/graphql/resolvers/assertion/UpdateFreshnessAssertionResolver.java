@@ -1,12 +1,12 @@
 package com.linkedin.datahub.graphql.resolvers.assertion;
 
-import com.linkedin.assertion.SlaAssertionType;
+import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.common.urn.UrnUtils;
 import com.linkedin.datahub.graphql.QueryContext;
 import com.linkedin.datahub.graphql.exception.AuthorizationException;
 import com.linkedin.datahub.graphql.generated.Assertion;
-import com.linkedin.datahub.graphql.generated.CreateSlaAssertionInput;
+import com.linkedin.datahub.graphql.generated.UpdateFreshnessAssertionInput;
 import com.linkedin.datahub.graphql.resolvers.ResolverUtils;
 import com.linkedin.datahub.graphql.types.assertion.AssertionMapper;
 import com.linkedin.metadata.service.AssertionService;
@@ -19,30 +19,38 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class CreateSlaAssertionResolver implements DataFetcher<CompletableFuture<Assertion>> {
+public class UpdateFreshnessAssertionResolver implements DataFetcher<CompletableFuture<Assertion>> {
 
   private final AssertionService _assertionService;
 
-  public CreateSlaAssertionResolver(@Nonnull final AssertionService assertionService) {
+  public UpdateFreshnessAssertionResolver(@Nonnull final AssertionService assertionService) {
     _assertionService = Objects.requireNonNull(assertionService, "assertionService is required");
   }
 
   @Override
   public CompletableFuture<Assertion> get(final DataFetchingEnvironment environment) throws Exception {
     final QueryContext context = environment.getContext();
-    final CreateSlaAssertionInput
-        input = ResolverUtils.bindArgument(environment.getArgument("input"), CreateSlaAssertionInput.class);
-    final Urn asserteeUrn = UrnUtils.getUrn(input.getEntityUrn());
+
+    final Urn assertionUrn = UrnUtils.getUrn(environment.getArgument("urn"));
+    final UpdateFreshnessAssertionInput
+        input = ResolverUtils.bindArgument(environment.getArgument("input"), UpdateFreshnessAssertionInput.class);
 
     return CompletableFuture.supplyAsync(() -> {
+      // Check whether the current user is allowed to update the assertion.
+      final AssertionInfo info = _assertionService.getAssertionInfo(assertionUrn);
+
+      if (info == null) {
+        throw new IllegalArgumentException(String.format("Failed to update Assertion. Assertion with urn %s does not exist.", assertionUrn));
+      }
+
+      final Urn asserteeUrn = AssertionUtils.getAsserteeUrnFromInfo(info);
 
       if (AssertionUtils.isAuthorizedToEditAssertionFromAssertee(context, asserteeUrn)) {
 
-        // First create the new assertion.
-        final Urn assertionUrn = _assertionService.createSlaAssertion(
-            asserteeUrn,
-            SlaAssertionType.valueOf(input.getType().toString()),
-            AssertionUtils.createSlaAssertionSchedule(input.getSchedule()),
+        // First update the existing assertion.
+        _assertionService.updateFreshnessAssertion(
+            assertionUrn,
+            AssertionUtils.createFreshnessAssertionSchedule(input.getSchedule()),
             input.getActions() != null ? AssertionUtils.createAssertionActions(input.getActions()) : null,
             context.getAuthentication()
         );

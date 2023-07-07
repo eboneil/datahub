@@ -37,9 +37,9 @@ A type of built-in system monitor, e.g. those that generate anomalies.
 """
 enum SystemMonitorType {
   """
-  An SLA or Freshness monitor.
+  An Freshness or Freshness monitor.
   """
-  SLA
+  FRESHNESS
 }
 
 """
@@ -192,9 +192,9 @@ The type of assertion evaluation parameters
 """
 enum AssertionEvaluationParametersType {
   """
-  Parameters required to evaluate a Dataset SLA
+  Parameters required to evaluate a Dataset Freshness Assertions
   """
-  DATASET_SLA
+  DATASET_FRESHNESS
 }
 
 """
@@ -207,19 +207,19 @@ type AssertionEvaluationParameters {
   type: AssertionEvaluationParametersType!
 
   """
-  The parameters required to evaluate a dataset SLA assertion. Present if type is DATASET_SLA.
+  The parameters required to evaluate a dataset freshness assertion. Present if type is DATASET_FRESHNESS.
   """
-  datasetSlaParameters: DatasetSlaAssertionParameters
+  datasetFreshnessParameters: DatasetFreshnessAssertionParameters
 }
 
 """
-The parameters required to evaluate a dataset SLA assertion. Present if type is DATASET_SLA.
+The parameters required to evaluate a dataset freshness assertion. Present if type is DATASET_FRESHNESS.
 """
-type DatasetSlaAssertionParameters {
+type DatasetFreshnessAssertionParameters {
     """
     The source of the change operation.
     """
-    sourceType: DatasetSlaSourceType!
+    sourceType: DatasetFreshnessSourceType!
 
     """
     Information about the field to use. Present when sourceType is FIELD_VALUE
@@ -235,7 +235,7 @@ type DatasetSlaAssertionParameters {
 """
 The source of the change operation.
 """
-enum DatasetSlaSourceType {
+enum DatasetFreshnessSourceType {
   """
   Determine that a change has occurred by inspecting a particular field, e.g. a timestamp column.
   """
@@ -352,19 +352,19 @@ input AssertionEvaluationParametersInput {
     type: AssertionEvaluationParametersType!
 
     """
-    The parameters required to evaluate a dataset SLA assertion. Present if type is DATASET_SLA.
+    The parameters required to evaluate a dataset freshness assertion. Present if type is DATASET_FRESHNESS.
     """
-    datasetSlaParameters: DatasetSlaAssertionParametersInput
+    datasetFreshnessParameters: DatasetFreshnessAssertionParametersInput
 }
 
 """
-Input for the parameters required to evaluate a dataset SLA assertion. Present if type is DATASET_SLA.
+Input for the parameters required to evaluate a dataset freshness assertion. Present if type is DATASET_FRESHNESS.
 """
-input DatasetSlaAssertionParametersInput {
+input DatasetFreshnessAssertionParametersInput {
     """
     The source of the change operation.
     """
-    sourceType: DatasetSlaSourceType!
+    sourceType: DatasetFreshnessSourceType!
 
     """
     Information about the field to use. Present when sourceType is FIELD_VALUE

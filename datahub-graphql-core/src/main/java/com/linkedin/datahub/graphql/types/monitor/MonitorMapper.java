@@ -8,8 +8,8 @@ import com.linkedin.datahub.graphql.generated.AssertionEvaluationSpec;
 import com.linkedin.datahub.graphql.generated.AssertionMonitor;
 import com.linkedin.datahub.graphql.generated.AuditLogSpec;
 import com.linkedin.datahub.graphql.generated.CronSchedule;
-import com.linkedin.datahub.graphql.generated.DatasetSlaAssertionParameters;
-import com.linkedin.datahub.graphql.generated.DatasetSlaSourceType;
+import com.linkedin.datahub.graphql.generated.DatasetFreshnessAssertionParameters;
+import com.linkedin.datahub.graphql.generated.DatasetFreshnessSourceType;
 import com.linkedin.datahub.graphql.generated.EntityType;
 import com.linkedin.datahub.graphql.generated.Monitor;
 import com.linkedin.datahub.graphql.generated.MonitorInfo;
@@ -98,25 +98,25 @@ public class MonitorMapper {
     final AssertionEvaluationParameters assertionEvaluationParameters = new AssertionEvaluationParameters();
     assertionEvaluationParameters.setType(
         AssertionEvaluationParametersType.valueOf(backendAssertionEvaluationParameters.getType().name()));
-    if (backendAssertionEvaluationParameters.getDatasetSlaParameters() != null) {
-      assertionEvaluationParameters.setDatasetSlaParameters(mapDatasetSlaAssertionParameters(
-          backendAssertionEvaluationParameters.getDatasetSlaParameters()));
+    if (backendAssertionEvaluationParameters.getDatasetFreshnessParameters() != null) {
+      assertionEvaluationParameters.setDatasetFreshnessParameters(mapDatasetFreshnessAssertionParameters(
+          backendAssertionEvaluationParameters.getDatasetFreshnessParameters()));
     }
     return assertionEvaluationParameters;
   }
 
-  private static DatasetSlaAssertionParameters mapDatasetSlaAssertionParameters(
-      com.linkedin.monitor.DatasetSlaAssertionParameters backendDatasetSlaAssertionParameters) {
-    final DatasetSlaAssertionParameters datasetSlaAssertionParameters = new DatasetSlaAssertionParameters();
-    datasetSlaAssertionParameters.setSourceType(
-        DatasetSlaSourceType.valueOf(backendDatasetSlaAssertionParameters.getSourceType().name()));
-    if (backendDatasetSlaAssertionParameters.hasField()) {
-      datasetSlaAssertionParameters.setField(mapSchemaFieldSpec(backendDatasetSlaAssertionParameters.getField()));
+  private static DatasetFreshnessAssertionParameters mapDatasetFreshnessAssertionParameters(
+      com.linkedin.monitor.DatasetFreshnessAssertionParameters backendDatasetFreshnessAssertionParameters) {
+    final DatasetFreshnessAssertionParameters datasetFreshnessAssertionParameters = new DatasetFreshnessAssertionParameters();
+    datasetFreshnessAssertionParameters.setSourceType(
+        DatasetFreshnessSourceType.valueOf(backendDatasetFreshnessAssertionParameters.getSourceType().name()));
+    if (backendDatasetFreshnessAssertionParameters.hasField()) {
+      datasetFreshnessAssertionParameters.setField(mapSchemaFieldSpec(backendDatasetFreshnessAssertionParameters.getField()));
     }
-    if (backendDatasetSlaAssertionParameters.hasAuditLog()) {
-      datasetSlaAssertionParameters.setAuditLog(mapAuditLogSpec(backendDatasetSlaAssertionParameters.getAuditLog()));
+    if (backendDatasetFreshnessAssertionParameters.hasAuditLog()) {
+      datasetFreshnessAssertionParameters.setAuditLog(mapAuditLogSpec(backendDatasetFreshnessAssertionParameters.getAuditLog()));
     }
-    return datasetSlaAssertionParameters;
+    return datasetFreshnessAssertionParameters;
   }
 
   private static SchemaFieldSpec mapSchemaFieldSpec(com.linkedin.assertion.FreshnessFieldSpec backendSchemaFieldSpec) {

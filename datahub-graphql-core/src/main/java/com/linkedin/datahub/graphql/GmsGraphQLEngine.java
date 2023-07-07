@@ -114,11 +114,11 @@ import com.linkedin.datahub.graphql.resolvers.actionrequest.ListRejectedActionRe
 import com.linkedin.datahub.graphql.resolvers.anomaly.EntityAnomaliesResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.AssertionRunEventResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.CreateDatasetAssertionResolver;
-import com.linkedin.datahub.graphql.resolvers.assertion.CreateSlaAssertionResolver;
+import com.linkedin.datahub.graphql.resolvers.assertion.CreateFreshnessAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.DeleteAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.EntityAssertionsResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.UpdateDatasetAssertionResolver;
-import com.linkedin.datahub.graphql.resolvers.assertion.UpdateSlaAssertionResolver;
+import com.linkedin.datahub.graphql.resolvers.assertion.UpdateFreshnessAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.auth.CreateAccessTokenResolver;
 import com.linkedin.datahub.graphql.resolvers.auth.GetAccessTokenResolver;
 import com.linkedin.datahub.graphql.resolvers.auth.ListAccessTokensResolver;
@@ -1908,9 +1908,9 @@ public class GmsGraphQLEngine {
             .dataFetcher("runEvents", new AssertionRunEventResolver(entityClient)));
         builder.type("Mutation", typeWiring -> typeWiring
             .dataFetcher("createDatasetAssertion", new CreateDatasetAssertionResolver(assertionService))
-            .dataFetcher("createSlaAssertion", new CreateSlaAssertionResolver(assertionService))
+            .dataFetcher("createFreshnessAssertion", new CreateFreshnessAssertionResolver(assertionService))
             .dataFetcher("updateDatasetAssertion", new UpdateDatasetAssertionResolver(assertionService))
-            .dataFetcher("updateSlaAssertion", new UpdateSlaAssertionResolver(assertionService)));
+            .dataFetcher("updateFreshnessAssertion", new UpdateFreshnessAssertionResolver(assertionService)));
     }
 
     private void configurePolicyResolvers(final RuntimeWiring.Builder builder) {

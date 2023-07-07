@@ -15,10 +15,10 @@ import com.linkedin.assertion.AssertionType;
 import com.linkedin.assertion.DatasetAssertionInfo;
 import com.linkedin.assertion.DatasetAssertionScope;
 import com.linkedin.assertion.FixedIntervalSchedule;
-import com.linkedin.assertion.SlaAssertionInfo;
-import com.linkedin.assertion.SlaAssertionSchedule;
-import com.linkedin.assertion.SlaAssertionScheduleType;
-import com.linkedin.assertion.SlaAssertionType;
+import com.linkedin.assertion.FreshnessAssertionInfo;
+import com.linkedin.assertion.FreshnessAssertionSchedule;
+import com.linkedin.assertion.FreshnessAssertionScheduleType;
+import com.linkedin.assertion.FreshnessAssertionType;
 import com.linkedin.common.AssertionsSummary;
 import com.linkedin.common.UrnArray;
 import com.linkedin.common.urn.Urn;
@@ -46,7 +46,7 @@ import static com.linkedin.metadata.Constants.*;
 public class AssertionServiceTest {
 
   private static final Urn TEST_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test");
-  private static final Urn TEST_SLA_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test-dataset-sla");
+  private static final Urn TEST_FRESHNESS_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test-dataset-freshness");
   private static final Urn TEST_NON_EXISTENT_ASSERTION_URN = UrnUtils.getUrn("urn:li:assertion:test-non-existant");
   private static final Urn TEST_DATASET_URN = UrnUtils.getUrn("urn:li:dataset:(urn:li:dataPlatform:hive,name,PROD)");
   private static final Urn TEST_NON_EXISTENT_DATASET_URN = UrnUtils.getUrn("urn:li:dataset:(urn:li:dataPlatform:hive,non-existant,PROD)");
@@ -123,13 +123,13 @@ public class AssertionServiceTest {
 
   // acryl-only
   @Test
-  public void testCreateSlaAssertionRequiredFields() throws Exception {
+  public void testCreateFreshnessAssertionRequiredFields() throws Exception {
     // Test data and mocks
     EntityClient mockClient = Mockito.mock(EntityClient.class);
     Urn entityUrn = UrnUtils.getUrn("urn:li:dataset:1");
-    SlaAssertionType slaAssertionType = SlaAssertionType.DATASET_CHANGE;
-    SlaAssertionSchedule schedule = new SlaAssertionSchedule()
-        .setType(SlaAssertionScheduleType.FIXED_INTERVAL)
+    FreshnessAssertionType freshnessAssertionType = FreshnessAssertionType.DATASET_CHANGE;
+    FreshnessAssertionSchedule schedule = new FreshnessAssertionSchedule()
+        .setType(FreshnessAssertionScheduleType.FIXED_INTERVAL)
         .setFixedInterval(new FixedIntervalSchedule().setMultiple(2).setUnit(CalendarInterval.HOUR));
     Mockito.doAnswer(invocation -> {
       List<MetadataChangeProposal> aspects = invocation.getArgument(0);
@@ -142,20 +142,20 @@ public class AssertionServiceTest {
         Mockito.mock(Authentication.class));
 
     // Test method
-    Urn result = service.createSlaAssertion(entityUrn, slaAssertionType, schedule, null, Mockito.mock(Authentication.class));
+    Urn result = service.createFreshnessAssertion(entityUrn, freshnessAssertionType, schedule, null, Mockito.mock(Authentication.class));
 
     // Assert result
     Assert.assertEquals(result.getEntityType(), "assertion");
   }
 
   @Test
-  public void testCreateSlaAssertionAllFields() throws Exception {
+  public void testCreateFreshnessAssertionAllFields() throws Exception {
     // Test data and mocks
     EntityClient mockClient = Mockito.mock(EntityClient.class);
     Urn entityUrn = UrnUtils.getUrn("urn:li:dataset:1");
-    SlaAssertionType slaAssertionType = SlaAssertionType.DATASET_CHANGE;
-    SlaAssertionSchedule schedule = new SlaAssertionSchedule()
-        .setType(SlaAssertionScheduleType.FIXED_INTERVAL)
+    FreshnessAssertionType freshnessAssertionType = FreshnessAssertionType.DATASET_CHANGE;
+    FreshnessAssertionSchedule schedule = new FreshnessAssertionSchedule()
+        .setType(FreshnessAssertionScheduleType.FIXED_INTERVAL)
         .setFixedInterval(new FixedIntervalSchedule().setMultiple(2).setUnit(CalendarInterval.HOUR));
     AssertionActions actions = new AssertionActions()
         .setOnSuccess(new AssertionActionArray())
@@ -172,7 +172,7 @@ public class AssertionServiceTest {
         Mockito.mock(Authentication.class));
 
     // Test method
-    Urn result = service.createSlaAssertion(entityUrn, slaAssertionType, schedule, actions, Mockito.mock(Authentication.class));
+    Urn result = service.createFreshnessAssertion(entityUrn, freshnessAssertionType, schedule, actions, Mockito.mock(Authentication.class));
 
     // Assert result
     Assert.assertEquals(result.getEntityType(), "assertion");
@@ -245,12 +245,12 @@ public class AssertionServiceTest {
   }
 
   @Test
-  public void testUpdateSlaAssertionRequiredFields() throws Exception {
+  public void testUpdateFreshnessAssertionRequiredFields() throws Exception {
     // Test data and mocks
     EntityClient mockClient = createMockEntityClient();
-    Urn assertionUrn = TEST_SLA_ASSERTION_URN;
-    SlaAssertionSchedule schedule = new SlaAssertionSchedule()
-        .setType(SlaAssertionScheduleType.FIXED_INTERVAL)
+    Urn assertionUrn = TEST_FRESHNESS_ASSERTION_URN;
+    FreshnessAssertionSchedule schedule = new FreshnessAssertionSchedule()
+        .setType(FreshnessAssertionScheduleType.FIXED_INTERVAL)
         .setFixedInterval(new FixedIntervalSchedule().setMultiple(2).setUnit(CalendarInterval.HOUR));
     Mockito.doAnswer(invocation -> {
       List<MetadataChangeProposal> aspects = invocation.getArgument(0);
@@ -263,19 +263,19 @@ public class AssertionServiceTest {
         Mockito.mock(Authentication.class));
 
     // Test method
-    Urn result = service.updateSlaAssertion(assertionUrn, schedule, null, Mockito.mock(Authentication.class));
+    Urn result = service.updateFreshnessAssertion(assertionUrn, schedule, null, Mockito.mock(Authentication.class));
 
     // Assert result
-    Assert.assertEquals(result, TEST_SLA_ASSERTION_URN);
+    Assert.assertEquals(result, TEST_FRESHNESS_ASSERTION_URN);
   }
 
   @Test
-  public void testUpdateSlaAssertionAllFields() throws Exception {
+  public void testUpdateFreshnessAssertionAllFields() throws Exception {
     // Test data and mocks
     EntityClient mockClient = createMockEntityClient();
-    Urn assertionUrn = TEST_SLA_ASSERTION_URN;
-    SlaAssertionSchedule schedule = new SlaAssertionSchedule()
-        .setType(SlaAssertionScheduleType.FIXED_INTERVAL)
+    Urn assertionUrn = TEST_FRESHNESS_ASSERTION_URN;
+    FreshnessAssertionSchedule schedule = new FreshnessAssertionSchedule()
+        .setType(FreshnessAssertionScheduleType.FIXED_INTERVAL)
         .setFixedInterval(new FixedIntervalSchedule().setMultiple(2).setUnit(CalendarInterval.HOUR));
     AssertionActions actions = new AssertionActions()
         .setOnSuccess(new AssertionActionArray())
@@ -292,10 +292,10 @@ public class AssertionServiceTest {
         Mockito.mock(Authentication.class));
 
     // Test method
-    Urn result = service.updateSlaAssertion(assertionUrn, schedule, actions, Mockito.mock(Authentication.class));
+    Urn result = service.updateFreshnessAssertion(assertionUrn, schedule, actions, Mockito.mock(Authentication.class));
 
     // Assert result
-    Assert.assertEquals(result, TEST_SLA_ASSERTION_URN);
+    Assert.assertEquals(result, TEST_FRESHNESS_ASSERTION_URN);
   }
 
   @Test
@@ -400,7 +400,7 @@ public class AssertionServiceTest {
             .setAspects(new EnvelopedAspectMap(Collections.emptyMap())));
     Mockito.when(mockClient.getV2(
         Mockito.eq(Constants.ASSERTION_ENTITY_NAME),
-        Mockito.eq(TEST_SLA_ASSERTION_URN),
+        Mockito.eq(TEST_FRESHNESS_ASSERTION_URN),
         Mockito.eq(ImmutableSet.of(Constants.ASSERTION_INFO_ASPECT_NAME, ASSERTION_ACTIONS_ASPECT_NAME)),
         Mockito.any(Authentication.class))
     ).thenReturn(
@@ -409,7 +409,7 @@ public class AssertionServiceTest {
             .setEntityName(ASSERTION_ENTITY_NAME)
             .setAspects(new EnvelopedAspectMap(ImmutableMap.of(
                 ASSERTION_INFO_ASPECT_NAME,
-                new EnvelopedAspect().setValue(new Aspect(mockSLAAssertionInfo().data()))
+                new EnvelopedAspect().setValue(new Aspect(mockFRESHNESSAssertionInfo().data()))
             ))));
 
     // Init for assertions summary
@@ -455,10 +455,10 @@ public class AssertionServiceTest {
     return info;
   }
 
-  private static AssertionInfo mockSLAAssertionInfo() throws Exception {
+  private static AssertionInfo mockFRESHNESSAssertionInfo() throws Exception {
     final AssertionInfo info = new AssertionInfo();
-    info.setType(AssertionType.SLA);
-    info.setSlaAssertion(new SlaAssertionInfo()
+    info.setType(AssertionType.FRESHNESS);
+    info.setFreshnessAssertion(new FreshnessAssertionInfo()
         .setEntity(TEST_DATASET_URN)
     );
     return info;

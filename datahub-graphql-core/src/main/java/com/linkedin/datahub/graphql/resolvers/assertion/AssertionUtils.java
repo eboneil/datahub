@@ -10,15 +10,15 @@ import com.linkedin.assertion.AssertionActions;
 import com.linkedin.assertion.AssertionInfo;
 import com.linkedin.assertion.AssertionStdParameterType;
 import com.linkedin.assertion.FixedIntervalSchedule;
-import com.linkedin.assertion.SlaAssertionScheduleType;
-import com.linkedin.assertion.SlaCronSchedule;
+import com.linkedin.assertion.FreshnessAssertionScheduleType;
+import com.linkedin.assertion.FreshnessCronSchedule;
 import com.linkedin.common.urn.Urn;
 import com.linkedin.data.template.SetMode;
 import com.linkedin.datahub.graphql.QueryContext;
 import com.linkedin.datahub.graphql.authorization.AuthorizationUtils;
 import com.linkedin.datahub.graphql.generated.AssertionStdParameterInput;
 import com.linkedin.datahub.graphql.generated.AssertionStdParametersInput;
-import com.linkedin.datahub.graphql.generated.SlaAssertionScheduleInput;
+import com.linkedin.datahub.graphql.generated.FreshnessAssertionScheduleInput;
 import com.linkedin.datahub.graphql.resolvers.AuthUtils;
 import com.linkedin.metadata.authorization.PoliciesConfig;
 import com.linkedin.timeseries.CalendarInterval;
@@ -52,11 +52,11 @@ public class AssertionUtils {
   }
 
   @Nonnull
-  public static com.linkedin.assertion.SlaAssertionSchedule createSlaAssertionSchedule(@Nonnull final SlaAssertionScheduleInput schedule) {
-    final com.linkedin.assertion.SlaAssertionSchedule result = new com.linkedin.assertion.SlaAssertionSchedule();
-    result.setType(SlaAssertionScheduleType.valueOf(schedule.getType().toString()));
+  public static com.linkedin.assertion.FreshnessAssertionSchedule createFreshnessAssertionSchedule(@Nonnull final FreshnessAssertionScheduleInput schedule) {
+    final com.linkedin.assertion.FreshnessAssertionSchedule result = new com.linkedin.assertion.FreshnessAssertionSchedule();
+    result.setType(FreshnessAssertionScheduleType.valueOf(schedule.getType().toString()));
     if (schedule.getCron() != null) {
-      result.setCron(new SlaCronSchedule()
+      result.setCron(new FreshnessCronSchedule()
         .setCron(schedule.getCron().getCron())
         .setTimezone(schedule.getCron().getTimezone())
         .setWindowStartOffsetMs(schedule.getCron().getWindowStartOffsetMs(), SetMode.IGNORE_NULL)
@@ -100,8 +100,8 @@ public class AssertionUtils {
     switch (info.getType()) {
       case DATASET:
         return info.getDatasetAssertion().getDataset();
-      case SLA:
-        return info.getSlaAssertion().getEntity();
+      case FRESHNESS:
+        return info.getFreshnessAssertion().getEntity();
       default:
         throw new RuntimeException(String.format("Unsupported Assertion Type %s provided", info.getType()));
     }

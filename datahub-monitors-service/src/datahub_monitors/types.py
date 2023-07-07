@@ -23,17 +23,17 @@ class AssertionType(Enum):
     """Enumeration of assertion types."""
 
     DATASET = "DATASET"
-    SLA = "SLA"
+    FRESHNESS = "FRESHNESS"
 
 
-class SlaAssertionType(Enum):
-    """Enumeration of sla assertion types."""
+class FreshnessAssertionType(Enum):
+    """Enumeration of freshness assertion types."""
 
     DATASET_CHANGE = "DATASET_CHANGE"
 
 
-class SlaAssertionScheduleType(Enum):
-    """Enumeration of sla assertion schedule types."""
+class FreshnessAssertionScheduleType(Enum):
+    """Enumeration of freshness assertion schedule types."""
 
     CRON = "CRON"
     FIXED_INTERVAL = "FIXED_INTERVAL"
@@ -71,8 +71,8 @@ class AssertionResultType(Enum):
     FAILURE = "FAILURE"
 
 
-class DatasetSlaSourceType(Enum):
-    """Enumeration of Dataset SLA source types result types."""
+class DatasetFreshnessSourceType(Enum):
+    """Enumeration of Dataset FRESHNESS source types result types."""
 
     # The freshness signal comes from a column / field value last updated.
     FIELD_VALUE = "FIELD_VALUE"
@@ -106,7 +106,7 @@ class EntityEventType(Enum):
 class AssertionEvaluationParametersType(Enum):
     """Enumeration of evaluation parameter types for an assertion"""
 
-    DATASET_SLA = "DATASET_SLA"
+    DATASET_FRESHNESS = "DATASET_FRESHNESS"
 
 
 class CronSchedule(PermissiveBaseModel):
@@ -117,7 +117,7 @@ class CronSchedule(PermissiveBaseModel):
     timezone: str
 
 
-class SlaCronSchedule(PermissiveBaseModel):
+class FreshnessCronSchedule(PermissiveBaseModel):
     """The cron string"""
 
     cron: str
@@ -136,12 +136,12 @@ class FixedIntervalSchedule(PermissiveBaseModel):
     multiple: int
 
 
-class SlaAssertionSchedule(PermissiveBaseModel):
+class FreshnessAssertionSchedule(PermissiveBaseModel):
     """The type of the schedule"""
 
-    type: SlaAssertionScheduleType
+    type: FreshnessAssertionScheduleType
 
-    cron: Optional[SlaCronSchedule] = None
+    cron: Optional[FreshnessCronSchedule] = None
 
     fixed_interval: Optional[FixedIntervalSchedule] = Field(alias="fixedInterval")
 
@@ -167,10 +167,10 @@ class AuditLogSpec(PermissiveBaseModel):
     user_name: Optional[str] = Field(alias="userName")
 
 
-class DatasetSlaAssertionParameters(PermissiveBaseModel):
+class DatasetFreshnessAssertionParameters(PermissiveBaseModel):
     """The type of the freshness signal"""
 
-    source_type: DatasetSlaSourceType = Field(alias="sourceType")
+    source_type: DatasetFreshnessSourceType = Field(alias="sourceType")
 
     # A descriptor for a Dataset Field to use. Present when source_type is FIELD_LAST_UPDATED
     field: Optional[SchemaFieldSpec] = None
@@ -179,12 +179,12 @@ class DatasetSlaAssertionParameters(PermissiveBaseModel):
     audit_log: Optional[AuditLogSpec] = Field(alias="auditLog")
 
 
-class SlaAssertion(PermissiveBaseModel):
-    """The type of the SLA Assertion"""
+class FreshnessAssertion(PermissiveBaseModel):
+    """The type of the FRESHNESS Assertion"""
 
-    type: SlaAssertionType
+    type: FreshnessAssertionType
 
-    schedule: SlaAssertionSchedule
+    schedule: FreshnessAssertionSchedule
 
 
 class AssertionEntity(PermissiveBaseModel):
@@ -285,8 +285,10 @@ class Assertion(PermissiveBaseModel):
     # The urn of the connection required to evaluate the assertion. If there is no connection urn we are limited in terms of what we can do
     connection_urn: Optional[str] = Field(alias="connectionUrn")
 
-    # An SLA Assertion Object
-    sla_assertion: Optional[SlaAssertion] = Field(alias="slaAssertion")
+    # An FRESHNESS Assertion Object
+    freshness_assertion: Optional[FreshnessAssertion] = Field(
+        alias="freshnessAssertion"
+    )
 
     @root_validator(pre=True)
     def extract(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -318,8 +320,8 @@ class Assertion(PermissiveBaseModel):
             values["connectionUrn"] = platform_urn
         if "info" in values and "type" in values["info"]:
             values["type"] = values["info"]["type"]
-        if "slaAssertion" not in values:
-            values["slaAssertion"] = values["info"]["slaAssertion"]
+        if "freshnessAssertion" not in values:
+            values["freshnessAssertion"] = values["info"]["freshnessAssertion"]
         return values
 
 
@@ -327,9 +329,9 @@ class AssertionEvaluationParameters(PermissiveBaseModel):
     # The type of the parameters"""
     type: AssertionEvaluationParametersType
 
-    # Dataset SLA Parameters. Present if the type is DATASET_SLA
-    dataset_sla_parameters: Optional[DatasetSlaAssertionParameters] = Field(
-        alias="datasetSlaParameters"
+    # Dataset FRESHNESS Parameters. Present if the type is DATASET_FRESHNESS
+    dataset_freshness_parameters: Optional[DatasetFreshnessAssertionParameters] = Field(
+        alias="datasetFreshnessParameters"
     )
 
 

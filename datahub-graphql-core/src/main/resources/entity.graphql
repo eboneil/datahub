@@ -7151,9 +7151,9 @@ The top-level assertion type. Currently single Dataset assertions are the only t
 enum AssertionType {
     DATASET
     """
-    An SLA assertion
+    A Freshness assertion
     """
-    SLA
+    FRESHNESS
 }
 
 """

@@ -3,7 +3,7 @@ import time
 from typing import List, Optional, cast
 
 from datahub_monitors.assertion.engine.evaluator.evaluator import AssertionEvaluator
-from datahub_monitors.assertion.engine.evaluator.sla_utils import (
+from datahub_monitors.assertion.engine.evaluator.freshness_utils import (
     get_event_type_parameters_from_parameters,
 )
 from datahub_monitors.assertion.engine.evaluator.time_utils import (
@@ -23,31 +23,31 @@ from datahub_monitors.types import (
     AssertionResultType,
     AssertionType,
     CronSchedule,
-    DatasetSlaAssertionParameters,
-    DatasetSlaSourceType,
+    DatasetFreshnessAssertionParameters,
+    DatasetFreshnessSourceType,
     FixedIntervalSchedule,
-    SlaAssertion,
-    SlaAssertionScheduleType,
-    SlaCronSchedule,
+    FreshnessAssertion,
+    FreshnessAssertionScheduleType,
+    FreshnessCronSchedule,
 )
 
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_SLA_PARAMETERS = AssertionEvaluationParameters(
-    type=AssertionEvaluationParametersType.DATASET_SLA,
-    dataset_sla_parameters=DatasetSlaAssertionParameters(
-        sourceType=DatasetSlaSourceType.INFORMATION_SCHEMA
+DEFAULT_FRESHNESS_PARAMETERS = AssertionEvaluationParameters(
+    type=AssertionEvaluationParametersType.DATASET_FRESHNESS,
+    dataset_freshness_parameters=DatasetFreshnessAssertionParameters(
+        sourceType=DatasetFreshnessSourceType.INFORMATION_SCHEMA
     ),
 )
 
 
-class SlaAssertionEvaluator(AssertionEvaluator):
-    """Evaluator for SLA assertions."""
+class FreshnessAssertionEvaluator(AssertionEvaluator):
+    """Evaluator for FRESHNESS assertions."""
 
     @property
     def type(self) -> AssertionType:
-        return AssertionType.SLA
+        return AssertionType.FRESHNESS
 
     def __init__(self, connection_provider: ConnectionProvider):
         self.connection_provider = connection_provider
@@ -104,12 +104,14 @@ class SlaAssertionEvaluator(AssertionEvaluator):
         connection: Connection,
         context: AssertionEvaluationContext,
     ) -> AssertionEvaluationResult:
-        assert assertion.sla_assertion is not None
-        assert assertion.sla_assertion.schedule.cron is not None
+        assert assertion.freshness_assertion is not None
+        assert assertion.freshness_assertion.schedule.cron is not None
 
         # These fields are required for
-        cast(SlaAssertion, assertion.sla_assertion)
-        cron_schedule = cast(SlaCronSchedule, assertion.sla_assertion.schedule.cron)
+        cast(FreshnessAssertion, assertion.freshness_assertion)
+        cron_schedule = cast(
+            FreshnessCronSchedule, assertion.freshness_assertion.schedule.cron
+        )
         cron_schedule_start_offset = cron_schedule.window_start_offset_ms
 
         # Get the last executed time of the assertion, to compute the bounds of the cron window.
@@ -142,12 +144,12 @@ class SlaAssertionEvaluator(AssertionEvaluator):
         connection: Connection,
         context: AssertionEvaluationContext,
     ) -> AssertionEvaluationResult:
-        assert assertion.sla_assertion is not None
-        assert assertion.sla_assertion.schedule.fixed_interval is not None
+        assert assertion.freshness_assertion is not None
+        assert assertion.freshness_assertion.schedule.fixed_interval is not None
 
-        sla_assertion = cast(SlaAssertion, assertion.sla_assertion)
+        freshness_assertion = cast(FreshnessAssertion, assertion.freshness_assertion)
         fixed_interval_schedule = cast(
-            FixedIntervalSchedule, sla_assertion.schedule.fixed_interval
+            FixedIntervalSchedule, freshness_assertion.schedule.fixed_interval
         )
 
         end_time = int(time.time() * 1000)
@@ -170,22 +172,25 @@ class SlaAssertionEvaluator(AssertionEvaluator):
         context: AssertionEvaluationContext,
     ) -> AssertionEvaluationResult:
         # Here's how we evaluate an Assertion.
-        # 1. Fetch the "dataset SLA assertion config"
+        # 1. Fetch the "dataset FRESHNESS assertion config"
         # 2. Based on the type, we take different paths.
-        assert assertion.sla_assertion is not None
+        assert assertion.freshness_assertion is not None
 
-        sla_assertion = cast(SlaAssertion, assertion.sla_assertion)
-        if sla_assertion.schedule.type == SlaAssertionScheduleType.CRON:
+        freshness_assertion = cast(FreshnessAssertion, assertion.freshness_assertion)
+        if freshness_assertion.schedule.type == FreshnessAssertionScheduleType.CRON:
             return self._evaluate_internal_cron(
                 assertion, parameters, connection, context
             )
-        elif sla_assertion.schedule.type == SlaAssertionScheduleType.FIXED_INTERVAL:
+        elif (
+            freshness_assertion.schedule.type
+            == FreshnessAssertionScheduleType.FIXED_INTERVAL
+        ):
             return self._evaluate_internal_fixed_interval(
                 assertion, parameters, connection, context
             )
         else:
             raise Exception(
-                f"Failed to evaluate SLA Assertion. Unsupported SLA Schedule Type {assertion.sla_assertion.schedule.type} provided."
+                f"Failed to evaluate FRESHNESS Assertion. Unsupported FRESHNESS Schedule Type {assertion.freshness_assertion.schedule.type} provided."
             )
 
     def evaluate(
@@ -207,7 +212,7 @@ class SlaAssertionEvaluator(AssertionEvaluator):
 
             return self._evaluate_internal(
                 assertion,
-                parameters if parameters is not None else DEFAULT_SLA_PARAMETERS,
+                parameters if parameters is not None else DEFAULT_FRESHNESS_PARAMETERS,
                 connection,
                 context,
             )

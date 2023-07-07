@@ -1,12 +1,12 @@
 import {
     AssertionEvaluationParametersType,
     AssertionType,
-    DatasetSlaSourceType,
+    DatasetFreshnessSourceType,
     DateInterval,
     EntityType,
     SchemaFieldDataType,
-    SlaAssertionScheduleType,
-    SlaAssertionType,
+    FreshnessAssertionScheduleType,
+    FreshnessAssertionType,
 } from '../../../../../../../../types.generated';
 
 // Every 6 hours.
@@ -19,10 +19,10 @@ export const DEFAULT_ASSERTION_EVALUATION_INTERVAL_MULTIPLE = 6;
 // Information used for rendering different types of assertions.
 export const ASSERTION_TYPES = [
     {
-        name: 'SLA',
-        description: 'Monitor the freshness of this dataset by defining a custom SLA assertion',
+        name: 'Freshness',
+        description: 'Monitor the freshness of this dataset by defining a custom assertion',
         imageSrc: null,
-        type: AssertionType.Sla,
+        type: AssertionType.Freshness,
         entityTypes: [EntityType.Dataset],
     },
 ];
@@ -34,7 +34,7 @@ export const DEFAULT_BUILDER_STATE = {
     entityUrn: null,
     assertion: {
         type: null,
-        slaAssertion: null,
+        freshnessAssertion: null,
         actions: null,
     },
     schedule: {
@@ -44,11 +44,11 @@ export const DEFAULT_BUILDER_STATE = {
     parameters: null,
 };
 
-// Default assertion definition used when the selected type is SLA.
-export const DEFAULT_DATASET_SLA_ASSERTION_STATE = {
-    type: SlaAssertionType.DatasetChange,
+// Default assertion definition used when the selected type is Freshness.
+export const DEFAULT_DATASET_FRESHNESS_ASSERTION_STATE = {
+    type: FreshnessAssertionType.DatasetChange,
     schedule: {
-        type: SlaAssertionScheduleType.FixedInterval,
+        type: FreshnessAssertionScheduleType.FixedInterval,
         fixedInterval: {
             unit: DateInterval.Hour,
             multiple: 6,
@@ -56,11 +56,11 @@ export const DEFAULT_DATASET_SLA_ASSERTION_STATE = {
     },
 };
 
-// Default assertion parameters used when the selected type is SLA
-export const DEFAULT_DATASET_SLA_ASSERTION_PARAMETERS_STATE = {
-    type: AssertionEvaluationParametersType.DatasetSla,
-    datasetSlaParameters: {
-        sourceType: DatasetSlaSourceType.AuditLog,
+// Default assertion parameters used when the selected type is Freshness
+export const DEFAULT_DATASET_FRESHNESS_ASSERTION_PARAMETERS_STATE = {
+    type: AssertionEvaluationParametersType.DatasetFreshness,
+    datasetFreshnessParameters: {
+        sourceType: DatasetFreshnessSourceType.AuditLog,
         auditLog: {},
     },
 };

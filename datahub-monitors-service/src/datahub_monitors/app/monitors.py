@@ -5,8 +5,8 @@ from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from datahub.secret.datahub_secret_store import DataHubSecretStore
 
 from datahub_monitors.assertion.engine.engine import AssertionEngine
-from datahub_monitors.assertion.engine.evaluator.sla_evaluator import (
-    SlaAssertionEvaluator,
+from datahub_monitors.assertion.engine.evaluator.freshness_evaluator import (
+    FreshnessAssertionEvaluator,
 )
 from datahub_monitors.assertion.result.assertion_run_event_handler import (
     AssertionRunEventResultHandler,
@@ -47,7 +47,7 @@ def start_async_monitors() -> None:
 
         # Create assertion evaluators
         evaluators = [
-            SlaAssertionEvaluator(
+            FreshnessAssertionEvaluator(
                 DataHubIngestionSourceConnectionProvider(graph, [datahub_secret_store])
             ),
         ]

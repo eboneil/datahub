@@ -5,11 +5,11 @@ import com.linkedin.assertion.FreshnessFieldSpec
 /**
  * Information about the parameters required to evaluate an assertion
  */
-record DatasetSlaAssertionParameters {
+record DatasetFreshnessAssertionParameters {
   /**
   * The source of the change operation.
   */
-  sourceType: enum DatasetSlaSourceType {
+  sourceType: enum DatasetFreshnessSourceType {
     /**
     * Determine that a change has occurred by inspecting a particular field's value.
     */

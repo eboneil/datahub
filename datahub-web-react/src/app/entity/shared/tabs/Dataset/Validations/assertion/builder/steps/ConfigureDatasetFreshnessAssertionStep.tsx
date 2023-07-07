@@ -5,13 +5,13 @@ import { AssertionBuilderStep, StepProps } from '../types';
 import {
     AssertionEvaluationParametersType,
     CronSchedule,
-    DatasetSlaAssertionParameters,
+    DatasetFreshnessAssertionParameters,
     FixedIntervalSchedule,
-    SlaAssertionScheduleType,
+    FreshnessAssertionScheduleType,
 } from '../../../../../../../../../types.generated';
-import { FixedIntervalScheduleBuilder } from './sla/FixedIntervalSchedulerBuilder';
-import { CronScheduleBuilder } from './sla/CronScheduleBuilder';
-import { DatasetSlaSourceBuilder } from './sla/DatasetSlaSourceBuilder';
+import { FixedIntervalScheduleBuilder } from './freshness/FixedIntervalSchedulerBuilder';
+import { CronScheduleBuilder } from './freshness/CronScheduleBuilder';
+import { DatasetFreshnessSourceBuilder } from './freshness/DatasetFreshnessSourceBuilder';
 
 const TypeLabel = styled(Typography.Title)`
     && {
@@ -45,25 +45,25 @@ const SourceDescription = styled(Typography.Paragraph)`
 `;
 
 /**
- * Step for defining the Dataset SLA assertion
+ * Step for defining the Dataset Freshness assertion
  */
-export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, prev }: StepProps) => {
-    const slaAssertion = state.assertion?.slaAssertion;
-    const slaSchedule = slaAssertion?.schedule;
-    const slaScheduleType = slaSchedule?.type;
-    const slaScheduleCron = slaSchedule?.cron;
-    const slaScheduleFixedInterval = slaSchedule?.fixedInterval;
-    const datasetSlaParameters = state.parameters?.datasetSlaParameters;
+export const ConfigureDatasetFreshnessAssertionStep = ({ state, updateState, goTo, prev }: StepProps) => {
+    const freshnessAssertion = state.assertion?.freshnessAssertion;
+    const freshnessSchedule = freshnessAssertion?.schedule;
+    const freshnessScheduleType = freshnessSchedule?.type;
+    const freshnessScheduleCron = freshnessSchedule?.cron;
+    const freshnessScheduleFixedInterval = freshnessSchedule?.fixedInterval;
+    const datasetFreshnessParameters = state.parameters?.datasetFreshnessParameters;
 
-    const updateScheduleType = (scheduleType: SlaAssertionScheduleType) => {
+    const updateScheduleType = (scheduleType: FreshnessAssertionScheduleType) => {
         updateState({
             ...state,
             assertion: {
                 ...state.assertion,
-                slaAssertion: {
-                    ...state?.assertion?.slaAssertion,
+                freshnessAssertion: {
+                    ...state?.assertion?.freshnessAssertion,
                     schedule: {
-                        ...state?.assertion?.slaAssertion?.schedule,
+                        ...state?.assertion?.freshnessAssertion?.schedule,
                         type: scheduleType,
                     },
                 },
@@ -76,10 +76,10 @@ export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, pre
             ...state,
             assertion: {
                 ...state.assertion,
-                slaAssertion: {
-                    ...state?.assertion?.slaAssertion,
+                freshnessAssertion: {
+                    ...state?.assertion?.freshnessAssertion,
                     schedule: {
-                        ...state?.assertion?.slaAssertion?.schedule,
+                        ...state?.assertion?.freshnessAssertion?.schedule,
                         fixedInterval,
                     },
                 },
@@ -92,10 +92,10 @@ export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, pre
             ...state,
             assertion: {
                 ...state.assertion,
-                slaAssertion: {
-                    ...state.assertion?.slaAssertion,
+                freshnessAssertion: {
+                    ...state.assertion?.freshnessAssertion,
                     schedule: {
-                        ...state.assertion?.slaAssertion?.schedule,
+                        ...state.assertion?.freshnessAssertion?.schedule,
                         cron,
                     },
                 },
@@ -103,12 +103,12 @@ export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, pre
         });
     };
 
-    const updateDatasetSlaAssertionParameters = (parameters: DatasetSlaAssertionParameters) => {
+    const updateDatasetFreshnessAssertionParameters = (parameters: DatasetFreshnessAssertionParameters) => {
         updateState({
             ...state,
             parameters: {
-                type: AssertionEvaluationParametersType.DatasetSla,
-                datasetSlaParameters: {
+                type: AssertionEvaluationParametersType.DatasetFreshness,
+                datasetFreshnessParameters: {
                     sourceType: parameters.sourceType,
                     auditLog: parameters.auditLog as any,
                     field: parameters.field as any,
@@ -121,27 +121,27 @@ export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, pre
         <Step>
             <Form>
                 <Section>
-                    <TypeLabel level={5}>SLA Type</TypeLabel>
-                    <Radio.Group value={slaScheduleType} onChange={(e) => updateScheduleType(e.target.value)}>
-                        <Radio.Button value={SlaAssertionScheduleType.FixedInterval}>Fixed Interval</Radio.Button>
-                        <Radio.Button value={SlaAssertionScheduleType.Cron}>Schedule</Radio.Button>
+                    <TypeLabel level={5}>Type</TypeLabel>
+                    <Radio.Group value={freshnessScheduleType} onChange={(e) => updateScheduleType(e.target.value)}>
+                        <Radio.Button value={FreshnessAssertionScheduleType.FixedInterval}>Fixed Interval</Radio.Button>
+                        <Radio.Button value={FreshnessAssertionScheduleType.Cron}>Schedule</Radio.Button>
                     </Radio.Group>
                     <SourceDescription type="secondary">
-                        {slaScheduleType === SlaAssertionScheduleType.FixedInterval
+                        {freshnessScheduleType === FreshnessAssertionScheduleType.FixedInterval
                             ? 'Define an expected change interval to monitor for this dataset'
                             : 'Define an expected change schedule to monitor for this dataset'}
                     </SourceDescription>
                 </Section>
                 <Section>
-                    {slaScheduleType === SlaAssertionScheduleType.FixedInterval ? (
+                    {freshnessScheduleType === FreshnessAssertionScheduleType.FixedInterval ? (
                         <FixedIntervalScheduleBuilder
-                            value={slaScheduleFixedInterval as FixedIntervalSchedule}
+                            value={freshnessScheduleFixedInterval as FixedIntervalSchedule}
                             onChange={updateFixedIntervalSchedule}
                         />
                     ) : (
                         <CronScheduleBuilder
                             title="Expected Change Schedule"
-                            value={slaScheduleCron as CronSchedule}
+                            value={freshnessScheduleCron as CronSchedule}
                             onChange={updateCronSchedule}
                             actionText="Changes by"
                             descriptionText="Assertion will fail if this dataset has not changed by the schedule timed, or between two consecutive schedule times"
@@ -151,11 +151,11 @@ export const ConfigureDatasetSlaAssertionStep = ({ state, updateState, goTo, pre
                 <Section>
                     <Collapse>
                         <Collapse.Panel key="Advanced" header="Advanced">
-                            <DatasetSlaSourceBuilder
+                            <DatasetFreshnessSourceBuilder
                                 entityUrn={state.entityUrn as string}
                                 platformUrn={state.platformUrn as string}
-                                value={datasetSlaParameters as DatasetSlaAssertionParameters}
-                                onChange={updateDatasetSlaAssertionParameters}
+                                value={datasetFreshnessParameters as DatasetFreshnessAssertionParameters}
+                                onChange={updateDatasetFreshnessAssertionParameters}
                             />
                         </Collapse.Panel>
                     </Collapse>

@@ -9,7 +9,7 @@ import { Assertion, AssertionRunStatus, AssertionType } from '../../../../../../
 import { getResultColor, getResultIcon, getResultText } from './assertionUtils';
 import { useDeleteAssertionMutation } from '../../../../../../graphql/assertion.generated';
 import { capitalizeFirstLetterOnly } from '../../../../../shared/textUtil';
-import { SlaAssertionDescription } from './SlaAssertionDescription';
+import { FreshnessAssertionDescription } from './FreshnessAssertionDescription';
 import { LinkWrapper } from '../../../../../shared/LinkWrapper';
 
 const ResultContainer = styled.div`
@@ -82,7 +82,7 @@ export const DatasetAssertionsList = ({ assertions, onDelete }: Props) => {
         type: assertion.info?.type,
         platform: assertion.platform,
         datasetAssertionInfo: assertion.info?.datasetAssertion,
-        slaAssertionInfo: assertion.info?.slaAssertion,
+        freshnessAssertionInfo: assertion.info?.freshnessAssertion,
         lastExecTime: assertion.runEvents?.runEvents?.length && assertion.runEvents.runEvents[0].timestampMillis,
         lastExecResult:
             assertion.runEvents?.runEvents?.length &&
@@ -118,7 +118,7 @@ export const DatasetAssertionsList = ({ assertions, onDelete }: Props) => {
                         </div>
                         {(assertionType === AssertionType.Dataset && (
                             <DatasetAssertionDescription assertionInfo={record.datasetAssertionInfo} />
-                        )) || <SlaAssertionDescription assertionInfo={record.slaAssertionInfo} />}
+                        )) || <FreshnessAssertionDescription assertionInfo={record.freshnessAssertionInfo} />}
                     </ResultContainer>
                 );
             },

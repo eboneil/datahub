@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { Radio, Typography } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
-    DatasetSlaAssertionParameters,
-    DatasetSlaSourceType,
+    DatasetFreshnessAssertionParameters,
+    DatasetFreshnessSourceType,
     SchemaFieldSpec,
 } from '../../../../../../../../../../types.generated';
 import { FieldValueSourceBuilder } from './FieldValueSourceBuilder';
@@ -28,16 +28,16 @@ const StyledInfoCircleOutlined = styled(InfoCircleOutlined)`
 type Props = {
     entityUrn: string;
     platformUrn: string;
-    value?: DatasetSlaAssertionParameters | null;
-    onChange: (newParams: DatasetSlaAssertionParameters) => void;
+    value?: DatasetFreshnessAssertionParameters | null;
+    onChange: (newParams: DatasetFreshnessAssertionParameters) => void;
 };
 
 /**
- * Builder used to configure the Source Type of Dataset SLA assertion evaluations.
- * This represents the signal that is used as input when determining whether an SLA has been
+ * Builder used to configure the Source Type of Dataset Freshness assertion evaluations.
+ * This represents the signal that is used as input when determining whether an Freshness has been
  * missed or not.
  *
- * If demand exists, we can extend this support customizing the audit-log based SLA assertions to include;:
+ * If demand exists, we can extend this support customizing the audit-log based Freshness assertions to include;:
  *
  *     - Operation types (monitor for inserts, updates, deletes, create tables specifically)
  *     - Row counts (min number of rows that change for a given operation)
@@ -45,8 +45,8 @@ type Props = {
  *
  * For applicable sources
  */
-export const DatasetSlaSourceBuilder = ({ entityUrn, platformUrn, value, onChange }: Props) => {
-    const sourceType = value?.sourceType || DatasetSlaSourceType.AuditLog;
+export const DatasetFreshnessSourceBuilder = ({ entityUrn, platformUrn, value, onChange }: Props) => {
+    const sourceType = value?.sourceType || DatasetFreshnessSourceType.AuditLog;
     const field = value?.field;
 
     const { data } = useGetDatasetSchemaQuery({
@@ -75,7 +75,7 @@ export const DatasetSlaSourceBuilder = ({ entityUrn, platformUrn, value, onChang
     const sourceTypes = getSourceTypesForPlatform(platformUrn).filter((st) => SOURCE_TYPE_TO_INFO.has(st));
     const selectedSourceTypeInfo = SOURCE_TYPE_TO_INFO.get(sourceType);
 
-    const updateSourceType = (newSourceType: DatasetSlaSourceType) => {
+    const updateSourceType = (newSourceType: DatasetFreshnessSourceType) => {
         onChange({
             ...value,
             sourceType: newSourceType,
@@ -106,7 +106,7 @@ export const DatasetSlaSourceBuilder = ({ entityUrn, platformUrn, value, onChang
                 <StyledInfoCircleOutlined />
                 {selectedSourceTypeInfo.description}
             </SourceDescription>
-            {sourceType === DatasetSlaSourceType.FieldValue && (
+            {sourceType === DatasetFreshnessSourceType.FieldValue && (
                 <FieldValueSourceBuilder fields={dateFieldSpecs} value={field} onChange={updateFieldSpec} />
             )}
         </Form>

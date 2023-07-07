@@ -2,12 +2,12 @@ import {
     AssertionAction,
     AssertionType,
     AssertionEvaluationParametersType,
-    DatasetSlaSourceType,
+    DatasetFreshnessSourceType,
     DateInterval,
     EntityType,
     SchemaFieldDataType,
-    SlaAssertionScheduleType,
-    SlaAssertionType,
+    FreshnessAssertionScheduleType,
+    FreshnessAssertionType,
 } from '../../../../../../../../types.generated';
 
 /**
@@ -42,11 +42,11 @@ export interface AssertionMonitorBuilderState {
         /**
          * The schedule on which to execute the source (optional)
          */
-        slaAssertion?: {
+        freshnessAssertion?: {
             /**
-             * The type of the SLA assertion
+             * The type of the Freshness assertion
              */
-            type?: SlaAssertionType | null;
+            type?: FreshnessAssertionType | null;
 
             /**
              * The schedule defining the assertion itself.
@@ -55,7 +55,7 @@ export interface AssertionMonitorBuilderState {
                 /**
                  * The type of the schedule.
                  */
-                type?: SlaAssertionScheduleType | null;
+                type?: FreshnessAssertionScheduleType | null;
 
                 /**
                  * A cron schedule definition
@@ -135,13 +135,13 @@ export interface AssertionMonitorBuilderState {
         type?: AssertionEvaluationParametersType | null;
 
         /**
-         * Information required to execute a dataset change operation SLA assertion.
+         * Information required to execute a dataset change operation Freshness assertion.
          */
-        datasetSlaParameters?: {
+        datasetFreshnessParameters?: {
             /**
              * The source type of the operation
              */
-            sourceType?: DatasetSlaSourceType | null;
+            sourceType?: DatasetFreshnessSourceType | null;
 
             /**
              * The field that should be used when determining whether an operation has occurred. Only applicable if source type = "FIELD_VALUE"
@@ -191,7 +191,7 @@ export interface AssertionMonitorBuilderState {
  */
 export enum AssertionBuilderStep {
     SELECT_TYPE = 'SELECT_TYPE',
-    CONFIGURE_DATASET_SLA_ASSERTION = 'CONFIGURE_DATASET_SLA_ASSERTION',
+    CONFIGURE_DATASET_FRESHNESS_ASSERTION = 'CONFIGURE_DATASET_FRESHNESS_ASSERTION',
     CONFIGURE_SCHEDULE = 'CONFIGURE_SCHEDULE',
 }
 

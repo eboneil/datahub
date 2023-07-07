@@ -119,7 +119,7 @@ class SnowflakeSource(Source):
                 query_history.rows_deleted AS "ROWS_DELETED",
                 exploded_access_history.user_name AS "USER_NAME",
                 (DATE_PART('EPOCH', exploded_access_history.query_start_time) * 1000) AS "QUERY_START_MS",
-                exploded_access_history.updated_objects:objectName::STRING AS "MODIFIED_OBJECT",
+                exploded_access_history.updated_objects:objectName::STRING AS "MODIFIED_OBJECT"
             FROM
                 exploded_access_history as exploded_access_history
             INNER JOIN
