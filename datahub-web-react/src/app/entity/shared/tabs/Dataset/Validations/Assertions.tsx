@@ -88,6 +88,9 @@ export const Assertions = () => {
                         setRemovedUrns([...removedUrns, assertionUrn]);
                         setTimeout(() => refetch(), 3000);
                     }}
+                    onUpdate={() => {
+                        setTimeout(() => refetch(), 3000);
+                    }}
                 />
             )}
             {showAssertionBuilder && (

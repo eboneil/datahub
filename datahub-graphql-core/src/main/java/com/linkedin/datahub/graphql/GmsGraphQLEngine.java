@@ -117,6 +117,7 @@ import com.linkedin.datahub.graphql.resolvers.assertion.CreateDatasetAssertionRe
 import com.linkedin.datahub.graphql.resolvers.assertion.CreateFreshnessAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.DeleteAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.EntityAssertionsResolver;
+import com.linkedin.datahub.graphql.resolvers.assertion.UpdateAssertionActionsResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.UpdateDatasetAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.assertion.UpdateFreshnessAssertionResolver;
 import com.linkedin.datahub.graphql.resolvers.auth.CreateAccessTokenResolver;
@@ -1910,7 +1911,8 @@ public class GmsGraphQLEngine {
             .dataFetcher("createDatasetAssertion", new CreateDatasetAssertionResolver(assertionService))
             .dataFetcher("createFreshnessAssertion", new CreateFreshnessAssertionResolver(assertionService))
             .dataFetcher("updateDatasetAssertion", new UpdateDatasetAssertionResolver(assertionService))
-            .dataFetcher("updateFreshnessAssertion", new UpdateFreshnessAssertionResolver(assertionService)));
+            .dataFetcher("updateFreshnessAssertion", new UpdateFreshnessAssertionResolver(assertionService))
+            .dataFetcher("updateAssertionActions", new UpdateAssertionActionsResolver(assertionService)));
     }
 
     private void configurePolicyResolvers(final RuntimeWiring.Builder builder) {
