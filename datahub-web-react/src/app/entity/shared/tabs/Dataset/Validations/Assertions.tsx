@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useGetDatasetAssertionsQuery } from '../../../../../../graphql/dataset.generated';
-import { Assertion, AssertionResultType } from '../../../../../../types.generated';
+import { Assertion, AssertionResultType, AssertionSourceType } from '../../../../../../types.generated';
 import { useEntityData } from '../../../EntityContext';
 import { DatasetAssertionsList } from './DatasetAssertionsList';
 import { DatasetAssertionsSummary } from './DatasetAssertionsSummary';
@@ -62,7 +62,10 @@ export const Assertions = () => {
     const assertions =
         (combinedData && combinedData.dataset?.assertions?.assertions?.map((assertion) => assertion as Assertion)) ||
         [];
-    const filteredAssertions = assertions.filter((assertion) => !removedUrns.includes(assertion.urn));
+    const filteredAssertions = assertions.filter(
+        (assertion) =>
+            !removedUrns.includes(assertion.urn) && assertion?.info?.source?.type !== AssertionSourceType.Inferred,
+    );
 
     // Pre-sort the list of assertions based on which has been most recently executed.
     assertions.sort(sortAssertions);

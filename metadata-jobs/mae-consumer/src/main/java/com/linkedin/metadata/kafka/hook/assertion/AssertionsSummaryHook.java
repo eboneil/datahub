@@ -6,6 +6,7 @@ import com.linkedin.assertion.AssertionResult;
 import com.linkedin.assertion.AssertionResultType;
 import com.linkedin.assertion.AssertionRunEvent;
 import com.linkedin.assertion.AssertionRunStatus;
+import com.linkedin.assertion.AssertionSourceType;
 import com.linkedin.assertion.DatasetAssertionInfo;
 import com.linkedin.common.AssertionSummaryDetails;
 import com.linkedin.common.AssertionSummaryDetailsArray;
@@ -134,6 +135,14 @@ public class AssertionsSummaryHook implements MetadataChangeLogHook {
 
     // 2. Retrieve associated urns.
     if (assertionInfo != null) {
+
+      // If this assertion is system generated, we avoid placing it in the summary.
+      // This is because system assertions are used a) to recommend assertions and b) to generate anomalies.
+      // Users will not expect to see system assertions appearing in the normal custom assertions summary.
+      if (isInferredAssertion(assertionInfo)) {
+        log.debug(String.format("Skipping adding result of inferred assertion with urn %s to summary", assertionUrn));
+        return;
+      }
 
       final List<Urn> assertionEntities = extractAssertionEntities(assertionInfo);
 
@@ -296,5 +305,13 @@ public class AssertionsSummaryHook implements MetadataChangeLogHook {
       log.error(
           String.format("Failed to updated assertions summary for entity with urn %s! Skipping updating the summary", entityUrn), e);
     }
+  }
+
+  /**
+   * Returns true if we are dealing with a system-inferred assertions, which we typically exclude from the normal
+   * Assertions summary to avoid confusing users.
+   */
+  private boolean isInferredAssertion(@Nonnull final AssertionInfo assertionInfo) {
+    return assertionInfo.hasSource() && AssertionSourceType.INFERRED.equals(assertionInfo.getSource().getType());
   }
 }
