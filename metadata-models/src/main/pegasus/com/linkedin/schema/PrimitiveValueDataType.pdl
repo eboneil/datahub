@@ -1,0 +1,36 @@
+namespace com.linkedin.schema
+
+record PrimitiveValueDataType {
+ /**
+  * The type of the value
+  */
+  type: union[
+    StringType,
+    NumberType
+  ]
+
+
+  /**
+   * Value constraints. If present, a list of values that are allowed
+   */
+  valueConstraints: optional union[
+    stringarray: array[string],
+    numericarray: array[int],
+  ]
+
+  /**
+   * The cardinality of the value type. One of ONE, MANY
+   */
+  cardinality: enum Cardinality {
+    /**
+      * The value is a single value
+      */
+      ONE,
+
+    /**
+      * The value is a list of values
+      */
+      MANY
+  } = "ONE"
+
+}
