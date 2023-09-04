@@ -109,7 +109,7 @@ public class IngestOwnershipTypesStep extends UpgradeStep {
     proposal.setChangeType(ChangeType.UPSERT);
 
     _entityService.ingestProposal(AspectsBatchImpl.builder()
-            .mcps(List.of(keyAspectProposal, proposal), _entityService.getEntityRegistry()).build(), auditStamp,
+            .mcps(List.of(keyAspectProposal, proposal), _entityService.getEntityRegistry(), _entityService).build(), auditStamp,
             false);
   }
 

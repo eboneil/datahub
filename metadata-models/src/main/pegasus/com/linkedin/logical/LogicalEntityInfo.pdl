@@ -1,0 +1,14 @@
+namespace com.linkedin.logical
+
+@Aspect = {
+    "name": "logicalEntityInfo"
+}
+record LogicalEntityInfo {
+
+    fullyQualifiedName: string
+
+    displayName: optional string
+
+    description: optional string
+
+}

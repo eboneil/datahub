@@ -15,6 +15,7 @@ import com.linkedin.metadata.entity.restoreindices.RestoreIndicesArgs;
 import com.linkedin.metadata.entity.restoreindices.RestoreIndicesResult;
 import com.linkedin.metadata.entity.transactions.AspectsBatch;
 import com.linkedin.metadata.models.AspectSpec;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.query.ListUrnsResult;
 import com.linkedin.metadata.run.AspectRowSummary;
@@ -33,7 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public interface EntityService {
+public interface EntityService extends AspectRetriever {
 
   /**
    * Retrieves the latest aspects corresponding to a batch of {@link Urn}s based on a provided
@@ -199,7 +200,7 @@ public interface EntityService {
                                                  @Nullable final SystemMetadata newSystemMetadata, @Nonnull AuditStamp auditStamp,
                                                  @Nonnull final ChangeType changeType);
 
-  RecordTemplate getLatestAspect(@Nonnull final Urn urn, @Nonnull final String aspectName);
+  //RecordTemplate getLatestAspect(@Nonnull final Urn urn, @Nonnull final String aspectName);
 
   @Deprecated
   void ingestEntities(@Nonnull final List<Entity> entities, @Nonnull final AuditStamp auditStamp,

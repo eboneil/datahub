@@ -44,9 +44,11 @@ import com.linkedin.metadata.entity.retention.BulkApplyRetentionArgs;
 import com.linkedin.metadata.entity.retention.BulkApplyRetentionResult;
 import com.linkedin.metadata.entity.transactions.AspectsBatch;
 import com.linkedin.metadata.event.EventProducer;
+import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectSpec;
 import com.linkedin.metadata.models.EntitySpec;
 import com.linkedin.metadata.models.RelationshipFieldSpec;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.query.ListUrnsResult;
 import com.linkedin.metadata.run.AspectRowSummary;
@@ -127,7 +129,7 @@ import static com.linkedin.metadata.utils.PegasusUtils.*;
  * TODO: Consider whether we can abstract away virtual versioning semantics to subclasses of this class.
  */
 @Slf4j
-public class EntityServiceImpl implements EntityService {
+public class EntityServiceImpl implements EntityService, AspectRetriever {
 
   /**
    * As described above, the latest version of an aspect should <b>always</b> take the value 0, with
@@ -516,6 +518,7 @@ public class EntityServiceImpl implements EntityService {
                     .aspectName(pair.getKey())
                     .aspect(pair.getValue())
                     .systemMetadata(systemMetadata)
+                    .aspectRetriever(this)
                     .build(_entityRegistry))
             .collect(Collectors.toList());
     return ingestAspects(AspectsBatchImpl.builder().items(items).build(), auditStamp, true, true);
@@ -715,6 +718,7 @@ public class EntityServiceImpl implements EntityService {
                     .aspectName(aspectName)
                     .aspect(newValue)
                     .systemMetadata(systemMetadata)
+                    .aspectRetriever(this)
                     .build(_entityRegistry))
             .build();
     List<UpdateAspectResult> ingested = ingestAspects(aspectsBatch, auditStamp, true, false);
@@ -731,7 +735,7 @@ public class EntityServiceImpl implements EntityService {
    */
   @Override
   public IngestResult ingestProposal(MetadataChangeProposal proposal, AuditStamp auditStamp, final boolean async) {
-    return ingestProposal(AspectsBatchImpl.builder().mcps(List.of(proposal), getEntityRegistry()).build(), auditStamp,
+    return ingestProposal(AspectsBatchImpl.builder().mcps(List.of(proposal), getEntityRegistry(), this).build(), auditStamp,
             async).stream().findFirst().get();
   }
 
@@ -1305,6 +1309,7 @@ public class EntityServiceImpl implements EntityService {
                     .aspectName(pair.getKey())
                     .aspect(pair.getValue())
                     .systemMetadata(systemMetadata)
+                    .aspectRetriever(this)
                     .build(_entityRegistry)).collect(Collectors.toList()))
             .build();
 
@@ -1930,4 +1935,5 @@ public class EntityServiceImpl implements EntityService {
     final List<RelationshipFieldSpec> relationshipFieldSpecs = aspectSpec.getRelationshipFieldSpecs();
     return relationshipFieldSpecs.stream().anyMatch(RelationshipFieldSpec::isLineageRelationship);
   }
+
 }

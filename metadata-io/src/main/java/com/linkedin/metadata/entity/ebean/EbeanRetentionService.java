@@ -54,7 +54,7 @@ public class EbeanRetentionService extends RetentionService {
   @Override
   protected AspectsBatch buildAspectsBatch(List<MetadataChangeProposal> mcps) {
     return AspectsBatchImpl.builder()
-            .mcps(mcps, _entityService.getEntityRegistry())
+            .mcps(mcps, _entityService.getEntityRegistry(), _entityService)
             .build();
   }
 

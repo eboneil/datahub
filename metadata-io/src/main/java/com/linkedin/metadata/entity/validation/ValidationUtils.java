@@ -4,9 +4,13 @@ import com.linkedin.common.urn.Urn;
 import com.linkedin.data.schema.validation.ValidationResult;
 import com.linkedin.data.template.RecordTemplate;
 import com.linkedin.metadata.entity.EntityUtils;
+import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectSpec;
+import com.linkedin.metadata.models.AspectValidationException;
 import com.linkedin.metadata.models.EntitySpec;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
+import java.lang.reflect.InvocationTargetException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Consumer;
@@ -56,7 +60,7 @@ public class ValidationUtils {
     return aspectSpec;
   }
 
-  public static void validateRecordTemplate(EntityRegistry entityRegistry, EntitySpec entitySpec, Urn urn, RecordTemplate aspect) {
+  public static void validateRecordTemplate(EntityRegistry entityRegistry, EntitySpec entitySpec, AspectSpec aspectSpec, Urn urn, RecordTemplate aspect, AspectRetriever aspectRetriever) {
     EntityRegistryUrnValidator validator = new EntityRegistryUrnValidator(entityRegistry);
     validator.setCurrentEntitySpec(entitySpec);
     Consumer<ValidationResult> resultFunction = validationResult -> {
@@ -64,11 +68,20 @@ public class ValidationUtils {
               + validationResult.getMessages()); };
     RecordTemplateValidator.validate(EntityUtils.buildKeyAspect(entityRegistry, urn), resultFunction, validator);
     RecordTemplateValidator.validate(aspect, resultFunction, validator);
+    if (aspectSpec != null && aspectSpec.getAspectPayloadValidator() != null) {
+        try {
+          AspectPayloadValidator aspectPayloadValidator =
+              aspectSpec.getAspectPayloadValidator();
+          aspectPayloadValidator.validateAspectUpsert(urn, aspect, aspectSpec.getName(), aspectRetriever);
+        } catch (AspectValidationException e) {
+          throw new IllegalArgumentException("Failed to validate aspect due to: " + e.getMessage(), e);
+        }
+    }
   }
 
   public static void validateRecordTemplate(EntityRegistry entityRegistry, Urn urn, RecordTemplate aspect) {
     EntitySpec entitySpec = entityRegistry.getEntitySpec(urn.getEntityType());
-    validateRecordTemplate(entityRegistry, entitySpec, urn, aspect);
+    validateRecordTemplate(entityRegistry, entitySpec, null, urn, aspect, null);
   }
 
   private ValidationUtils() {

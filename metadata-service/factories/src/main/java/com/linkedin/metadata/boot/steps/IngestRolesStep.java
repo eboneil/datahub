@@ -109,7 +109,7 @@ public class IngestRolesStep implements BootstrapStep {
     proposal.setChangeType(ChangeType.UPSERT);
 
     _entityService.ingestProposal(AspectsBatchImpl.builder()
-            .mcps(List.of(keyAspectProposal, proposal), _entityRegistry).build(),
+            .mcps(List.of(keyAspectProposal, proposal), _entityRegistry, _entityService).build(),
             new AuditStamp().setActor(Urn.createFromString(SYSTEM_ACTOR)).setTime(System.currentTimeMillis()),
             false);
 

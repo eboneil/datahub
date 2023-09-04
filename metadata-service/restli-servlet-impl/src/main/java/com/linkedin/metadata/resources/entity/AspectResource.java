@@ -210,14 +210,14 @@ public class AspectResource extends CollectionResourceTaskTemplate<String, Versi
         if (asyncBool) {
           // if async we'll expand the getAdditionalChanges later, no need to do this early
           batch = AspectsBatchImpl.builder()
-                  .mcps(List.of(metadataChangeProposal), _entityService.getEntityRegistry())
+                  .mcps(List.of(metadataChangeProposal), _entityService.getEntityRegistry(), _entityService)
                   .build();
         } else {
           Stream<MetadataChangeProposal> proposalStream = Stream.concat(Stream.of(metadataChangeProposal),
                   AspectUtils.getAdditionalChanges(metadataChangeProposal, _entityService).stream());
 
           batch = AspectsBatchImpl.builder()
-                  .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry())
+                  .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry(), _entityService)
                   .build();
         }
 

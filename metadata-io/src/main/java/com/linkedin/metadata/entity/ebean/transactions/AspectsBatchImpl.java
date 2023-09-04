@@ -3,6 +3,7 @@ package com.linkedin.metadata.entity.ebean.transactions;
 import com.linkedin.events.metadata.ChangeType;
 import com.linkedin.metadata.entity.transactions.AbstractBatchItem;
 import com.linkedin.metadata.entity.transactions.AspectsBatch;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.mxe.MetadataChangeProposal;
 import lombok.Builder;
@@ -31,12 +32,12 @@ public class AspectsBatchImpl implements AspectsBatch {
             return this;
         }
 
-        public AspectsBatchImplBuilder mcps(List<MetadataChangeProposal> mcps, EntityRegistry entityRegistry) {
+        public AspectsBatchImplBuilder mcps(List<MetadataChangeProposal> mcps, EntityRegistry entityRegistry, AspectRetriever aspectRetriever) {
             this.items = mcps.stream().map(mcp -> {
                 if (mcp.getChangeType().equals(ChangeType.PATCH)) {
                     return PatchBatchItem.PatchBatchItemBuilder.build(mcp, entityRegistry);
                 } else {
-                    return UpsertBatchItem.UpsertBatchItemBuilder.build(mcp, entityRegistry);
+                    return UpsertBatchItem.UpsertBatchItemBuilder.build(mcp, entityRegistry, aspectRetriever);
                 }
             }).collect(Collectors.toList());
             return this;

@@ -69,7 +69,7 @@ public class EntityUtils {
           @Nonnull Boolean async
   ) {
     entityService.ingestProposal(AspectsBatchImpl.builder()
-            .mcps(changes, entityService.getEntityRegistry()).build(), getAuditStamp(actor), async);
+            .mcps(changes, entityService.getEntityRegistry(), entityService).build(), getAuditStamp(actor), async);
   }
 
   /**

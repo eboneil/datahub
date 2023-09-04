@@ -1,0 +1,21 @@
+namespace com.linkedin.common
+
+record ExtendedPropertyValueAssignment {
+  /**
+   * The value assigned to the property.
+   */
+   value: union [ string, double ]
+
+  /**
+   * Audit stamp containing who created this relationship edge and when
+   */
+  created: optional AuditStamp
+
+  /**
+   * Audit stamp containing who last modified this relationship edge and when
+   */
+  lastModified: optional AuditStamp
+
+}
+
+

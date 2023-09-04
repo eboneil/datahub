@@ -32,6 +32,9 @@ public class AspectSpec {
   @Setter @Getter
   private ComparableVersion registryVersion = new ComparableVersion("0.0.0.0-dev");
 
+  @Getter
+  private final AspectPayloadValidator aspectPayloadValidator;
+
   public AspectSpec(@Nonnull final AspectAnnotation aspectAnnotation,
       @Nonnull final List<SearchableFieldSpec> searchableFieldSpecs,
       @Nonnull final List<SearchScoreFieldSpec> searchScoreFieldSpecs,
@@ -55,6 +58,19 @@ public class AspectSpec {
             (val1, val2) -> val1));
     _schema = schema;
     _aspectClass = aspectClass;
+
+    if (_aspectAnnotation.getValidator() == null) {
+      this.aspectPayloadValidator = null;
+    } else {
+      try {
+        Class<AspectPayloadValidator> aspectPayloadValidatorClass =
+            (Class<AspectPayloadValidator>) Class.forName(_aspectAnnotation.getValidator());
+        AspectPayloadValidator aspectPayloadValidator = aspectPayloadValidatorClass.newInstance();
+        this.aspectPayloadValidator = aspectPayloadValidator;
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        throw new RuntimeException("Failed to load aspect spec", e);
+      }
+    }
   }
 
   public String getName() {

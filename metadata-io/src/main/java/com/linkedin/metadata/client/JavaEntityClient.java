@@ -30,6 +30,7 @@ import com.linkedin.metadata.entity.ebean.transactions.AspectsBatchImpl;
 import com.linkedin.metadata.entity.transactions.AspectsBatch;
 import com.linkedin.metadata.event.EventProducer;
 import com.linkedin.metadata.graph.LineageDirection;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.query.AutoCompleteResult;
 import com.linkedin.metadata.query.ListResult;
 import com.linkedin.metadata.query.ListUrnsResult;
@@ -542,7 +543,7 @@ public class JavaEntityClient implements EntityClient {
         Stream<MetadataChangeProposal> proposalStream = Stream.concat(Stream.of(metadataChangeProposal),
                 additionalChanges.stream());
         AspectsBatch batch = AspectsBatchImpl.builder()
-                .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry())
+                .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry(), _entityService)
                 .build();
 
         IngestResult one = _entityService.ingestProposal(batch, auditStamp, async).stream()
@@ -644,4 +645,5 @@ public class JavaEntityClient implements EntityClient {
                 .append(throwable.getClass().getName())
                 .toString();
     }
+
 }

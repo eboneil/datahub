@@ -22,10 +22,13 @@ public class AspectAnnotation {
   private static final String IS_KEY_FIELD = "isKey";
   private static final String TIMESERIES_TYPE = "timeseries";
 
+  public static final String VALIDATOR_FIELD = "validator";
+
   String name;
   boolean isTimeseries;
   boolean autoRender;
   DataMap renderSpec;
+  String validator;
 
   @Nonnull
   public static AspectAnnotation fromSchemaProperty(
@@ -55,7 +58,8 @@ public class AspectAnnotation {
     boolean isTimeseries = type.isPresent() && type.get().equals(TIMESERIES_TYPE);
     Optional<Boolean> autoRender = AnnotationUtils.getField(map, AUTO_RENDER_FIELD, Boolean.class);
     Optional<DataMap> renderSpec = AnnotationUtils.getField(map, RENDER_SPEC_FIELD, DataMap.class);
+    Optional<String> validatorClass = AnnotationUtils.getField(map, VALIDATOR_FIELD, String.class);
 
-    return new AspectAnnotation(name.get(), isTimeseries, autoRender.orElseGet(() -> false), renderSpec.orElseGet(() -> null));
+    return new AspectAnnotation(name.get(), isTimeseries, autoRender.orElseGet(() -> false), renderSpec.orElseGet(() -> null), validatorClass.orElse(null));
   }
 }

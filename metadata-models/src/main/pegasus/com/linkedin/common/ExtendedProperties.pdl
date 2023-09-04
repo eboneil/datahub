@@ -1,0 +1,20 @@
+namespace com.linkedin.common
+
+/**
+ * Properties about an entity governed by ExtendedPropertyDefinition
+ */
+@Aspect = {
+   "name": "extendedProperties"
+   "validator": "com.linkedin.metadata.models.registry.validators.ExtendedPropertiesValidator"
+}
+record ExtendedProperties {
+  /**
+   * Custom property bag.
+   */
+  @Searchable = {
+    "/*": {
+      "queryByDefault": true
+    }
+  }
+  properties: map[string, ExtendedPropertyValueAssignment]
+}

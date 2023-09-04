@@ -130,7 +130,7 @@ public class StatefulTokenService extends StatelessTokenService {
             AspectUtils.getAdditionalChanges(proposal, _entityService).stream());
 
     _entityService.ingestProposal(AspectsBatchImpl.builder()
-            .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry())
+            .mcps(proposalStream.collect(Collectors.toList()), _entityService.getEntityRegistry(), _entityService)
             .build(), auditStamp, false);
 
     return accessToken;

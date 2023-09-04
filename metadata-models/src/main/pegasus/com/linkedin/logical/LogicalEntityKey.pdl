@@ -1,0 +1,8 @@
+namespace com.linkedin.logical
+
+@Aspect = {
+  "name": "logicalEntityKey"
+}
+record LogicalEntityKey {
+    id: string
+}

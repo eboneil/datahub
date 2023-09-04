@@ -1,0 +1,8 @@
+namespace com.linkedin.common
+
+@Aspect = {
+    "name": "extendedPropertyKey"
+}
+record ExtendedPropertyKey {
+    id: string
+}

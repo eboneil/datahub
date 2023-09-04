@@ -9,13 +9,16 @@ import com.linkedin.metadata.entity.EntityAspect;
 import com.linkedin.metadata.entity.EntityUtils;
 import com.linkedin.metadata.entity.transactions.AbstractBatchItem;
 import com.linkedin.metadata.entity.validation.ValidationUtils;
+import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectSpec;
 import com.linkedin.metadata.models.EntitySpec;
+import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
 import com.linkedin.metadata.utils.EntityKeyUtils;
 import com.linkedin.metadata.utils.GenericRecordUtils;
 import com.linkedin.mxe.MetadataChangeProposal;
 import com.linkedin.mxe.SystemMetadata;
+import java.lang.reflect.InvocationTargetException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,8 @@ public class UpsertBatchItem extends AbstractBatchItem {
     private final RecordTemplate aspect;
 
     private final MetadataChangeProposal metadataChangeProposal;
+
+    private final AspectRetriever aspectRetriever;
 
     // derived
     private final EntitySpec entitySpec;
@@ -78,13 +83,13 @@ public class UpsertBatchItem extends AbstractBatchItem {
             aspectSpec(ValidationUtils.validate(this.entitySpec, this.aspectName));
             log.debug("aspect spec = {}", this.aspectSpec);
 
-            ValidationUtils.validateRecordTemplate(entityRegistry, this.entitySpec, this.urn, this.aspect);
+            ValidationUtils.validateRecordTemplate(entityRegistry, this.entitySpec, this.aspectSpec, this.urn, this.aspect, this.aspectRetriever);
 
             return new UpsertBatchItem(this.urn, this.aspectName, AbstractBatchItem.generateSystemMetadataIfEmpty(this.systemMetadata),
-                    this.aspect, this.metadataChangeProposal, this.entitySpec, this.aspectSpec);
+                    this.aspect, this.metadataChangeProposal, this.aspectRetriever, this.entitySpec, this.aspectSpec);
         }
 
-        public static UpsertBatchItem build(MetadataChangeProposal mcp, EntityRegistry entityRegistry) {
+        public static UpsertBatchItem build(MetadataChangeProposal mcp, EntityRegistry entityRegistry, AspectRetriever aspectRetriever) {
             if (!mcp.getChangeType().equals(ChangeType.UPSERT)) {
                 throw new IllegalArgumentException("Invalid MCP, this class only supports change type of UPSERT.");
             }
@@ -98,6 +103,7 @@ public class UpsertBatchItem extends AbstractBatchItem {
                         + " for aspect " + mcp.getAspectName());
             }
 
+
             Urn urn = mcp.getEntityUrn();
             if (urn == null) {
                 urn = EntityKeyUtils.getUrnFromProposal(mcp, entitySpec.getKeyAspectSpec());
@@ -108,7 +114,8 @@ public class UpsertBatchItem extends AbstractBatchItem {
                     .aspectName(mcp.getAspectName())
                     .systemMetadata(mcp.getSystemMetadata())
                     .metadataChangeProposal(mcp)
-                    .aspect(convertToRecordTemplate(mcp, aspectSpec));
+                    .aspect(convertToRecordTemplate(mcp, aspectSpec))
+                    .aspectRetriever(aspectRetriever);
 
             return builder.build(entityRegistry);
         }

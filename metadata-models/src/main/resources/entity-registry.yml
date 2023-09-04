@@ -42,6 +42,7 @@ entities:
       - dataPlatformInstance
       - browsePathsV2
       - access
+      - extendedProperties
   - name: dataHubPolicy
     doc: DataHub Policies represent access policies granted to users or groups on metadata operations like edit, view etc.
     category: internal
@@ -450,5 +451,21 @@ entities:
     keyAspect: ownershipTypeKey
     aspects:
       - ownershipTypeInfo
+      - status
+  - name: logicalEntity
+    doc: Logical Entity represents a logical entity in a metamodel
+    category: core
+    keyAspect: logicalEntityKey
+    aspects:
+      - logicalEntityInfo
+      - institutionalMemory
+      - status
+  - name: extendedProperty
+    doc: Extended Property represents a property meant for extending the core model of a logical entity
+    category: core
+    keyAspect: extendedPropertyKey
+    aspects:
+      - propertyDefinition
+      - institutionalMemory
       - status
 events:

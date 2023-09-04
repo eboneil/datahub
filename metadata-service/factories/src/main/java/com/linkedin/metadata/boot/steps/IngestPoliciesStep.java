@@ -183,7 +183,7 @@ public class IngestPoliciesStep implements BootstrapStep {
     proposal.setChangeType(ChangeType.UPSERT);
 
     _entityService.ingestProposal(AspectsBatchImpl.builder()
-                    .mcps(List.of(keyAspectProposal, proposal), _entityRegistry)
+                    .mcps(List.of(keyAspectProposal, proposal), _entityRegistry, _entityService)
                     .build(),
             new AuditStamp().setActor(Urn.createFromString(Constants.SYSTEM_ACTOR)).setTime(System.currentTimeMillis()),
             false);
