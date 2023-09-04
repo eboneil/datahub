@@ -1,6 +1,12 @@
 namespace com.linkedin.common
 
 record ExtendedPropertyValueAssignment {
+
+  /**
+   * The property that is being assigned a value.
+   */
+  propertyUrn: Urn
+
   /**
    * The value assigned to the property.
    */

@@ -135,9 +135,14 @@ public class EntityUtils {
     Preconditions.checkState(aspectSpec != null, String.format("Aspect %s could not be found", aspectName));
     final RecordDataSchema aspectSchema = aspectSpec.getPegasusSchema();
     RecordTemplate aspectRecord = RecordUtils.toRecordTemplate(aspectSpec.getDataTemplateClass(), jsonAspect);
-    RecordTemplateValidator.validate(aspectRecord, validationFailure -> {
+    try {
+      RecordTemplateValidator.validate(aspectRecord, validationFailure -> {
+        log.warn(String.format("Failed to validate record %s against its schema.", aspectRecord));
+      });
+    } catch (Throwable t) {
       log.warn(String.format("Failed to validate record %s against its schema.", aspectRecord));
-    });
+      throw new RuntimeException(t);
+    }
     return aspectRecord;
   }
 

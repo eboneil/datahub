@@ -11,10 +11,5 @@ record ExtendedProperties {
   /**
    * Custom property bag.
    */
-  @Searchable = {
-    "/*": {
-      "queryByDefault": true
-    }
-  }
-  properties: map[string, ExtendedPropertyValueAssignment]
+  properties: array[ExtendedPropertyValueAssignment]
 }
