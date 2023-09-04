@@ -2,7 +2,6 @@ package com.linkedin.metadata.models.registry;
 
 import com.linkedin.common.urn.Urn;
 import com.linkedin.data.template.RecordTemplate;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 
 
