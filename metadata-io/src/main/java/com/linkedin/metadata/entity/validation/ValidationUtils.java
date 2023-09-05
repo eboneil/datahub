@@ -10,7 +10,6 @@ import com.linkedin.metadata.models.AspectValidationException;
 import com.linkedin.metadata.models.EntitySpec;
 import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
-import java.lang.reflect.InvocationTargetException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Consumer;
@@ -60,7 +59,8 @@ public class ValidationUtils {
     return aspectSpec;
   }
 
-  public static void validateRecordTemplate(EntityRegistry entityRegistry, EntitySpec entitySpec, AspectSpec aspectSpec, Urn urn, RecordTemplate aspect, AspectRetriever aspectRetriever) {
+  public static void validateRecordTemplate(EntityRegistry entityRegistry, EntitySpec entitySpec, AspectSpec aspectSpec,
+      Urn urn, RecordTemplate aspect, AspectRetriever aspectRetriever) {
     EntityRegistryUrnValidator validator = new EntityRegistryUrnValidator(entityRegistry);
     validator.setCurrentEntitySpec(entitySpec);
     Consumer<ValidationResult> resultFunction = validationResult -> {
