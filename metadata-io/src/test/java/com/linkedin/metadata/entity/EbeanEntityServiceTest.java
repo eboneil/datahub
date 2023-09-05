@@ -403,7 +403,7 @@ public class EbeanEntityServiceTest extends EntityServiceTest<EbeanAspectDao, Eb
           auditStamp.setActor(Urn.createFromString(Constants.DATAHUB_ACTOR));
           auditStamp.setTime(System.currentTimeMillis());
           AspectsBatchImpl batch = AspectsBatchImpl.builder()
-                  .mcps(mcps, entityService.getEntityRegistry())
+                  .mcps(mcps, entityService.getEntityRegistry(), entityService)
                   .build();
           entityService.ingestProposal(batch, auditStamp, false);
         }
