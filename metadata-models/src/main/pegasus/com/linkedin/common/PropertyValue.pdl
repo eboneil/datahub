@@ -1,6 +1,13 @@
 namespace com.linkedin.common
 
-typeref PropertyValue = union [
-    string,
-    double
-]
+record PropertyValue {
+    value: union [
+        string,
+        double
+    ]
+
+    /**
+    * Optional description of the property value
+    */
+    description: optional string
+}

@@ -2,7 +2,7 @@ import logging
 import os
 import tempfile
 from random import randint
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 
 import pytest
 import tenacity
@@ -14,7 +14,8 @@ from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from datahub.ingestion.sink.file import FileSink, FileSinkConfig
 from datahub.metadata.schema_classes import (
     ExtendedPropertiesClass, ExtendedPropertyDefinitionClass,
-    ExtendedPropertyValueAssignmentClass, LogicalEntityInfoClass)
+    ExtendedPropertyValueAssignmentClass, LogicalEntityInfoClass,
+    PropertyValueClass)
 
 from tests.utils import (delete_urns, delete_urns_from_file, get_gms_url,
                          get_sleep_info, ingest_file_via_rest,
@@ -103,6 +104,7 @@ def create_property_definition(
     graph: DataHubGraph,
     value_type: str = "STRING",
     cardinality: str = "SINGLE",
+    allowed_values: List[PropertyValueClass] = None,
 ):
     extended_property_definition = ExtendedPropertyDefinitionClass(
         fullyQualifiedName=f"io.acryl.privacy.{property_name}",
@@ -110,6 +112,7 @@ def create_property_definition(
         # description="The retention policy for the dataset",
         entityTypes=["urn:li:logicalEntity:dataset"],
         cardinality=cardinality,
+        allowedValues=allowed_values,
     )
 
     mcp = MetadataChangeProposalWrapper(
@@ -215,3 +218,40 @@ def test_extended_property_double_multiple(ingest_cleanup_data, graph):
     )
 
     attach_property_to_dataset(dataset_urns[0], property_name, [1.0, 2.0], graph=graph)
+
+
+@tenacity.retry(
+    stop=tenacity.stop_after_attempt(sleep_times), wait=tenacity.wait_fixed(sleep_sec)
+)
+@pytest.mark.dependency(depends=["test_healthchecks"])
+def test_extended_property_string_allowed_values(ingest_cleanup_data, graph):
+    property_name = "enumProperty"
+    generated_urns.append(f"urn:li:extendedProperty:{property_name}")
+
+    create_property_definition(
+        property_name,
+        graph,
+        value_type="STRING",
+        cardinality="MULTIPLE",
+        allowed_values=[
+            PropertyValueClass(value="foo"),
+            PropertyValueClass(value="bar"),
+        ],
+    )
+
+    attach_property_to_dataset(
+        dataset_urns[0], property_name, ["foo", "bar"], graph=graph
+    )
+
+    try:
+        attach_property_to_dataset(
+            dataset_urns[0], property_name, ["foo", "baz"], graph=graph
+        )
+        raise AssertionError(
+            "Should not be able to attach a value not in allowed values"
+        )
+    except Exception as e:
+        if not isinstance(e, AssertionError):
+            raise e
+        else:
+            pass
