@@ -105,7 +105,7 @@ public class TestUtils {
 
   public static void verifyIngestProposal(EntityService mockService, int numberOfInvocations, List<MetadataChangeProposal> proposals) {
     AspectsBatchImpl batch = AspectsBatchImpl.builder()
-              .mcps(proposals, mockService.getEntityRegistry())
+              .mcps(proposals, mockService.getEntityRegistry(), mockService)
               .build();
       Mockito.verify(mockService, Mockito.times(numberOfInvocations)).ingestProposal(
               Mockito.eq(batch),

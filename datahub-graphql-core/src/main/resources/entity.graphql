@@ -1407,6 +1407,11 @@ type Dataset implements EntityWithRelationships & Entity & BrowsableEntity {
     Whether or not this entity exists on DataHub
     """
     exists: Boolean
+
+    """
+    Extended properties about this Dataset
+    """
+    extendedProperties: [ExtendedPropertiesEntry!]
 }
 
 type RoleAssociation {
@@ -11164,4 +11169,21 @@ input UpdateOwnershipTypeInput {
     The description of the Custom Ownership Type
     """
     description: String
+}
+
+
+"""
+An entry in an extended properties list represented as a tuple
+"""
+type ExtendedPropertiesEntry {
+    """
+    The key of the map entry
+    """
+    key: String!
+
+    """
+    The value of the map entry
+    """
+    value: String
+
 }

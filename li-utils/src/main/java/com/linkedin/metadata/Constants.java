@@ -126,6 +126,8 @@ public class Constants {
   public static final String VIEW_PROPERTIES_ASPECT_NAME = "viewProperties";
   public static final String DATASET_PROFILE_ASPECT_NAME = "datasetProfile";
 
+  public static final String EXTENDED_PROPERTIES_ASPECT_NAME = "extendedProperties";
+
   // Chart
   public static final String CHART_KEY_ASPECT_NAME = "chartKey";
   public static final String CHART_INFO_ASPECT_NAME = "chartInfo";
