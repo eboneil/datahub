@@ -78,9 +78,4 @@ record GlossaryTermInfo includes CustomProperties {
   @deprecated
   rawSchema: optional string
 
-  /**
-   * Value type definition of the glossary term if applicable
-   */
-  valueType: optional PrimitiveValueDataType
-
 }

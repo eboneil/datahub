@@ -25,8 +25,4 @@ record GlossaryTermAssociation {
    */
   context: optional string
 
-  /**
-    * Optional value of the term, for terms that can carry a value
-    */
-  value: optional union[string, int]
 }
