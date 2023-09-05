@@ -9,7 +9,6 @@ import com.linkedin.data.template.RecordTemplate;
 import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectValidationException;
 import com.linkedin.metadata.models.registry.AspectRetriever;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
