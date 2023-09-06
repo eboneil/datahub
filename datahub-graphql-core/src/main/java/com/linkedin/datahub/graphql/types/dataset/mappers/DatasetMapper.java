@@ -6,6 +6,7 @@ import com.linkedin.common.DataPlatformInstance;
 import com.linkedin.common.Deprecation;
 import com.linkedin.common.Embed;
 import com.linkedin.common.ExtendedProperties;
+import com.linkedin.common.ExtendedPropertyValueAssignment;
 import com.linkedin.common.GlobalTags;
 import com.linkedin.common.GlossaryTerms;
 import com.linkedin.common.InstitutionalMemory;
@@ -21,6 +22,7 @@ import com.linkedin.datahub.graphql.generated.Dataset;
 import com.linkedin.datahub.graphql.generated.DatasetEditableProperties;
 import com.linkedin.datahub.graphql.generated.EntityType;
 import com.linkedin.datahub.graphql.generated.ExtendedPropertiesEntry;
+import com.linkedin.datahub.graphql.generated.ExtendedPropertyEntity;
 import com.linkedin.datahub.graphql.generated.FabricType;
 import com.linkedin.datahub.graphql.types.common.mappers.BrowsePathsV2Mapper;
 import com.linkedin.datahub.graphql.types.common.mappers.DataPlatformInstanceAspectMapper;
@@ -118,16 +120,7 @@ public class DatasetMapper implements ModelMapper<EntityResponse, Dataset> {
             dataset.setBrowsePathV2(BrowsePathsV2Mapper.map(new BrowsePathsV2(dataMap))));
         mappingHelper.mapToResult(ACCESS_DATASET_ASPECT_NAME, ((dataset, dataMap) ->
                 dataset.setAccess(AccessMapper.map(new Access(dataMap), entityUrn))));
-        mappingHelper.mapToResult(EXTENDED_PROPERTIES_ASPECT_NAME, ((dataset, dataMap) -> {
-            ExtendedProperties extendedProperties = new ExtendedProperties(dataMap);
-            List<ExtendedPropertiesEntry> extendedPropertiesList =
-            extendedProperties.getProperties()
-                .stream()
-                .map(assignment -> ExtendedPropertiesEntry.builder().setKey(assignment.getPropertyUrn().toString())
-                    .setValue(assignment.getValue().toString()).build())
-                .collect(Collectors.toList());
-            dataset.setExtendedProperties(extendedPropertiesList);
-        }));
+        mappingHelper.mapToResult(EXTENDED_PROPERTIES_ASPECT_NAME, (this::mapExtendedProperties));
         return mappingHelper.getResult();
     }
 
@@ -211,4 +204,25 @@ public class DatasetMapper implements ModelMapper<EntityResponse, Dataset> {
         final Domains domains = new Domains(dataMap);
         dataset.setDomain(DomainAssociationMapper.map(domains, dataset.getUrn()));
     }
+
+    private void mapExtendedProperties(@Nonnull Dataset dataset, @Nonnull DataMap dataMap) {
+        ExtendedProperties extendedProperties = new ExtendedProperties(dataMap);
+        List<ExtendedPropertiesEntry> extendedPropertiesList =
+        extendedProperties.getProperties()
+            .stream()
+            .map(assignment -> ExtendedPropertiesEntry.builder()
+                .setExtendedProperty(createExtendedPropertyEntity(assignment))
+                .setValue(assignment.getValue().toString()).build())
+            .collect(Collectors.toList());
+        dataset.setExtendedProperties(extendedPropertiesList);
+    }
+
+    private ExtendedPropertyEntity createExtendedPropertyEntity(ExtendedPropertyValueAssignment assignment) {
+        ExtendedPropertyEntity entity = new ExtendedPropertyEntity();
+        entity.setUrn(assignment.getPropertyUrn().toString());
+        entity.setType(EntityType.EXTENDED_PROPERTY);
+        return entity;
+    }
+
+
 }
