@@ -1,11 +1,9 @@
 package com.linkedin.metadata.models.registry.validators;
 
 import com.linkedin.common.ExtendedPropertyDefinition;
-import com.linkedin.common.urn.Urn;
 import com.linkedin.data.template.RecordTemplate;
 import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectValidationException;
-import com.linkedin.metadata.models.registry.AspectRetriever;
 
 import static com.linkedin.common.PropertyCardinality.*;
 
