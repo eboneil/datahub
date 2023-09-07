@@ -6,6 +6,7 @@
 ```yaml
 - id: io.acryl.privacy.retentionTime
   # urn: urn:li:extendedProperty:<>
+  # fullyQualifiedName: io.acryl.privacy.retentionTime
   type: STRING
   cardinality: MULTIPLE
   entityTypes:
@@ -19,8 +20,17 @@
       description: Use this for datasets that drive monthly reporting but contain pii
     - value: 2 yrs
       description: Use this for non-sensitive data that can be retained for longer
-- id: <>
-  ..
+- id: io.acryl.dataManagement.replicationSLA
+  type: NUMBER
+  description: "SLA for how long data can be delayed before replicating to the destination cluster"
+  entityTypes:
+    - dataset
+- id: io.acryl.dataManagement.deprecationDate
+  type: DATE
+  entityTypes:
+    - dataset
+    - dataFlow
+    - dataJob
 ```
 
 

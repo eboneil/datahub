@@ -98,6 +98,10 @@ def test_healthchecks(wait_for_healthchecks):
     # Call to wait_for_healthchecks fixture will do the actual functionality.
     pass
 
+def make_logical_type_urn(type: str) -> str:
+    if not type.startswith("urn:li:logicalType:"):
+        return f"urn:li:logicalType:{type}"
+    return type
 
 def create_property_definition(
     property_name: str,
@@ -108,8 +112,8 @@ def create_property_definition(
 ):
     extended_property_definition = ExtendedPropertyDefinitionClass(
         fullyQualifiedName=f"io.acryl.privacy.{property_name}",
-        valueType=value_type,
-        # description="The retention policy for the dataset",
+        valueType=make_logical_type_urn(value_type),
+        description="The retention policy for the dataset",
         entityTypes=["urn:li:logicalEntity:dataset"],
         cardinality=cardinality,
         allowedValues=allowed_values,
@@ -252,6 +256,41 @@ def test_extended_property_string_allowed_values(ingest_cleanup_data, graph):
         )
     except Exception as e:
         if not isinstance(e, AssertionError):
+            raise e
+        else:
+            pass
+
+
+@pytest.mark.dependency(depends=["test_healthchecks"])
+def test_extended_property_definition_evolution(ingest_cleanup_data, graph):
+    property_name = "enumProperty1234"
+
+    create_property_definition(
+        property_name,
+        graph,
+        value_type="STRING",
+        cardinality="MULTIPLE",
+        allowed_values=[
+            PropertyValueClass(value="foo"),
+            PropertyValueClass(value="bar"),
+        ],
+    )
+    generated_urns.append(f"urn:li:extendedProperty:{property_name}")
+
+    try:
+        create_property_definition(
+            property_name,
+            graph,
+            value_type="STRING",
+            cardinality="SINGLE",
+            allowed_values=[
+                PropertyValueClass(value="foo"),
+                PropertyValueClass(value="bar"),
+            ],
+        )
+        raise AssertionError("Should not be able to change cardinality from MULTIPLE to SINGLE")
+    except Exception as e:
+        if isinstance(e, AssertionError):
             raise e
         else:
             pass

@@ -45,6 +45,7 @@ import com.linkedin.metadata.entity.retention.BulkApplyRetentionResult;
 import com.linkedin.metadata.entity.transactions.AspectsBatch;
 import com.linkedin.metadata.event.EventProducer;
 import com.linkedin.metadata.models.AspectSpec;
+import com.linkedin.metadata.models.AspectValidationException;
 import com.linkedin.metadata.models.EntitySpec;
 import com.linkedin.metadata.models.RelationshipFieldSpec;
 import com.linkedin.metadata.models.registry.AspectRetriever;
@@ -573,24 +574,42 @@ public class EntityServiceImpl implements EntityService, AspectRetriever {
       // read #2
       Map<String, Map<String, Long>> nextVersions = _aspectDao.getNextVersions(urnAspects);
 
-      List<UpsertBatchItem> items = aspectsBatch.getItems().stream()
+
+      List<Pair<UpsertBatchItem, EntityAspect>> items = aspectsBatch.getItems().stream()
               .map(item -> {
+                // get latest aspect for this item
+                final EntityAspect latest = latestAspects.getOrDefault(item.getUrn().toString(), Map.of())
+                    .get(item.getAspectName());
                 if (item instanceof UpsertBatchItem) {
-                  return (UpsertBatchItem) item;
+                  return Pair.of((UpsertBatchItem) item, latest);
                 } else {
                   // patch to upsert
                   PatchBatchItem patchBatchItem = (PatchBatchItem) item;
-                  final String urnStr = patchBatchItem.getUrn().toString();
-                  final EntityAspect latest = latestAspects.getOrDefault(urnStr, Map.of()).get(patchBatchItem.getAspectName());
                   final RecordTemplate currentValue = latest != null
                           ? EntityUtils.toAspectRecord(patchBatchItem.getUrn(), patchBatchItem.getAspectName(), latest.getMetadata(), _entityRegistry) : null;
-                  return patchBatchItem.applyPatch(_entityRegistry, currentValue);
+                  return Pair.of(patchBatchItem.applyPatch(_entityRegistry, currentValue), latest);
                 }
               })
               .collect(Collectors.toList());
 
+      // do final pre-commit checks with previous aspect value
+      items.forEach(i -> {
+        UpsertBatchItem item = i.getFirst();
+        EntityAspect previousAspectRaw = i.getSecond();
+        try {
+          item.validatePrecommit(i.getSecond(), previousAspect -> {
+            final RecordTemplate currentValue = previousAspect != null
+                ? EntityUtils.toAspectRecord(item.getUrn(), item.getAspectName(), previousAspectRaw.getMetadata(), _entityRegistry) : null;
+            return currentValue;
+          });
+        } catch (AspectValidationException e) {
+          throw new RuntimeException(e);
+        }
+      });
+
       // Database Upsert results
       List<UpdateAspectResult> upsertResults = items.stream()
+              .map(itemPair -> itemPair.getFirst())
               .map(item -> {
                 final String urnStr = item.getUrn().toString();
                 final EntityAspect latest = latestAspects.getOrDefault(urnStr, Map.of()).get(item.getAspectName());

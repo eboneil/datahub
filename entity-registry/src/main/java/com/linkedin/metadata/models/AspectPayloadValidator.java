@@ -19,4 +19,8 @@ public interface AspectPayloadValidator {
       return true;
   }
 
+  default boolean validatePreCommit(RecordTemplate previousAspect, RecordTemplate proposedAspect) throws AspectValidationException {
+    return true;
+  };
+
 }

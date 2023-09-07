@@ -50,34 +50,29 @@ public class ExtendedPropertiesValidator implements AspectPayloadValidator {
         }
         // Check types
         for (ExtendedPropertyValueAssignment value: values) {
-          switch (extendedPropertyDefinition.getValueType()) {
-            case STRING:
-            case MARKDOWN: {
+          Urn valueType = extendedPropertyDefinition.getValueType();
+          if (valueType.getId().equals("STRING") || valueType.getId().equals("RICH_TEXT")) {
               log.debug("Property definition demands a string value. {}, {}", value.getValue().isString(),
                   value.getValue().isDouble());
               if (!value.getValue().isString()) {
                 throw new AspectValidationException(
                     "Property: " + property + ", value: " + value.getValue().toString() + " should be a string");
               }
-              break;
+          } else if (valueType.getId().equals("NUMBER")) {
+            log.debug("Property definition demands a numeric value. {}, {}", value.getValue().isString(),
+                value.getValue().isDouble());
+            if (!value.getValue().isDouble()) {
+              throw new AspectValidationException(
+                  "Property: " + property + ", value: " + value.getValue().toString() + " should be a number");
             }
-            case NUMBER: {
-              log.debug("Property definition demands a numeric value. {}, {}", value.getValue().isString(),
-                  value.getValue().isDouble());
-              if (!value.getValue().isDouble()) {
-                throw new AspectValidationException(
-                    "Property: " + property + ", value: " + value.getValue().toString() + " should be a number");
-              }
-              break;
-            }
-            default: {
+          } else {
               throw new AspectValidationException(
                   "Validation support for type " + extendedPropertyDefinition.getValueType() + " is not yet implemented.");
             }
-          }
         }
       }
     }
     return true;
   }
+
 }

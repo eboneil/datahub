@@ -1,7 +1,8 @@
 namespace com.linkedin.common
 
 @Aspect = {
-   "name": "propertyDefinition"
+   "name": "propertyDefinition",
+   "validator": "com.linkedin.metadata.models.registry.validators.PropertyDefinitionValidator"
 }
 record ExtendedPropertyDefinition {
 
@@ -16,17 +17,9 @@ record ExtendedPropertyDefinition {
     fullyQualifiedName: string
 
     /**
-    * The value type of the property.
+    * The value type of the property. Must be a logicalType
     */
-    valueType: enum PropertyValueType {
-        STRING
-        
-        DATE
-        
-        MARKDOWN
-        
-        NUMBER
-    }
+    valueType: Urn
 
     /**
     * A list of allowed values that the property is allowed to take. 
@@ -50,6 +43,11 @@ record ExtendedPropertyDefinition {
       }
     }
     entityTypes: array[Urn]
+
+    /**
+    * The description of the property. This is the description that will be shown in the UI.
+    */
+    description: optional string
 
 }
 

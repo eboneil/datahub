@@ -9,7 +9,9 @@ import com.linkedin.metadata.entity.EntityAspect;
 import com.linkedin.metadata.entity.EntityUtils;
 import com.linkedin.metadata.entity.transactions.AbstractBatchItem;
 import com.linkedin.metadata.entity.validation.ValidationUtils;
+import com.linkedin.metadata.models.AspectPayloadValidator;
 import com.linkedin.metadata.models.AspectSpec;
+import com.linkedin.metadata.models.AspectValidationException;
 import com.linkedin.metadata.models.EntitySpec;
 import com.linkedin.metadata.models.registry.AspectRetriever;
 import com.linkedin.metadata.models.registry.EntityRegistry;
@@ -17,6 +19,7 @@ import com.linkedin.metadata.utils.EntityKeyUtils;
 import com.linkedin.metadata.utils.GenericRecordUtils;
 import com.linkedin.mxe.MetadataChangeProposal;
 import com.linkedin.mxe.SystemMetadata;
+import java.util.function.Function;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,8 @@ public class UpsertBatchItem extends AbstractBatchItem {
 
     private final AspectRetriever aspectRetriever;
 
+    private final AspectPayloadValidator aspectValidator;
+
     // derived
     private final EntitySpec entitySpec;
     private final AspectSpec aspectSpec;
@@ -69,7 +74,16 @@ public class UpsertBatchItem extends AbstractBatchItem {
         return latest;
     }
 
+    public void validatePrecommit(EntityAspect second, Function<EntityAspect, RecordTemplate> aspectDeserializer)
+        throws AspectValidationException {
+        if (this.aspectValidator != null) {
+            this.aspectValidator.validatePreCommit(aspectDeserializer.apply(second), this.aspect);
+        }
+    }
+
     public static class UpsertBatchItemBuilder {
+
+        private AspectPayloadValidator aspectPayloadValidator = null;
 
         public UpsertBatchItem build(EntityRegistry entityRegistry) {
             EntityUtils.validateUrn(entityRegistry, this.urn);
@@ -82,9 +96,17 @@ public class UpsertBatchItem extends AbstractBatchItem {
             log.debug("aspect spec = {}", this.aspectSpec);
 
             ValidationUtils.validateRecordTemplate(entityRegistry, this.entitySpec, this.aspectSpec, this.urn, this.aspect, this.aspectRetriever);
-
+            if (aspectSpec != null && aspectSpec.getAspectPayloadValidator() != null) {
+                try {
+                    this.aspectPayloadValidator =
+                        aspectSpec.getAspectPayloadValidator();
+                    aspectPayloadValidator.validateAspectUpsert(urn, aspect, aspectSpec.getName(), aspectRetriever);
+                } catch (AspectValidationException e) {
+                    throw new IllegalArgumentException("Failed to validate aspect due to: " + e.getMessage(), e);
+                }
+            }
             return new UpsertBatchItem(this.urn, this.aspectName, AbstractBatchItem.generateSystemMetadataIfEmpty(this.systemMetadata),
-                    this.aspect, this.metadataChangeProposal, this.aspectRetriever, this.entitySpec, this.aspectSpec);
+                    this.aspect, this.metadataChangeProposal, this.aspectRetriever, aspectPayloadValidator, this.entitySpec, this.aspectSpec);
         }
 
         public static UpsertBatchItem build(MetadataChangeProposal mcp, EntityRegistry entityRegistry, AspectRetriever aspectRetriever) {

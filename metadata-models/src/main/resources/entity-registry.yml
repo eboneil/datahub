@@ -453,11 +453,19 @@ entities:
       - ownershipTypeInfo
       - status
   - name: logicalEntity
-    doc: Logical Entity represents a logical entity in a metamodel
+    doc: Logical Entity represents a logical entity in a data model
     category: core
     keyAspect: logicalEntityKey
     aspects:
       - logicalEntityInfo
+      - institutionalMemory
+      - status
+  - name: logicalType
+    doc: Logical Type represents a logical type in a data model
+    category: core
+    keyAspect: logicalTypeKey
+    aspects:
+      - logicalTypeInfo
       - institutionalMemory
       - status
   - name: extendedProperty

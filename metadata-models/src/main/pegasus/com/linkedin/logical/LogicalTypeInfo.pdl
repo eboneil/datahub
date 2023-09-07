@@ -1,0 +1,16 @@
+namespace com.linkedin.logical
+
+@Aspect = {
+    "name": "logicalTypeInfo"
+}
+record LogicalTypeInfo {
+
+    fullyQualifiedName: string
+
+    displayName: optional string
+
+    description: optional string
+
+    jsonSchema: optional string
+
+}
