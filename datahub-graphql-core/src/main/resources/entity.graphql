@@ -11211,6 +11211,15 @@ type ExtendedPropertyDefinition {
     displayName: String!
 }
 
+type StringValue {
+    stringValue: String!
+}
+
+type FloatValue {
+    floatValue: Float!
+}
+
+union PropertyValue = StringValue | FloatValue
 
 """
 An entry in an extended properties list represented as a tuple
@@ -11224,5 +11233,5 @@ type ExtendedPropertiesEntry {
     """
     The value of the extended property for this entity
     """
-    value: String
+    value: PropertyValue!
 }

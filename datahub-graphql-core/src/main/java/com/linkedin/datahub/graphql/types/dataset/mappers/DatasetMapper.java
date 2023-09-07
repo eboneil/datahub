@@ -24,6 +24,8 @@ import com.linkedin.datahub.graphql.generated.EntityType;
 import com.linkedin.datahub.graphql.generated.ExtendedPropertiesEntry;
 import com.linkedin.datahub.graphql.generated.ExtendedPropertyEntity;
 import com.linkedin.datahub.graphql.generated.FabricType;
+import com.linkedin.datahub.graphql.generated.FloatValue;
+import com.linkedin.datahub.graphql.generated.StringValue;
 import com.linkedin.datahub.graphql.types.common.mappers.BrowsePathsV2Mapper;
 import com.linkedin.datahub.graphql.types.common.mappers.DataPlatformInstanceAspectMapper;
 import com.linkedin.datahub.graphql.types.common.mappers.DeprecationMapper;
@@ -210,11 +212,20 @@ public class DatasetMapper implements ModelMapper<EntityResponse, Dataset> {
         List<ExtendedPropertiesEntry> extendedPropertiesList =
         extendedProperties.getProperties()
             .stream()
-            .map(assignment -> ExtendedPropertiesEntry.builder()
-                .setExtendedProperty(createExtendedPropertyEntity(assignment))
-                .setValue(assignment.getValue().toString()).build())
+            .map(this::mapExtendedProperty)
             .collect(Collectors.toList());
         dataset.setExtendedProperties(extendedPropertiesList);
+    }
+
+    private ExtendedPropertiesEntry mapExtendedProperty(ExtendedPropertyValueAssignment valueAssignment) {
+        ExtendedPropertiesEntry entry = new ExtendedPropertiesEntry();
+        entry.setExtendedProperty(createExtendedPropertyEntity(valueAssignment));
+         if (valueAssignment.getValue().isString()) {
+            entry.setValue(new StringValue(valueAssignment.getValue().getString()));
+         } else if (valueAssignment.getValue().isDouble()) {
+            entry.setValue(new FloatValue(valueAssignment.getValue().getDouble()));
+        }
+        return entry;
     }
 
     private ExtendedPropertyEntity createExtendedPropertyEntity(ExtendedPropertyValueAssignment assignment) {

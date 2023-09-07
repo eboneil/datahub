@@ -235,7 +235,14 @@ fragment nonRecursiveDatasetFields on Dataset {
                 displayName
             }
         }
-        value
+        value {
+            ... on StringValue {
+                stringValue
+            }
+            ... on FloatValue {
+                floatValue
+            }
+        }
     }
     editableProperties {
         description
