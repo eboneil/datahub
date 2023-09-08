@@ -1,15 +1,15 @@
 import json
 import logging
-import os
 from pathlib import Path
-import pathlib
 
 import click
 from click_default_group import DefaultGroup
-from datahub import upgrade, telemetry
+
+from datahub import telemetry
 from datahub.api.entities.dataset.dataset import Dataset
-from datahub.cli.specific.file_loader import load_file
 from datahub.ingestion.graph.client import get_default_graph
+from datahub.telemetry import telemetry
+from datahub.upgrade import upgrade
 
 logger = logging.getLogger(__name__)
 
@@ -20,42 +20,16 @@ def dataset() -> None:
     pass
 
 
-# def mutate(file: Path, upsert: bool) -> None:
-#     """Update or Upsert a Dataset in DataHub"""
-
-#     config_dict = load_file(pathlib.Path(file))
-#     id = config_dict.get("id") if isinstance(config_dict, dict) else None
-#     with get_default_graph() as graph:
-#         dataset: Dataset = Dataset.from_yaml(file)
-#         if upsert and not graph.exists(dataset.urn):
-#             logger.info(f"Dataset {dataset.urn} does not exist, will create.")
-#             upsert = False
-
-#         try:
-#             for mcp in dataset.generate_mcp(upsert=upsert):
-#                 graph.emit(mcp)
-#             click.secho(f"Update succeeded for urn {dataset.urn}.", fg="green")
-#         except Exception as e:
-#             click.secho(
-#                 f"Update failed for id {id}. due to {e}",
-#                 fg="red",
-#             )
-
-
 @dataset.command(
     name="upsert",
 )
 @click.option("-f", "--file", required=True, type=click.Path(exists=True))
-@click.option(
-    "--validate-assets/--no-validate-assets", required=False, is_flag=True, default=True
-)
-@click.option("--external-url", required=False, type=str)
 @upgrade.check_upgrade
 @telemetry.with_telemetry()
 def upsert(file: Path) -> None:
     """Upsert attributes to a Dataset in DataHub."""
 
-    Dataset.create(file, upsert=True)
+    Dataset.create(file)
 
 
 @dataset.command(

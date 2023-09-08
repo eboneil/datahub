@@ -1,9 +1,15 @@
-from pathlib import Path
+import logging
+
 from typing import List, Optional
-from datahub.ingestion.graph.client import DataHubGraph
-from ruamel.yaml import YAML
+from datahub.emitter.mcp import MetadataChangeProposalWrapper
+from datahub.ingestion.graph.client import DataHubGraph, get_default_graph
+from datahub.metadata.schema_classes import ExtendedPropertyDefinitionClass
 
 from datahub.configuration.common import ConfigModel
+import yaml
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class ExtendedProperties(ConfigModel):
@@ -11,10 +17,10 @@ class ExtendedProperties(ConfigModel):
     id: Optional[str] = None
     fully_qualified_name: Optional[str] = None
     type: Optional[str] = None
-    cardinality: Optional[str] = None
+    description: Optional[str] = None
     display_name: Optional[str] = None
     entity_types: Optional[List[str]] = None
-    description: Optional[str] = None
+    cardinality: Optional[str] = None
     allowed_values: Optional[dict] = None
 
     property
@@ -23,15 +29,31 @@ class ExtendedProperties(ConfigModel):
             return self.id
         else:
             return f"urn:li:extendedProperty:{self.id}"
+        
+    def make_logical_type_urn(type: str) -> str:
+        if not type.startswith("urn:li:logicalType:"):
+            return f"urn:li:logicalType:{type}"
+        return type
 
-    @classmethod
-    def from_yaml(
-        cls,
-        file: Path,
-    ) -> "ExtendedProperties":
-        with open(file) as fp:
-            yaml = YAML(typ="rt")  # default, if not specfied, is 'rt' (round-trip)
-            orig_dictionary = yaml.load(fp)
-            parsed_extended_properties = ExtendedProperties.parse_obj_allow_extras(orig_dictionary)
-            parsed_extended_properties._original_yaml_dict = orig_dictionary
-            return parsed_extended_properties
+    def create(file: str):
+        emitter: DataHubGraph
+        with get_default_graph() as emitter:
+            with open(file, "r") as fp:
+                extendedproperties: List[dict] = yaml.safe_load(fp)
+                for extendedproperty in extendedproperties:
+                    extendedproperty = ExtendedProperties.parse_obj(extendedproperty)
+                    mcp = MetadataChangeProposalWrapper(
+                        entityUrn=extendedproperty.urn,
+                        aspect=ExtendedPropertyDefinitionClass(
+                            fullyQualifiedName=extendedproperty.fully_qualified_name,
+                            valueType=ExtendedProperties.make_logical_type_urn(extendedproperty.type),
+                            displayName=extendedproperty.display_name,
+                            description=extendedproperty.description,
+                            entity_types=extendedproperty.entity_types,
+                            cardinality=extendedproperty.cardinality,
+                            allowedValues=extendedproperty.allowed_values,
+                        ),
+                    )
+                    emitter.emit_mcp(mcp)
+
+                    logger.info(f"Created extended property {extendedproperty.urn}")
