@@ -388,7 +388,7 @@ def add_asset(urn: str, asset: str, validate_assets: bool) -> None:
             graph.emit(mcp)
 
 
-@dataproduct.command(name="remove_asset", help="Add an asset to a Data Product")
+@dataproduct.command(name="remove_asset", help="Remove an asset from a Data Product")
 @click.option("--urn", required=True, type=str)
 @click.option("--asset", required=True, type=str)
 @click.option(
