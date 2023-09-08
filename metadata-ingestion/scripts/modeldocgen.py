@@ -83,6 +83,7 @@ class AspectDefinition:
     EntityUrns: Optional[List[str]] = None
     schema: Optional[avro.schema.Schema] = None
     type: Optional[str] = None
+    validator: Optional[str] = None
 
 
 @dataclass
