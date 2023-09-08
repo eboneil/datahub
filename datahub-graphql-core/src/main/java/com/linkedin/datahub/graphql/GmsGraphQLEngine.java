@@ -52,6 +52,7 @@ import com.linkedin.datahub.graphql.generated.Domain;
 import com.linkedin.datahub.graphql.generated.EntityPath;
 import com.linkedin.datahub.graphql.generated.EntityRelationship;
 import com.linkedin.datahub.graphql.generated.EntityRelationshipLegacy;
+import com.linkedin.datahub.graphql.generated.ExtendedPropertiesEntry;
 import com.linkedin.datahub.graphql.generated.ForeignKeyConstraint;
 import com.linkedin.datahub.graphql.generated.GetRootGlossaryNodesResult;
 import com.linkedin.datahub.graphql.generated.GetRootGlossaryTermsResult;
@@ -246,6 +247,7 @@ import com.linkedin.datahub.graphql.resolvers.type.AspectInterfaceTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.type.EntityInterfaceTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.type.HyperParameterValueTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.type.PlatformSchemaUnionTypeResolver;
+import com.linkedin.datahub.graphql.resolvers.type.PropertyValueResolver;
 import com.linkedin.datahub.graphql.resolvers.type.ResultsTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.type.TimeSeriesAspectInterfaceTypeResolver;
 import com.linkedin.datahub.graphql.resolvers.user.CreateNativeUserResetTokenResolver;
@@ -281,6 +283,7 @@ import com.linkedin.datahub.graphql.types.dataset.DatasetType;
 import com.linkedin.datahub.graphql.types.dataset.VersionedDatasetType;
 import com.linkedin.datahub.graphql.types.dataset.mappers.DatasetProfileMapper;
 import com.linkedin.datahub.graphql.types.domain.DomainType;
+import com.linkedin.datahub.graphql.types.extendedproperty.ExtendedPropertyType;
 import com.linkedin.datahub.graphql.types.rolemetadata.RoleType;
 import com.linkedin.datahub.graphql.types.glossary.GlossaryNodeType;
 import com.linkedin.datahub.graphql.types.glossary.GlossaryTermType;
@@ -433,6 +436,7 @@ public class GmsGraphQLEngine {
     private final QueryType queryType;
     private final DataProductType dataProductType;
     private final OwnershipType ownershipType;
+    private final ExtendedPropertyType extendedPropertyType;
 
     /**
      * A list of GraphQL Plugins that extend the core engine
@@ -542,6 +546,7 @@ public class GmsGraphQLEngine {
         this.queryType = new QueryType(entityClient);
         this.dataProductType = new DataProductType(entityClient);
         this.ownershipType = new OwnershipType(entityClient);
+        this.extendedPropertyType = new ExtendedPropertyType(entityClient);
 
         // Init Lists
         this.entityTypes = ImmutableList.of(
@@ -576,7 +581,8 @@ public class GmsGraphQLEngine {
             dataHubViewType,
             queryType,
             dataProductType,
-            ownershipType
+            ownershipType,
+            extendedPropertyType
         );
         this.loadableTypes = new ArrayList<>(entityTypes);
         // Extend loadable types with types from the plugins
@@ -1107,6 +1113,10 @@ public class GmsGraphQLEngine {
             .type("Owner", typeWiring -> typeWiring
                 .dataFetcher("ownershipType", new EntityTypeResolver(entityTypes,
                     (env) -> ((Owner) env.getSource()).getOwnershipType()))
+            )
+            .type("ExtendedPropertiesEntry", typeWiring -> typeWiring
+                .dataFetcher("extendedProperty", new LoadableTypeResolver<>(extendedPropertyType,
+                    (env) -> ((ExtendedPropertiesEntry) env.getSource()).getExtendedProperty().getUrn()))
             );
     }
 
@@ -1459,6 +1469,9 @@ public class GmsGraphQLEngine {
             )
             .type("HyperParameterValueType", typeWiring -> typeWiring
                 .typeResolver(new HyperParameterValueTypeResolver())
+            )
+            .type("PropertyValue", typeWiring -> typeWiring
+                .typeResolver(new PropertyValueResolver())
             )
             .type("Aspect", typeWiring -> typeWiring.typeResolver(new AspectInterfaceTypeResolver()))
             .type("TimeSeriesAspect", typeWiring -> typeWiring
