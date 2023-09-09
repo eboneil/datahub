@@ -3,8 +3,8 @@
   platform: hive
   # urn: urn:li:dataset:(urn:li:dataPlatform:hive,clicks,PROD) # use urn instead of id and platform
   subtype: table
-  # schema:
-  #   file: click_event.avsc
+  schema:
+    file: examples/extended_properties/click_event.avsc
   properties:
     retention: 365
   extended_properties:
@@ -24,7 +24,7 @@
     namespace: org.acryl.tracking
     version: 1.0.0
     retention: 30
-  # schema:
-  #   file: click_event.avsc
+  schema:
+    file: examples/extended_properties/click_event.avsc
   downstreams:
     - urn:li:dataset:(urn:li:dataPlatform:hive,clicks,PROD)
