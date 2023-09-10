@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from click_default_group import DefaultGroup
 
-from datahub import telemetry
+from datahub.telemetry import telemetry
 from datahub.api.entities.dataset.dataset import Dataset
 from datahub.ingestion.graph.client import get_default_graph
 from datahub.upgrade import upgrade

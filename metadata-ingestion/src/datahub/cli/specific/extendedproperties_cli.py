@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from click_default_group import DefaultGroup
 
-from datahub import telemetry
+from datahub.telemetry import telemetry
 from datahub.api.entities.extendedproperties.extendedproperties import (
     ExtendedProperties,
 )
