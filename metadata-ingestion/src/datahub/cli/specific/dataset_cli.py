@@ -8,7 +8,6 @@ from click_default_group import DefaultGroup
 from datahub import telemetry
 from datahub.api.entities.dataset.dataset import Dataset
 from datahub.ingestion.graph.client import get_default_graph
-from datahub.telemetry import telemetry
 from datahub.upgrade import upgrade
 
 logger = logging.getLogger(__name__)
