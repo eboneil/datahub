@@ -227,6 +227,23 @@ fragment nonRecursiveDatasetFields on Dataset {
         }
         externalUrl
     }
+    extendedProperties {
+        extendedProperty {
+            urn
+            type
+            definition {
+                displayName
+            }
+        }
+        value {
+            ... on StringValue {
+                stringValue
+            }
+            ... on FloatValue {
+                floatValue
+            }
+        }
+    }
     editableProperties {
         description
     }

@@ -891,6 +891,11 @@ enum EntityType {
     A Role from an organisation
     """
     ROLE
+
+    """"
+    An extended property on entities
+    """
+    EXTENDED_PROPERTY
 }
 
 """
@@ -11171,6 +11176,50 @@ input UpdateOwnershipTypeInput {
     description: String
 }
 
+"""
+An extended property that can be shared between different entities
+"""
+type ExtendedPropertyEntity implements Entity {
+    """
+    A primary key associated with the Query
+    """
+    urn: String!
+
+    """
+    A standard Entity Type
+    """
+    type: EntityType!
+
+    """
+    Definition of this extended property including its name
+    """
+    definition: ExtendedPropertyDefinition!
+
+    """
+    Granular API for querying edges extending from this entity
+    """
+    relationships(input: RelationshipsInput!): EntityRelationshipsResult
+}
+
+"""
+Properties about an individual Query
+"""
+type ExtendedPropertyDefinition {
+    """
+    The display name of this extended property. This is the "key" of the property.
+    """
+    displayName: String!
+}
+
+type StringValue {
+    stringValue: String!
+}
+
+type FloatValue {
+    floatValue: Float!
+}
+
+union PropertyValue = StringValue | FloatValue
 
 """
 An entry in an extended properties list represented as a tuple
@@ -11179,11 +11228,10 @@ type ExtendedPropertiesEntry {
     """
     The key of the map entry
     """
-    key: String!
+    extendedProperty: ExtendedPropertyEntity!
 
     """
-    The value of the map entry
+    The value of the extended property for this entity
     """
-    value: String
-
+    value: PropertyValue!
 }

@@ -73,6 +73,7 @@ public class Constants {
   public static final String QUERY_ENTITY_NAME = "query";
   public static final String DATA_PRODUCT_ENTITY_NAME = "dataProduct";
   public static final String OWNERSHIP_TYPE_ENTITY_NAME = "ownershipType";
+  public static final String EXTENDED_PROPERTY_ENTITY_NAME = "extendedProperty";
 
   /**
    * Aspects
@@ -294,6 +295,9 @@ public class Constants {
   // Ownership Types
   public static final String OWNERSHIP_TYPE_KEY_ASPECT_NAME = "ownershipTypeKey";
   public static final String OWNERSHIP_TYPE_INFO_ASPECT_NAME = "ownershipTypeInfo";
+
+  // Extended Property
+  public static final String EXTENDED_PROPERTY_DEFINITION_ASPECT_NAME = "propertyDefinition";
 
   // Settings
   public static final String GLOBAL_SETTINGS_ENTITY_NAME = "globalSettings";
