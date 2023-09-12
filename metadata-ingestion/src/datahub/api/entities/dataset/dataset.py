@@ -81,12 +81,6 @@ class Dataset(BaseModel):
             return v[len("urn:li:dataPlatform:") :]
         return v
 
-    @staticmethod  # TODO: move to datahub.utilities.urns module
-    def make_logical_entity_urn(entity_type: str) -> str:
-        if not entity_type.startswith("urn:li:logicalEntity:"):
-            return f"urn:li:logicalEntity:{entity_type}"
-        return entity_type
-
     @staticmethod  # TODO: determine if this should be static or not
     def create(file: str) -> None:
         emitter: DataHubGraph

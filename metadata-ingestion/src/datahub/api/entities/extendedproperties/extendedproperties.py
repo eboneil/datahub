@@ -7,7 +7,7 @@ from pydantic import validator
 from datahub.configuration.common import ConfigModel
 from datahub.emitter.mcp import MetadataChangeProposalWrapper
 from datahub.ingestion.graph.client import DataHubGraph, get_default_graph
-from datahub.metadata.schema_classes import ExtendedPropertyDefinitionClass, PropertyValueClass
+from datahub.metadata.schema_classes import ExtendedPropertyDefinitionClass, PropertyCardinalityClass, PropertyValueClass
 from datahub.utilities.urns.urn import Urn
 
 logging.basicConfig(level=logging.INFO)
@@ -41,18 +41,6 @@ class ExtendedProperties(ConfigModel):
             return f"urn:li:extendedProperty:{values['id']}"
         return v
 
-    @staticmethod  # TODO: move to datahub.utilities.urns module
-    def make_logical_type_urn(type: str) -> str:
-        if not type.startswith("urn:li:logicalType:"):
-            return f"urn:li:logicalType:{type}"
-        return type
-
-    @staticmethod  # TODO: move to datahub.utilities.urns module
-    def make_logical_entity_urn(entity_type: str) -> str:
-        if not entity_type.startswith("urn:li:logicalEntity:"):
-            return f"urn:li:logicalEntity:{entity_type}"
-        return entity_type
-
     @staticmethod
     def create(file: str) -> None:
         emitter: DataHubGraph
@@ -65,13 +53,13 @@ class ExtendedProperties(ConfigModel):
                         entityUrn=extendedproperty.urn,
                         aspect=ExtendedPropertyDefinitionClass(
                             fullyQualifiedName=extendedproperty.fqn,
-                            valueType=ExtendedProperties.make_logical_type_urn(
+                            valueType=Urn.make_logical_type_urn(
                                 extendedproperty.type
                             ),
                             displayName=extendedproperty.display_name,
-                            # description=extendedproperty.description,
+                            description=extendedproperty.description,
                             entityTypes=[
-                                ExtendedProperties.make_logical_entity_urn(entity_type)
+                                Urn.make_logical_entity_urn(entity_type)
                                 for entity_type in extendedproperty.entity_types or []
                             ],
                             cardinality=extendedproperty.cardinality,

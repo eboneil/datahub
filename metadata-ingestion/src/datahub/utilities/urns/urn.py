@@ -165,3 +165,15 @@ class Urn:
             if isinstance(other, Urn)
             else False
         )
+    
+    @staticmethod
+    def make_logical_type_urn(type: str) -> str:
+        if not type.startswith("urn:li:logicalType:"):
+            return f"urn:li:logicalType:{type}"
+        return type
+    
+    @staticmethod
+    def make_logical_entity_urn(entity_type: str) -> str:
+        if not entity_type.startswith("urn:li:logicalEntity:"):
+            return f"urn:li:logicalEntity:{entity_type}"
+        return entity_type
